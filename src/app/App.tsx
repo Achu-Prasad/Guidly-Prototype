@@ -1,0 +1,1052 @@
+import React, { useState, useMemo, useRef, useEffect } from "react";
+import { motion, AnimatePresence } from "motion/react";
+import {
+  CaretDown,
+  Calendar as CalendarIcon,
+  CaretLeft,
+  Check,
+  Translate,
+  CircleNotch as Loader2,
+  Lock
+} from "@phosphor-icons/react";
+import {
+  format,
+  addDays,
+  startOfToday,
+  isSameDay,
+} from "date-fns";
+import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
+import * as Popover from "@radix-ui/react-popover";
+import { DayPicker } from "react-day-picker";
+import { toast, Toaster } from "sonner";
+import "react-day-picker/dist/style.css";
+
+import { HomeScreen } from "./components/HomeScreen";
+import { SearchResults } from "./components/SearchResults";
+import { ConfirmationModal } from "./components/ConfirmationModal";
+import { PaymentScreen } from "./components/PaymentScreen";
+import { MentorProfile } from "./components/MentorProfile";
+import { BookingSuccess } from "./components/BookingSuccess";
+import { Bookings } from "./components/Bookings";
+import { TeamUp } from "./components/TeamUp";
+import { ChatList } from "./components/ChatList";
+import { ChatDetail } from "./components/ChatDetail";
+import { AccountScreen } from "./components/AccountScreen";
+import { NotificationScreen } from "./components/NotificationScreen";
+import { MENTORS } from "./data/mentors";
+import { Mentor } from "./types/mentor";
+import { TeamUpEvent } from "./types/team";
+import { Chat, Message } from "./types/chat";
+// @ts-ignore - Vite handles PNG imports at runtime
+import imgStolenLogo from "../assets/Stolen logo.png";
+
+// --- Mock Data ---
+const LANGUAGES = ["English", "Spanish", "French", "German", "Chinese", "Hindi", "Japanese", "Portuguese"];
+
+const SERVICES = [
+  { id: "interview-prep", name: "Interview prep.", duration: 45, price: "Free", cost: 0 },
+  { id: "career-guidance", name: "Career guidance", duration: 60, price: "20$", cost: 20 },
+  { id: "mock-interview", name: "Mock Interview", duration: 45, price: "50 $", cost: 50 },
+  { id: "portfolio-review", name: "Portfolio Review", duration: 30, price: "Free", cost: 0 },
+  { id: "project-review", name: "Project Review", duration: 60, price: "30 $", cost: 30 },
+];
+
+const LONG_TERM_PACKAGES = [
+  { id: "lt-6", name: "6 Sessions", sessions: 6, price: "80$", cost: 80 },
+  { id: "lt-12", name: "12 Sessions", sessions: 12, price: "140$", cost: 140 },
+  { id: "lt-24", name: "24 Sessions", sessions: 24, price: "240$", cost: 240 },
+];
+
+const TIME_SLOTS = [
+  "10:00 AM", "11:00 AM", "1:00 PM", "2:00 PM", "3:00 PM", "4:00 PM"
+];
+
+// --- Sub-Components ---
+
+const LanguageSelector = ({ selected, onSelect }: { selected: string, onSelect: (val: string) => void }) => (
+  <div className="content-stretch flex flex-col gap-[16px] items-start relative shrink-0 w-full">
+    <div className="content-stretch flex items-center relative shrink-0 w-full">
+      <p className="font-['Bricolage_Grotesque:Medium',sans-serif] font-medium leading-[20px] opacity-90 relative shrink-0 text-[#272d2c] text-[14px] w-[256px] whitespace-pre-wrap" style={{ fontVariationSettings: "'opsz' 14, 'wdth' 100" }}>
+        Choose the language you're most comfortable with.
+      </p>
+    </div>
+    <DropdownMenu.Root>
+      <DropdownMenu.Trigger asChild>
+        <button className="h-[50px] relative rounded-[4px] shrink-0 w-full border border-[rgba(63,69,68,0.25)] flex items-center justify-between px-[16px] py-[8px] bg-white cursor-pointer hover:bg-gray-50 transition-colors">
+          <span className="font-['Figtree:Regular',sans-serif] font-normal leading-[20px] text-[#3f4544] text-[14px]">{selected}</span>
+          <CaretDown size={16} className="text-[#3f4544] opacity-50" />
+        </button>
+      </DropdownMenu.Trigger>
+      <DropdownMenu.Portal>
+        <DropdownMenu.Content className="min-w-[200px] bg-white rounded-md p-1 shadow-lg border border-gray-100 z-50" sideOffset={5}>
+          {LANGUAGES.map((lang) => (
+            <DropdownMenu.Item
+              key={lang}
+              onSelect={() => onSelect(lang)}
+              className="group text-[14px] leading-none text-[#3f4544] rounded-[3px] flex items-center h-[32px] px-2 relative select-none outline-none hover:bg-[#2d5a4c] hover:text-white cursor-pointer"
+            >
+              {lang}
+              {selected === lang && <Check className="ml-auto h-4 w-4" />}
+            </DropdownMenu.Item>
+          ))}
+        </DropdownMenu.Content>
+      </DropdownMenu.Portal>
+    </DropdownMenu.Root>
+  </div>
+);
+
+const SessionTypeToggle = ({ type, setType }: { type: 'single' | 'long', setType: (t: 'single' | 'long') => void }) => (
+  <div className="content-stretch flex flex-col gap-[16px] items-start relative shrink-0 w-full">
+    <p className="font-['Bricolage_Grotesque:Medium',sans-serif] font-medium leading-[20px] opacity-90 relative shrink-0 text-[#272d2c] text-[14px] w-full whitespace-pre-wrap" style={{ fontVariationSettings: "'opsz' 14, 'wdth' 100" }}>
+      Session type
+    </p>
+    <div className="bg-[#f3f3f3] h-[54px] relative rounded-[12px] shrink-0 w-full p-[4px] flex">
+      <div className="relative flex w-full h-full">
+        <motion.div
+          className="absolute top-0 bottom-0 bg-white rounded-[8px] shadow-[0px_1px_2px_rgba(0,0,0,0.05)] border border-[rgba(63,69,68,0.15)]"
+          initial={false}
+          animate={{ x: type === 'single' ? 0 : '100%' }}
+          transition={{ type: "spring", stiffness: 300, damping: 30 }}
+          style={{ width: '50%' }}
+        />
+
+        <button
+          onClick={() => setType('single')}
+          className={`z-10 flex-[1] h-full flex items-center justify-center font-['Figtree:Medium',sans-serif] text-[14px] transition-colors duration-200 ${type === 'single' ? 'text-[#1b362e]' : 'text-[#3f4544] opacity-80'}`}
+        >
+          Single Session
+        </button>
+        <button
+          onClick={() => setType('long')}
+          className={`z-10 flex-[1] h-full flex items-center justify-center font-['Figtree:Medium',sans-serif] text-[14px] transition-colors duration-200 ${type === 'long' ? 'text-[#1b362e]' : 'text-[#3f4544] opacity-80'}`}
+        >
+          Long-Term
+        </button>
+      </div>
+    </div>
+
+    {/* Description points */}
+    <div className="flex flex-col gap-[6px] w-full">
+      <p className="font-['Figtree',sans-serif] text-[13px] leading-[18px]">
+        <span className="font-semibold text-[#272d2c]">Long-term Sessions:</span>{' '}
+        <span className="text-[#3f4544] opacity-70">For buying a mentorship package</span>
+      </p>
+    </div>
+
+    {/* Info card — only when Long-Term is selected */}
+    <AnimatePresence>
+      {type === 'long' && (
+        <motion.div
+          initial={{ opacity: 0, height: 0 }}
+          animate={{ opacity: 1, height: 'auto' }}
+          exit={{ opacity: 0, height: 0 }}
+          transition={{ duration: 0.25 }}
+          className="w-full overflow-hidden"
+        >
+          <div className="bg-[#f1f5f4] border border-[#2d5a4c]/10 rounded-[12px] p-[14px] flex gap-[10px] items-start">
+            <div className="w-[20px] h-[20px] rounded-full bg-[#2d5a4c]/15 flex items-center justify-center shrink-0 mt-0.5">
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M6 1C3.24 1 1 3.24 1 6C1 8.76 3.24 11 6 11C8.76 11 11 8.76 11 6C11 3.24 8.76 1 6 1ZM6.5 8.5H5.5V5.5H6.5V8.5ZM6.5 4.5H5.5V3.5H6.5V4.5Z" fill="#2d5a4c" /></svg>
+            </div>
+            <p className="font-['Figtree',sans-serif] text-[12px] leading-[18px] text-[#3f4544]">
+              In long-term sessions, your mentor will create a personalised roadmap with clear milestones. You'll discuss and agree on goals together before starting, ensuring every session adds real value to your growth.
+            </p>
+          </div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  </div>
+);
+
+const ServiceSelection = ({ services, selectedServices, toggleService, sessionType, longTermPackages }: { services: any[], selectedServices: string[], toggleService: (id: string) => void, sessionType?: 'single' | 'long', longTermPackages?: any[] }) => {
+  const totalMinutes = useMemo(() => {
+    return selectedServices.reduce((acc, id) => {
+      const service = services.find(s => s.id === id);
+      return acc + (service?.duration || 0);
+    }, 0);
+  }, [selectedServices, services]);
+
+  const maxMinutes = 120;
+  const isExceeded = totalMinutes > maxMinutes;
+  const progressPercentage = Math.min((totalMinutes / maxMinutes) * 100, 100);
+
+  // Long-term mode
+  if (sessionType === 'long' && longTermPackages) {
+    return (
+      <div className="content-stretch flex flex-col gap-[16px] items-start relative shrink-0 w-full">
+        <p className="font-['Bricolage_Grotesque:Medium',sans-serif] font-medium leading-[20px] opacity-90 relative shrink-0 text-[#272d2c] text-[14px] w-full whitespace-pre-wrap" style={{ fontVariationSettings: "'opsz' 14, 'wdth' 100" }}>
+          Choose your package
+        </p>
+
+        <div className="grid grid-cols-1 gap-[8px] w-full">
+          {longTermPackages.map((pkg: any) => {
+            const isSelected = selectedServices.includes(pkg.id);
+            return (
+              <button
+                key={pkg.id}
+                onClick={() => toggleService(pkg.id)}
+                className={`relative rounded-[8px] shrink-0 w-full border-[1.5px] transition-all duration-200 ${isSelected ? 'bg-[#f8f7f3] border-[#2d5a4c]' : 'bg-[#f3f3f3] border-transparent'}`}
+              >
+                <div className="content-stretch flex items-center justify-between p-[16px] relative w-full">
+                  <div className="content-stretch flex gap-[8px] items-center relative shrink-0">
+                    <p className="font-['Figtree:Medium',sans-serif] font-medium leading-[20px] text-[#272d2c] text-[14px]">
+                      {pkg.name}
+                    </p>
+                  </div>
+                  <p className={`font-['Figtree:Regular',sans-serif] font-normal leading-[16px] text-[14px] ${isSelected ? 'font-semibold text-[#272d2c]' : 'opacity-50 text-[#3f4544]'}`}>
+                    {pkg.price}
+                  </p>
+                </div>
+              </button>
+            );
+          })}
+        </div>
+
+
+      </div>
+    );
+  }
+
+  // Single session mode (original)
+  return (
+    <div className="content-stretch flex flex-col gap-[16px] items-start relative shrink-0 w-full">
+      <p className="font-['Bricolage_Grotesque:Medium',sans-serif] font-medium leading-[20px] opacity-90 relative shrink-0 text-[#272d2c] text-[14px] w-full whitespace-pre-wrap" style={{ fontVariationSettings: "'opsz' 14, 'wdth' 100" }}>
+        Select Service you need.
+      </p>
+
+      <div className="content-stretch flex flex-col gap-[24px] items-start relative shrink-0 w-full">
+        <div className="bg-white relative rounded-[12px] shrink-0 w-full border border-[rgba(63,69,68,0.1)] p-[16px]">
+          <div className="content-stretch flex flex-col gap-[10px] items-start relative w-full">
+            <div className="content-stretch flex items-center justify-between leading-[20px] relative shrink-0 text-[#272d2c] text-[14px] text-justify w-full">
+              <p className="font-['Figtree:Medium',sans-serif] font-medium">Session Capacity</p>
+              <p className={`font-['Figtree:Semi_Bold',sans-serif] font-semibold ${isExceeded ? 'text-red-500' : ''}`}>
+                {(totalMinutes / 60).toFixed(1)} / 2 Hours used
+              </p>
+            </div>
+
+            <div className="h-[10px] relative shrink-0 w-full bg-[#f3f3f3] rounded-[200px] overflow-hidden">
+              <motion.div
+                className={`h-full rounded-[200px] ${isExceeded ? 'bg-[#ff9999]' : 'bg-[#2d5a4c]'}`}
+                initial={{ width: 0 }}
+                animate={{ width: `${progressPercentage}%` }}
+                transition={{ type: "spring", stiffness: 100, damping: 20 }}
+              />
+            </div>
+            {isExceeded && (
+              <motion.p initial={{ opacity: 0, y: -5 }} animate={{ opacity: 1, y: 0 }} className="text-red-500 font-['Figtree:Semi_Bold',sans-serif] text-[12px] font-semibold">
+                you exceeded the limit
+              </motion.p>
+            )}
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 gap-[8px] w-full">
+          {services.map((service) => {
+            const isSelected = selectedServices.includes(service.id);
+            return (
+              <button
+                key={service.id}
+                onClick={() => toggleService(service.id)}
+                className={`relative rounded-[8px] shrink-0 w-full border-[1.5px] transition-all duration-200 ${isSelected ? 'bg-[#f8f7f3] border-[#2d5a4c]' : 'bg-[#f3f3f3] border-transparent'}`}
+              >
+                <div className="content-stretch flex items-center justify-between p-[16px] relative w-full">
+                  <div className="content-stretch flex gap-[8px] items-center relative shrink-0">
+                    <p className="font-['Figtree:Medium',sans-serif] font-medium leading-[20px] text-[#272d2c] text-[14px]">
+                      {service.name}
+                    </p>
+                    <div className={`${isSelected ? 'bg-[#2d5a4c] text-white' : 'bg-white text-[#1b362e]'} flex items-center justify-center px-[8px] py-[4px] relative rounded-[64px] shrink-0 transition-colors`}>
+                      <p className="font-['Figtree:Medium',sans-serif] font-medium leading-[14px] text-[10px]">{service.duration} Min</p>
+                    </div>
+                  </div>
+                  <p className={`font-['Figtree:Regular',sans-serif] font-normal leading-[16px] text-[14px] ${isSelected ? 'font-semibold text-[#272d2c]' : 'opacity-50 text-[#3f4544]'}`}>
+                    {service.price}
+                  </p>
+                </div>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const DateTimeSection = ({ selectedDate, onDateChange, selectedTime, onTimeChange, sessionType }: {
+  selectedDate: Date,
+  onDateChange: (d: Date) => void,
+  selectedTime: string | null,
+  onTimeChange: (t: string) => void,
+  sessionType?: 'single' | 'long'
+}) => {
+  const dates = useMemo(() => Array.from({ length: 14 }, (_, i) => addDays(startOfToday(), i)), []);
+
+  const availableTimes = useMemo(() => {
+    const day = selectedDate.getDate();
+    if (day % 3 === 0) return TIME_SLOTS.slice(0, 3);
+    if (day % 2 === 0) return TIME_SLOTS.slice(2, 5);
+    return TIME_SLOTS;
+  }, [selectedDate]);
+
+  return (
+    <div className="content-stretch flex flex-col gap-[20px] items-start relative shrink-0 w-full">
+      <div className="content-stretch flex flex-col gap-[16px] items-start relative shrink-0 w-full">
+        <div className="flex items-center justify-between w-full">
+          <p className="font-['Bricolage_Grotesque:Medium',sans-serif] font-medium leading-[20px] opacity-90 text-[#272d2c] text-[14px]">
+            {sessionType === 'long' ? 'Date & Time to start' : 'Date & Time'}
+          </p>
+          <Popover.Root>
+            <Popover.Trigger asChild>
+              <button className="font-['Figtree:Medium',sans-serif] font-medium text-[#2d5a4c] text-[12px] flex items-center gap-1">Change Date</button>
+            </Popover.Trigger>
+            <Popover.Portal>
+              <Popover.Content className="bg-white p-4 rounded-[24px] shadow-[0px_20px_50px_rgba(0,0,0,0.1)] border border-gray-100 z-50" sideOffset={5} align="end">
+                <DayPicker
+                  mode="single"
+                  selected={selectedDate}
+                  onSelect={(d) => d && onDateChange(d)}
+                  disabled={{ before: new Date() }}
+                  classNames={{
+                    months: "flex flex-col space-y-4",
+                    month: "space-y-4",
+                    caption: "flex justify-center pt-1 relative items-center",
+                    caption_label: "text-[16px] font-['Bricolage_Grotesque',sans-serif] font-medium text-[#272d2c]",
+                    nav: "space-x-1 flex items-center",
+                    nav_button: "h-8 w-8 bg-transparent p-0 opacity-50 hover:opacity-100 transition-opacity flex items-center justify-center rounded-lg border border-gray-100",
+                    nav_button_previous: "absolute left-1",
+                    nav_button_next: "absolute right-1",
+                    table: "w-full border-collapse space-y-1",
+                    head_row: "flex",
+                    head_cell: "text-[#3f4544] opacity-40 rounded-md w-9 font-normal text-[11px] font-['Figtree',sans-serif] uppercase tracking-wider",
+                    row: "flex w-full mt-2",
+                    cell: "text-center text-sm p-0 relative focus-within:relative focus-within:z-20",
+                    day: "h-9 w-9 p-0 font-normal aria-selected:opacity-100 hover:bg-[#2d5a4c]/10 rounded-full transition-all duration-200 font-['Figtree',sans-serif] text-[#272d2c] flex items-center justify-center",
+                    day_selected: "bg-[#2d5a4c]! text-white! hover:bg-[#2d5a4c]! hover:text-white! focus:bg-[#2d5a4c]! focus:text-white! rounded-full shadow-lg shadow-[#2d5a4c]/20",
+                    day_today: "bg-[#f3f3f3] text-[#2d5a4c] font-bold",
+                    day_disabled: "text-[#3f4544] opacity-20 cursor-not-allowed",
+                    day_outside: "text-[#3f4544] opacity-10",
+                    day_hidden: "invisible",
+                  }}
+                />
+              </Popover.Content>
+            </Popover.Portal>
+          </Popover.Root>
+        </div>
+
+        <div className="flex gap-[12px] overflow-x-auto pb-4 no-scrollbar w-full">
+          {dates.map((date) => {
+            const isSelected = isSameDay(date, selectedDate);
+            return (
+              <button
+                key={date.toISOString()}
+                onClick={() => onDateChange(date)}
+                className={`flex flex-col items-center justify-center min-w-[56px] h-[64px] rounded-[8px] transition-all duration-300 shrink-0 my-2 ${isSelected ? 'bg-[#2d5a4c] text-white shadow-[0px_8px_20px_rgba(0,0,0,0.15)] scale-110 z-10' : 'bg-white text-[#3f4544] border border-gray-100'}`}
+              >
+                <p className={`text-[12px] font-medium leading-[16px] ${isSelected ? 'opacity-70' : 'opacity-70'}`}>{format(date, 'EEE').toUpperCase()}</p>
+                <p className="text-[16px] font-medium leading-[24px]">{format(date, 'd')}</p>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      <div className="grid grid-cols-3 gap-[8px] w-full">
+        {availableTimes.map((time) => {
+          const isSelected = selectedTime === time;
+          return (
+            <button key={time} onClick={() => onTimeChange(time)} className={`flex items-center justify-center p-[8px] rounded-[4px] transition-colors w-full ${isSelected ? 'bg-[#2d5a4c] text-white' : 'bg-[#f3f3f3] text-[#3f4544]'}`}>
+              <p className="font-['Figtree:Regular',sans-serif] font-normal leading-[20px] text-[14px]">{time}</p>
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+};
+
+// --- Chat Initial Data ---
+const INITIAL_CHATS: Chat[] = [
+  {
+    id: 1,
+    name: "Charles",
+    message: "That's great! Portfolio is key. I'll quickly search for some resources I have on that.",
+    time: "10:06 AM",
+    unread: 2,
+    status: 'read',
+    image: "https://i.pravatar.cc/150?u=charles",
+    type: 'mentor'
+  },
+  {
+    id: 2,
+    name: "Achu Prasad",
+    message: "Do you need help ?",
+    time: "09:52 AM",
+    unread: 0,
+    status: 'sent',
+    image: "https://i.pravatar.cc/150?u=achu",
+    type: 'mentor'
+  },
+  {
+    id: 3,
+    name: "Stolen & Friends",
+    message: "That would be awesome! Thanks!",
+    time: "09:36 AM",
+    unread: 0,
+    status: 'sent',
+    image: imgStolenLogo,
+    type: 'community',
+    isGroup: true
+  }
+];
+
+const INITIAL_MESSAGES: Record<string | number, Message[]> = {
+  1: [
+    { id: 1, text: "Hi! Welcome to Guidly coaching.", sender: 'other', time: "10:00 AM" },
+    { id: 2, text: "How can I help you today with your career goals?", sender: 'other', time: "10:01 AM" },
+    { id: 3, text: "I'm looking for some advice on UI/UX portfolio structure.", sender: 'me', time: "10:05 AM" },
+    { id: 4, text: "That's great! Portfolio is key. I'll quickly search for some resources I have on that.", sender: 'other', time: "10:06 AM" },
+    { id: 5, text: "Otherwise, you can type \"session\" to book a live 1:1 with me.", sender: 'other', time: "10:06 AM" },
+  ],
+  3: [
+    { id: 1, text: "Hey everyone! How can we actually start a research before designing something?", sender: 'other', senderName: "Achu Prasad", senderImage: "https://i.pravatar.cc/150?u=achu", time: "09:26 AM" },
+    { id: 2, text: "I usually start with competitive analysis.", sender: 'other', senderName: "Charles", senderImage: "https://i.pravatar.cc/150?u=charles", time: "09:28 AM" },
+    { id: 3, text: "Have you guys checked out the Nielsen Norman Group resources?", sender: 'other', senderName: "Esther Howard", senderImage: "https://i.pravatar.cc/150?u=esther", time: "09:30 AM" },
+    { id: 4, text: "I'm working on a template for that! I'll share it here once it's done.", sender: 'me', time: "09:35 AM" },
+    { id: 5, text: "That would be awesome! Thanks!", sender: 'other', senderName: "Stolen", senderImage: "https://i.pravatar.cc/150?u=stolen", time: "09:36 AM" },
+  ]
+};
+
+// --- Booking Types ---
+interface BookingEntry {
+  id: string;
+  title: string;
+  subtitle: string;
+  date: string;
+  time: string;
+  duration: string;
+  type: 'session' | 'event';
+  status?: 'join' | 'upcoming';
+}
+
+const INITIAL_BOOKINGS: BookingEntry[] = [
+  {
+    id: '1',
+    title: 'Mentoring Session',
+    subtitle: 'Interview prep & mock interview',
+    date: '02/06/2025',
+    time: '08:00 PM (IST)',
+    duration: '2 Hr',
+    type: 'session',
+    status: 'join'
+  },
+  {
+    id: '2',
+    title: 'FIGWAR 3.0',
+    subtitle: 'By Stolen and Friends',
+    date: '04/06/2025',
+    time: '08:00 PM (IST)',
+    duration: '2 Hr',
+    type: 'event'
+  },
+  {
+    id: '3',
+    title: 'Mentoring Session',
+    subtitle: 'Interview prep & mock interview',
+    date: '06/06/2025',
+    time: '10:00 PM (IST)',
+    duration: '2 Hr',
+    type: 'session'
+  }
+];
+
+// --- Main App ---
+
+export default function App() {
+  const [currentView, setCurrentView] = useState<'home' | 'search-results' | 'profile' | 'booking' | 'payment' | 'booking-success' | 'teamup' | 'bookings' | 'chat' | 'chat-detail' | 'account' | 'notifications'>('home');
+  const [selectedChatUser, setSelectedChatUser] = useState<{ id: string | number, name: string, image: string, isGroup?: boolean } | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedMentor, setSelectedMentor] = useState<Mentor | null>(null);
+  const [mentorProfileInitialTab, setMentorProfileInitialTab] = useState('Overview');
+  const [previousView, setPreviousView] = useState<string>('home');
+  const [chatReturnView, setChatReturnView] = useState<'chat' | 'profile'>('chat');
+
+  const [recentMentors, setRecentMentors] = useState<Mentor[]>([]);
+  const [favouriteMentors, setFavouriteMentors] = useState<Mentor[]>([]);
+
+  // Chat state
+  const [chats, setChats] = useState<Chat[]>(INITIAL_CHATS);
+  const [messagesPerChat, setMessagesPerChat] = useState<Record<string | number, Message[]>>(INITIAL_MESSAGES);
+
+  // Bookings state
+  const [bookings, setBookings] = useState<BookingEntry[]>(INITIAL_BOOKINGS);
+
+  // Compute unread chat indicator
+  const hasUnreadChats = useMemo(() => chats.some(c => c.unread > 0), [chats]);
+
+  const handleSendMessage = (userId: string | number, text: string) => {
+    const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    const newMessage: Message = {
+      id: Date.now(),
+      text,
+      sender: 'me',
+      time
+    };
+
+    setMessagesPerChat(prev => ({
+      ...prev,
+      [userId]: [...(prev[userId] || []), newMessage]
+    }));
+
+    setChats(prev => prev.map(chat => {
+      if (chat.id === userId) {
+        return {
+          ...chat,
+          message: text,
+          time,
+          status: 'sent' as const,
+          unread: 0
+        };
+      }
+      return chat;
+    }));
+  };
+
+  const handleOpenChat = (user: { id: string | number, name: string, image: string, isGroup?: boolean }) => {
+    // Check if chat exists, if not create a placeholder
+    const chatExists = chats.find(c => c.id === user.id);
+    if (!chatExists) {
+      const newChat: Chat = {
+        id: user.id,
+        name: user.name,
+        image: user.image,
+        message: "Start a conversation...",
+        time: "Now",
+        unread: 0,
+        status: 'read',
+        type: user.isGroup ? 'community' : 'mentor',
+        isGroup: user.isGroup
+      };
+      setChats(prev => [newChat, ...prev]);
+    } else {
+      // Mark as read
+      setChats(prev => prev.map(c => c.id === user.id ? { ...c, unread: 0, status: 'read' as const } : c));
+    }
+
+    setSelectedChatUser(user);
+    setCurrentView('chat-detail');
+  };
+
+  const toggleFavourite = (mentor: Mentor) => {
+    setFavouriteMentors(prev => {
+      const exists = prev.find(m => m.id === mentor.id);
+      if (exists) {
+        toast.success(`Removed ${mentor.name} from favourites`);
+        return prev.filter(m => m.id !== mentor.id);
+      } else {
+        toast.success(`Added ${mentor.name} to favourites!`);
+        return [...prev, mentor];
+      }
+    });
+  };
+
+  // Booking flow states
+  const [language, setLanguage] = useState("English");
+  const [sessionType, setSessionType] = useState<'single' | 'long'>('single');
+  const [selectedServices, setSelectedServices] = useState<string[]>(["career-guidance"]);
+  const [selectedDate, setSelectedDate] = useState<Date>(addDays(startOfToday(), 2));
+  const [selectedTime, setSelectedTime] = useState<string | null>("11:00 AM");
+  const [description, setDescription] = useState("");
+  const [showConfirmation, setShowConfirmation] = useState(false);
+  const [lastBookingId, setLastBookingId] = useState("");
+  const [bookingType, setBookingType] = useState<'mentorship' | 'event'>('mentorship');
+  const [selectedEventBooking, setSelectedEventBooking] = useState<TeamUpEvent | null>(null);
+  const [bookingsInitialTab, setBookingsInitialTab] = useState('All');
+  const [isBookingProcessing, setIsBookingProcessing] = useState(false);
+
+  const handleSetSessionType = (type: 'single' | 'long') => {
+    setSessionType(type);
+    setSelectedServices([]); // Clear selections when switching type
+  };
+
+  const toggleService = (id: string) => {
+    if (sessionType === 'long') {
+      // Single-select for long-term packages
+      setSelectedServices(prev => prev.includes(id) ? [] : [id]);
+    } else {
+      setSelectedServices(prev => prev.includes(id) ? prev.filter(s => s !== id) : [...prev, id]);
+    }
+  };
+
+  const currentServices = useMemo(() => {
+    if (selectedMentor) {
+      return selectedMentor.services.map(s => ({
+        id: s.id,
+        name: s.title,
+        duration: parseInt(s.duration),
+        price: s.price,
+        cost: s.cost
+      }));
+    }
+    return SERVICES;
+  }, [selectedMentor]);
+
+  const totalMinutes = useMemo(() => selectedServices.reduce((acc, id) => acc + (currentServices.find(s => s.id === id)?.duration || 0), 0), [selectedServices, currentServices]);
+  const totalPrice = useMemo(() => {
+    if (sessionType === 'long') {
+      return selectedServices.reduce((acc, id) => acc + (LONG_TERM_PACKAGES.find(p => p.id === id)?.cost || 0), 0);
+    }
+    return selectedServices.reduce((acc, id) => acc + (currentServices.find(s => s.id === id)?.cost || 0), 0);
+  }, [selectedServices, currentServices, sessionType]);
+  const selectedServiceObjects = useMemo(() => selectedServices.map(id => currentServices.find(s => s.id === id)!).filter(Boolean), [selectedServices, currentServices]);
+
+
+  const handleBookEvent = async (event: TeamUpEvent) => {
+    setSelectedEventBooking(event);
+    setBookingType('event');
+    if (event.ticket_price === 0) {
+      setIsBookingProcessing(true);
+      // Give some visual feedback for free events too
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      setIsBookingProcessing(false);
+      handlePaymentSuccess('free', 'evt-' + Math.random().toString(36).substr(2, 9));
+    } else {
+      setCurrentView('payment');
+    }
+  };
+
+  const handleGoToPayment = () => {
+    setBookingType('mentorship');
+    setShowConfirmation(false);
+    setCurrentView('payment');
+  };
+
+  const handlePaymentSuccess = (method: string, bookingId: string) => {
+    setLastBookingId(bookingId);
+
+    // Build a new booking entry from current booking flow data
+    const dateStr = bookingType === 'event' && selectedEventBooking
+      ? format(new Date(selectedEventBooking.start_time), 'dd/MM/yyyy')
+      : `${String(selectedDate.getDate()).padStart(2, '0')}/${String(selectedDate.getMonth() + 1).padStart(2, '0')}/${selectedDate.getFullYear()}`;
+
+    let newBooking: BookingEntry;
+
+    if (bookingType === 'event' && selectedEventBooking) {
+      newBooking = {
+        id: bookingId,
+        title: selectedEventBooking.title,
+        subtitle: `Hosted by ${selectedEventBooking.host_name}`,
+        date: dateStr,
+        time: format(new Date(selectedEventBooking.start_time), 'hh:mm a'),
+        duration: '1 Hr', // Simplified duration logic for events
+        type: 'event',
+        status: 'upcoming'
+      };
+    } else if (sessionType === 'long') {
+      const selectedPkg = LONG_TERM_PACKAGES.find(p => selectedServices.includes(p.id));
+      newBooking = {
+        id: bookingId,
+        title: selectedMentor ? `Long-Term with ${selectedMentor.name}` : 'Long-Term Mentoring',
+        subtitle: selectedPkg ? selectedPkg.name : 'Long-term package',
+        date: dateStr,
+        time: selectedTime ? `${selectedTime} (IST)` : 'TBD',
+        duration: selectedPkg ? `${selectedPkg.sessions} Sessions` : '',
+        type: 'session',
+        status: 'upcoming'
+      };
+    } else {
+      const serviceNames = selectedServiceObjects.map(s => s.name).join(', ');
+      const durationHrs = totalMinutes >= 60 ? `${(totalMinutes / 60).toFixed(totalMinutes % 60 === 0 ? 0 : 1)} Hr` : `${totalMinutes} Min`;
+      newBooking = {
+        id: bookingId,
+        title: selectedMentor ? `Session with ${selectedMentor.name}` : 'Mentoring Session',
+        subtitle: serviceNames || 'General session',
+        date: dateStr,
+        time: selectedTime ? `${selectedTime} (IST)` : 'TBD',
+        duration: durationHrs,
+        type: 'session',
+        status: 'upcoming'
+      };
+    }
+
+    setBookings(prev => [newBooking, ...prev]);
+
+    setCurrentView('booking-success');
+    toast.success(`Booking successful!`);
+  };
+
+  const handleNavigate = (view: any) => {
+    setPreviousView(currentView);
+    setCurrentView(view);
+  };
+
+  if (currentView === 'home') {
+    return (
+      <div className="bg-[#fafafa] h-screen flex items-center justify-center p-4 overflow-hidden">
+        <div className="w-[360px] h-full max-h-[800px] bg-white relative overflow-hidden flex flex-col shadow-2xl rounded-[32px] border border-gray-100">
+          <HomeScreen
+            onSearch={(query) => {
+              setSearchQuery(query);
+              setCurrentView('search-results');
+            }}
+            onSelectMentor={(mentor) => {
+              const m = mentor as Mentor;
+              setSelectedMentor(m);
+              setRecentMentors(prev => {
+                const filtered = prev.filter(rm => rm.id !== m.id);
+                return [m, ...filtered].slice(0, 10);
+              });
+              setSelectedServices(m.services.length > 0 ? [m.services[0].id] : []);
+              setMentorProfileInitialTab('Overview');
+              setPreviousView('home');
+              setCurrentView('profile');
+            }}
+            onNavigate={handleNavigate}
+            recentMentors={recentMentors}
+            favouriteMentors={favouriteMentors}
+            hasUnreadChats={hasUnreadChats}
+          />
+        </div>
+        <Toaster position="top-center" />
+      </div>
+    );
+  }
+
+  if (currentView === 'teamup') {
+    return (
+      <div className="bg-[#fafafa] h-screen flex items-center justify-center p-4 overflow-hidden">
+        <div className="w-[360px] h-full max-h-[800px] bg-white relative overflow-hidden flex flex-col shadow-2xl rounded-[32px] border border-gray-100">
+          <TeamUp onNavigate={handleNavigate} hasUnreadChats={hasUnreadChats} onBookEvent={handleBookEvent} />
+
+          <AnimatePresence>
+            {isBookingProcessing && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="absolute inset-0 z-[100] flex flex-col items-center justify-center bg-white/90 backdrop-blur-md"
+              >
+                <div className="relative">
+                  <motion.div
+                    animate={{ rotate: 360 }}
+                    transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                    className="w-16 h-16 border-4 border-[#2d5a4c]/10 border-t-[#2d5a4c] rounded-full"
+                  />
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="w-8 h-8 bg-[#2d5a4c] rounded-full animate-pulse flex items-center justify-center">
+                      <Check size={14} className="text-white" weight="bold" />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="mt-8 text-center px-6">
+                  <h3 className="font-['Bricolage_Grotesque:Semi_Bold',sans-serif] text-[20px] text-[#272d2c] mb-2 uppercase tracking-widest">
+                    Booking Event
+                  </h3>
+                  <p className="font-['Figtree:Medium',sans-serif] text-[14px] text-[#3f4544] opacity-60">
+                    Reserving your spot...
+                  </p>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+        <Toaster position="top-center" />
+      </div>
+    );
+  }
+
+  if (currentView === 'bookings') {
+    return (
+      <div className="bg-[#fafafa] h-screen flex items-center justify-center p-4 overflow-hidden">
+        <div className="w-[360px] h-full max-h-[800px] bg-white relative overflow-hidden flex flex-col shadow-2xl rounded-[32px] border border-gray-100">
+          <Bookings onNavigate={handleNavigate} bookings={bookings} hasUnreadChats={hasUnreadChats} initialTab={bookingsInitialTab} />
+        </div>
+        <Toaster position="top-center" />
+      </div>
+    );
+  }
+
+  if (currentView === 'account') {
+    return (
+      <div className="bg-[#fafafa] h-screen flex items-center justify-center p-4 overflow-hidden">
+        <div className="w-[360px] h-full max-h-[800px] bg-white relative overflow-hidden flex flex-col shadow-2xl rounded-[32px] border border-gray-100">
+          <AccountScreen
+            onNavigate={handleNavigate}
+            hasUnreadChats={hasUnreadChats}
+          />
+        </div>
+        <Toaster position="top-center" />
+      </div>
+    );
+  }
+
+  if (currentView === 'chat') {
+    return (
+      <div className="bg-[#fafafa] h-screen flex items-center justify-center p-4 overflow-hidden">
+        <div className="w-[360px] h-full max-h-[800px] bg-white relative overflow-hidden flex flex-col shadow-2xl rounded-[32px] border border-gray-100">
+          <ChatList
+            onNavigate={handleNavigate}
+            onSelectChat={(user) => {
+              setChatReturnView('chat');
+              handleOpenChat(user);
+            }}
+            chats={chats}
+            hasUnreadChats={hasUnreadChats}
+          />
+        </div>
+        <Toaster position="top-center" />
+      </div>
+    );
+  }
+
+  if (currentView === 'chat-detail' && selectedChatUser) {
+    return (
+      <div className="bg-[#fafafa] h-screen flex items-center justify-center p-4 overflow-hidden">
+        <div className="w-[360px] h-full max-h-[800px] bg-white relative overflow-hidden flex flex-col shadow-2xl rounded-[32px] border border-gray-100">
+          <ChatDetail
+            user={selectedChatUser}
+            onBack={() => setCurrentView(chatReturnView)}
+            onMessageSent={handleSendMessage}
+            initialMessages={messagesPerChat[selectedChatUser.id] || []}
+          />
+        </div>
+        <Toaster position="top-center" />
+      </div>
+    );
+  }
+
+  if (currentView === 'profile' && selectedMentor) {
+    return (
+      <div className="bg-[#fafafa] h-screen flex items-center justify-center p-4 overflow-hidden">
+        <div className="w-[360px] h-full max-h-[800px] bg-white relative overflow-hidden flex flex-col shadow-2xl rounded-[32px] border border-gray-100">
+          <MentorProfile
+            mentor={selectedMentor}
+            onBack={() => setCurrentView(previousView as any)}
+            onBook={() => setCurrentView('booking')}
+            onChat={(mentor) => {
+              setChatReturnView('profile');
+              handleOpenChat({
+                id: mentor.id,
+                name: mentor.name,
+                image: mentor.image
+              });
+            }}
+            initialTab={mentorProfileInitialTab}
+            onToggleFavourite={toggleFavourite}
+            isFavourite={!!favouriteMentors.find(m => m.id === selectedMentor?.id)}
+          />
+        </div>
+        <Toaster position="top-center" />
+      </div>
+    );
+  }
+
+  if (currentView === 'search-results') {
+    return (
+      <div className="bg-[#fafafa] h-screen flex items-center justify-center p-4 overflow-hidden">
+        <div className="w-[360px] h-full max-h-[800px] bg-white relative overflow-hidden flex flex-col shadow-2xl rounded-[32px] border border-gray-100">
+          <SearchResults
+            query={searchQuery}
+            onBack={() => setCurrentView('home')}
+            onSelectMentor={(mentor) => {
+              const m = mentor as Mentor;
+              setSelectedMentor(m);
+              setRecentMentors(prev => {
+                const filtered = prev.filter(rm => rm.id !== m.id);
+                return [m, ...filtered].slice(0, 10);
+              });
+              setSelectedServices(m.services.length > 0 ? [m.services[0].id] : []);
+              setMentorProfileInitialTab('Overview');
+              setPreviousView('search-results');
+              setCurrentView('profile');
+            }}
+            onNavigate={handleNavigate}
+            hasUnreadChats={hasUnreadChats}
+          />
+        </div>
+        <Toaster position="top-center" />
+      </div>
+    );
+  }
+
+
+  if (currentView === 'notifications') {
+    return (
+      <div className="bg-[#fafafa] h-screen flex items-center justify-center p-4 overflow-hidden">
+        <div className="w-[360px] h-full max-h-[800px] bg-white relative overflow-hidden flex flex-col shadow-2xl rounded-[32px] border border-gray-100">
+          <NotificationScreen
+            onClose={() => setCurrentView('home')}
+            onNavigateToBooking={(id) => {
+              setCurrentView('bookings');
+              // Maybe scroll to booking?
+            }}
+          />
+        </div>
+        <Toaster position="top-center" />
+      </div>
+    );
+  }
+
+  if (currentView === 'booking') {
+    return (
+      <div className="bg-[#fafafa] h-screen flex items-center justify-center p-4 overflow-hidden">
+        <div className="w-[360px] h-full max-h-[800px] bg-white relative overflow-hidden flex flex-col shadow-2xl rounded-[32px] border border-gray-100">
+
+          {/* Header/Nav */}
+          <div className="sticky top-0 bg-white/80 backdrop-blur-md z-30 px-6 pt-[36px] pb-4 flex items-center justify-between">
+            <button
+              onClick={() => setCurrentView('home')}
+              className="p-2 -ml-2 hover:bg-gray-100 rounded-full transition-colors"
+            >
+              <CaretLeft className="text-[#0F1615]" size={24} weight="bold" />
+            </button>
+            <div className="flex gap-[12px] items-center">
+              <div className={`rounded-[200px] size-[8px] transition-all ${!showConfirmation ? 'bg-[#2d5a4c]' : 'bg-[#e7e8e8]'}`} />
+              <div className={`rounded-[200px] h-[8px] transition-all ${showConfirmation ? 'bg-[#2d5a4c] w-[34px]' : 'bg-[#e7e8e8] w-[8px]'}`} />
+              <div className="bg-[#e7e8e8] h-[8px] rounded-[200px] size-[8px]" />
+            </div>
+          </div>
+
+          {/* Mentor Profile Summary (Optional addition for context) */}
+          {selectedMentor && (
+            null
+          )}
+
+          {/* Scrollable Content */}
+          <div className="flex-1 overflow-y-auto px-6 pb-[100px] pt-4 space-y-12 no-scrollbar">
+            <LanguageSelector selected={language} onSelect={setLanguage} />
+            <SessionTypeToggle type={sessionType} setType={handleSetSessionType} />
+            <ServiceSelection services={currentServices} selectedServices={selectedServices} toggleService={toggleService} sessionType={sessionType} longTermPackages={LONG_TERM_PACKAGES} />
+            <DateTimeSection selectedDate={selectedDate} onDateChange={setSelectedDate} selectedTime={selectedTime} onTimeChange={setSelectedTime} sessionType={sessionType} />
+
+            <div className="space-y-4">
+              <p className="font-['Bricolage_Grotesque:Medium',sans-serif] font-medium leading-[20px] opacity-90 text-[#272d2c] text-[14px]">Short description</p>
+              <textarea
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                placeholder="As a mentee seeking guidance..."
+                className="w-full h-[120px] p-4 bg-[#f8f9f8] rounded-[12px] text-[14px] outline-none border border-transparent focus:border-[#2d5a4c]/20 resize-none transition-all"
+              />
+            </div>
+          </div>
+
+          {/* Footer Button */}
+          <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-white via-white to-transparent pt-8">
+            <motion.button
+              whileTap={{ scale: 0.98 }}
+              onClick={() => setShowConfirmation(true)}
+              className="w-full h-[56px] bg-[#2d5a4c] flex items-center justify-center rounded-[16px] text-white font-semibold text-[16px] shadow-lg font-[Figtree] relative z-[99]"
+            >
+              Continue for Confirmation
+            </motion.button>
+          </div>
+
+          <AnimatePresence>
+            {showConfirmation && (
+              <ConfirmationModal
+                isOpen={showConfirmation}
+                onClose={() => setShowConfirmation(false)}
+                onConfirm={handleGoToPayment}
+                data={{
+                  mentorName: selectedMentor?.name,
+                  mentorImage: selectedMentor?.image,
+                  language,
+                  services: selectedServiceObjects,
+                  sessionType,
+                  date: selectedDate,
+                  time: selectedTime,
+                  totalDuration: totalMinutes,
+                  totalPrice: totalPrice
+                }}
+              />
+            )}
+          </AnimatePresence>
+        </div>
+        <Toaster position="top-center" />
+
+        <style>{`
+          .no-scrollbar::-webkit-scrollbar { display: none; }
+          .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        `}</style>
+      </div>
+    );
+  }
+
+  if (currentView === 'payment') {
+    const amountToPay = bookingType === 'event' && selectedEventBooking
+      ? selectedEventBooking.ticket_price
+      : totalPrice;
+
+    return (
+      <div className="bg-[#fafafa] h-screen flex items-center justify-center p-4 overflow-hidden">
+        <div className="w-[360px] h-full max-h-[800px] bg-white relative overflow-hidden flex flex-col shadow-2xl rounded-[32px] border border-gray-100">
+          <PaymentScreen
+            amount={amountToPay}
+            onBack={() => {
+              if (bookingType === 'event') {
+                setCurrentView('teamup');
+              } else {
+                setCurrentView('booking');
+              }
+            }}
+            onSuccess={handlePaymentSuccess}
+            bookingDetails={bookingType === 'event' && selectedEventBooking ? {
+              scheduled_time: new Date(selectedEventBooking.start_time),
+              duration_min: 60,
+              service_snapshot: { name: selectedEventBooking.title, type: 'Event' },
+              user_notes: ''
+            } : {
+              scheduled_time: selectedDate, // Note: selectedDate is Date object
+              duration_min: totalMinutes,
+              service_snapshot: selectedServiceObjects,
+              user_notes: description
+            }}
+          />
+        </div>
+        <Toaster position="top-center" />
+      </div>
+    );
+  }
+
+  if (currentView === 'booking-success') {
+    const lastBooking = bookings.find(b => b.id === lastBookingId) || bookings[0];
+
+    const successData = {
+      mentorName: lastBooking?.subtitle?.replace('Hosted by ', '') || 'Host',
+      language: 'English',
+      services: [lastBooking?.title || 'Event'],
+      sessionType: lastBooking?.type === 'event' ? 'Event' : 'Mentorship',
+      dateTime: new Date(),
+      duration: lastBooking?.duration || '1 Hr',
+      transactionId: lastBookingId || '123456'
+    };
+
+    return (
+      <div className="bg-[#fafafa] h-screen flex items-center justify-center p-4 overflow-hidden">
+        <div className="w-[360px] h-full max-h-[800px] bg-white relative overflow-hidden flex flex-col shadow-2xl rounded-[32px] border border-gray-100">
+          <BookingSuccess
+            onClose={() => {
+              setBookingsInitialTab(bookingType === 'event' ? 'Events' : 'All');
+              setCurrentView('bookings');
+            }}
+            onGoToGuidelines={() => {
+              setBookingsInitialTab(bookingType === 'event' ? 'Events' : 'All');
+              setCurrentView('bookings');
+            }}
+            bookingData={successData}
+          />
+        </div>
+        <Toaster position="top-center" />
+      </div>
+    );
+  }
+
+  return (
+    <div className="bg-[#fafafa] min-h-screen flex items-center justify-center p-4">
+      <div className="w-[360px] h-[800px] bg-white relative overflow-hidden flex flex-col shadow-2xl rounded-[32px] border border-gray-100">
+        <div className="flex-1 flex items-center justify-center p-8 text-center">
+          <p className="text-[#3f4544]">Screen under construction</p>
+          <button onClick={() => setCurrentView('home')} className="mt-4 text-[#2d5a4c] font-medium underline">Go Home</button>
+        </div>
+      </div>
+    </div>
+  );
+}
