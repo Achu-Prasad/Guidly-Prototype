@@ -23,7 +23,9 @@ import {
   Ticket,
   ArrowRight,
   X,
-  Heart
+  Heart,
+  CircleNotch,
+  Check
 } from "@phosphor-icons/react";
 import { Logo } from './Logo';
 import { ImageWithFallback } from './figma/ImageWithFallback';
@@ -70,14 +72,40 @@ interface TeamUpProps {
   onSelectCommunity?: (community: Community) => void;
   bookedEventTitles?: string[];
   unreadNotificationsCount?: number;
+  communityStatuses?: Record<string, 'none' | 'requesting' | 'joined'>;
+  onJoinRequest?: (community: Community) => void;
 }
 
-export const TeamUp = ({ onNavigate, hasUnreadChats, onBookEvent, onSelectCommunity, bookedEventTitles = [], unreadNotificationsCount = 0 }: TeamUpProps) => {
+export const TeamUp = ({
+  onNavigate,
+  hasUnreadChats,
+  onBookEvent,
+  onSelectCommunity,
+  bookedEventTitles = [],
+  unreadNotificationsCount = 0,
+  communityStatuses = {},
+  onJoinRequest
+}: TeamUpProps) => {
   const [activeTab, setActiveTab] = useState('Communities');
   const [searchQuery, setSearchQuery] = useState('');
   const [bookmarkedEvents, setBookmarkedEvents] = useState<string[]>([]);
   const [selectedEvent, setSelectedEvent] = useState<TeamUpEvent | null>(null);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [joiningIds, setJoiningIds] = useState<string[]>([]);
+
+  const handleJoinClick = (e: React.MouseEvent, community: Community) => {
+    e.stopPropagation();
+    const status = communityStatuses[community.id] || 'none';
+    if (status !== 'none' || joiningIds.includes(community.id)) return;
+
+    setJoiningIds(prev => [...prev, community.id]);
+    onJoinRequest?.(community);
+
+    // Remove from joiningIds after visual animation (1.5s)
+    setTimeout(() => {
+      setJoiningIds(prev => prev.filter(id => id !== community.id));
+    }, 1500);
+  };
 
   const handleEventClick = (event: TeamUpEvent) => {
     setSelectedEvent(event);
@@ -202,8 +230,39 @@ export const TeamUp = ({ onNavigate, hasUnreadChats, onBookEvent, onSelectCommun
                     <button className="text-[12px] font-medium text-[#3f4544] opacity-70">
                       View page
                     </button>
-                    <button className="bg-[#2D5A4C] text-white px-4 py-2 rounded-[64px] text-[14px] font-medium">
-                      Request to Join
+                    <button
+                      onClick={(e) => handleJoinClick(e, community)}
+                      disabled={communityStatuses[community.id] === 'joined' || joiningIds.includes(community.id)}
+                      className={`px-4 py-2 rounded-[64px] text-[14px] font-medium transition-all flex items-center gap-2 ${communityStatuses[community.id] === 'joined'
+                        ? 'bg-[#575C5B] text-white opacity-60 cursor-not-allowed'
+                        : (communityStatuses[community.id] === 'requesting' || joiningIds.includes(community.id))
+                          ? 'bg-[#2D5A4C] text-white'
+                          : 'bg-[#2D5A4C] text-white hover:bg-[#1F4439]'
+                        }`}
+                    >
+                      {joiningIds.includes(community.id) ? (
+                        <>
+                          <motion.div
+                            animate={{ rotate: 360 }}
+                            transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                          >
+                            <CircleNotch size={16} weight="bold" />
+                          </motion.div>
+                          <span>Sending...</span>
+                        </>
+                      ) : communityStatuses[community.id] === 'requesting' ? (
+                        <>
+                          <Check size={16} weight="bold" />
+                          <span>Request Sent</span>
+                        </>
+                      ) : communityStatuses[community.id] === 'joined' ? (
+                        <>
+                          <Check size={16} weight="bold" />
+                          <span>Joined</span>
+                        </>
+                      ) : (
+                        "Request to Join"
+                      )}
                     </button>
                   </div>
                 </div>
@@ -389,6 +448,48 @@ export const TeamUp = ({ onNavigate, hasUnreadChats, onBookEvent, onSelectCommun
                 </div>
               );
             })}
+          </div>
+        )}
+        {activeTab === 'Joined' && (
+          <div className="space-y-6">
+            {COMMUNITIES.filter(c => communityStatuses[c.id] === 'joined').length > 0 ? (
+              COMMUNITIES.filter(c => communityStatuses[c.id] === 'joined').map((community) => (
+                <motion.div
+                  key={community.id}
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  onClick={() => onSelectCommunity?.(community)}
+                  className="bg-white rounded-[16px] overflow-hidden shadow-[0px_4px_9px_0px_rgba(0,0,0,0.08)] border border-[rgba(63,69,68,0.1)] cursor-pointer"
+                >
+                  <div className="p-4 flex gap-4 items-center">
+                    <div className="size-[64px] rounded-[12px] overflow-hidden bg-[#f3f3f3] shrink-0">
+                      <ImageWithFallback src={community.logo} alt="" className="w-full h-full object-cover" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between mb-1">
+                        <h3 className="text-[16px] font-bold text-[#1b362e] truncate">{community.name}</h3>
+                        <div className="bg-[#e8f0ed] px-2 py-0.5 rounded-full flex items-center gap-1">
+                          <Check size={10} weight="bold" className="text-[#2d5a4c]" />
+                          <span className="text-[10px] font-bold text-[#2d5a4c] uppercase">Member</span>
+                        </div>
+                      </div>
+                      <p className="text-[13px] text-[#3f4544] opacity-60 line-clamp-1">{community.description}</p>
+                    </div>
+                    <CaretRight size={20} className="text-[#3f4544] opacity-30" />
+                  </div>
+                </motion.div>
+              ))
+            ) : (
+              <div className="flex flex-col items-center justify-center py-20 text-center px-6">
+                <div className="size-16 rounded-full bg-[#f1f5f4] flex items-center justify-center mb-4">
+                  <Users size={32} weight="thin" className="text-[#2d5a4c] opacity-40" />
+                </div>
+                <h3 className="text-[16px] font-['Bricolage_Grotesque'] font-semibold text-[#272d2c] mb-1">No joined communities</h3>
+                <p className="text-[13px] font-['Figtree'] text-[#3f4544] opacity-60 leading-relaxed">
+                  Join communities to connect with other designers and share your work.
+                </p>
+              </div>
+            )}
           </div>
         )}
       </div>

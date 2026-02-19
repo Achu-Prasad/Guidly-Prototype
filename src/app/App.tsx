@@ -389,56 +389,8 @@ const DateTimeSection = ({ selectedDate, onDateChange, selectedTime, onTimeChang
 };
 
 // --- Chat Initial Data ---
-const INITIAL_CHATS: Chat[] = [
-  {
-    id: 1,
-    name: "Charles",
-    message: "That's great! Portfolio is key. I'll quickly search for some resources I have on that.",
-    time: "10:06 AM",
-    unread: 2,
-    status: 'read',
-    image: "https://i.pravatar.cc/150?u=charles",
-    type: 'mentor'
-  },
-  {
-    id: 2,
-    name: "Achu Prasad",
-    message: "Do you need help ?",
-    time: "09:52 AM",
-    unread: 0,
-    status: 'sent',
-    image: "https://i.pravatar.cc/150?u=achu",
-    type: 'mentor'
-  },
-  {
-    id: 3,
-    name: "Stolen & Friends",
-    message: "That would be awesome! Thanks!",
-    time: "09:36 AM",
-    unread: 0,
-    status: 'sent',
-    image: imgStolenLogo,
-    type: 'community',
-    isGroup: true
-  }
-];
-
-const INITIAL_MESSAGES: Record<string | number, Message[]> = {
-  1: [
-    { id: 1, text: "Hi! Welcome to Guidly coaching.", sender: 'other', time: "10:00 AM" },
-    { id: 2, text: "How can I help you today with your career goals?", sender: 'other', time: "10:01 AM" },
-    { id: 3, text: "I'm looking for some advice on UI/UX portfolio structure.", sender: 'me', time: "10:05 AM" },
-    { id: 4, text: "That's great! Portfolio is key. I'll quickly search for some resources I have on that.", sender: 'other', time: "10:06 AM" },
-    { id: 5, text: "Otherwise, you can type \"session\" to book a live 1:1 with me.", sender: 'other', time: "10:06 AM" },
-  ],
-  3: [
-    { id: 1, text: "Hey everyone! How can we actually start a research before designing something?", sender: 'other', senderName: "Achu Prasad", senderImage: "https://i.pravatar.cc/150?u=achu", time: "09:26 AM" },
-    { id: 2, text: "I usually start with competitive analysis.", sender: 'other', senderName: "Charles", senderImage: "https://i.pravatar.cc/150?u=charles", time: "09:28 AM" },
-    { id: 3, text: "Have you guys checked out the Nielsen Norman Group resources?", sender: 'other', senderName: "Esther Howard", senderImage: "https://i.pravatar.cc/150?u=esther", time: "09:30 AM" },
-    { id: 4, text: "I'm working on a template for that! I'll share it here once it's done.", sender: 'me', time: "09:35 AM" },
-    { id: 5, text: "That would be awesome! Thanks!", sender: 'other', senderName: "Stolen", senderImage: "https://i.pravatar.cc/150?u=stolen", time: "09:36 AM" },
-  ]
-};
+const INITIAL_CHATS: Chat[] = [];
+const INITIAL_MESSAGES: Record<string | number, Message[]> = {};
 
 // --- Booking Types ---
 interface BookingEntry {
@@ -453,37 +405,7 @@ interface BookingEntry {
   mentorId?: string | number;
 }
 
-const INITIAL_BOOKINGS: BookingEntry[] = [
-  {
-    id: '1',
-    title: 'Mentoring Session',
-    subtitle: 'Interview prep & mock interview',
-    date: '02/06/2025',
-    time: '08:00 PM (IST)',
-    duration: '2 Hr',
-    type: 'session',
-    status: 'join',
-    mentorId: '1'
-  },
-  {
-    id: '2',
-    title: 'FIGWAR 3.0',
-    subtitle: 'By Stolen and Friends',
-    date: '04/06/2025',
-    time: '08:00 PM (IST)',
-    duration: '2 Hr',
-    type: 'event'
-  },
-  {
-    id: '3',
-    title: 'Mentoring Session',
-    subtitle: 'Interview prep & mock interview',
-    date: '06/06/2025',
-    time: '10:00 PM (IST)',
-    duration: '2 Hr',
-    type: 'session'
-  }
-];
+const INITIAL_BOOKINGS: BookingEntry[] = [];
 
 // --- Main App ---
 
@@ -505,6 +427,21 @@ export default function App() {
 
   const handleJoinCommunity = (community: Community) => {
     toast.success(`You've joined ${community.name}!`);
+    const chatExists = chats.find(c => c.id === community.id);
+    if (!chatExists) {
+      const newChat: Chat = {
+        id: community.id,
+        name: community.name,
+        image: community.logo,
+        message: "You joined this community",
+        time: "Now",
+        unread: 0,
+        status: 'read',
+        type: 'community',
+        isGroup: true
+      };
+      setChats(prev => [newChat, ...prev]);
+    }
   };
 
   const [recentMentors, setRecentMentors] = useState<Mentor[]>([]);
@@ -513,6 +450,88 @@ export default function App() {
   // Chat state
   const [chats, setChats] = useState<Chat[]>(INITIAL_CHATS);
   const [messagesPerChat, setMessagesPerChat] = useState<Record<string | number, Message[]>>(INITIAL_MESSAGES);
+
+  // Community Join Status: 'none' | 'requesting' | 'joined'
+  const [communityStatuses, setCommunityStatuses] = useState<Record<string, 'none' | 'requesting' | 'joined'>>({});
+
+  const simulateLiveCommunityChat = (community: Community) => {
+    const senderAvatars: Record<string, string> = {
+      "Sarah Chen": "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&h=150&fit=crop",
+      "Marcus": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop",
+      "Elena R.": "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop",
+      "Devin": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop"
+    };
+
+    const trendMessages = [
+      { sender: "Sarah Chen", text: "Hey everyone! Just saw the new Figma AI features 🚀. What do we think?", delay: 3000 },
+      { sender: "Marcus", text: "They look promising! Especially the auto-layout improvements.", delay: 8000 },
+      { sender: "Elena R.", text: "Anyone else struggling with variable spacing in Tailwind? 😅", delay: 15000 },
+      { sender: "Devin", text: "Check out this new design system documentation style: [link]", delay: 25000 },
+      { sender: "Sarah Chen", text: "Minimalism is making a huge comeback this year, have you noticed?", delay: 40000 }
+    ];
+
+    trendMessages.forEach((msg, index) => {
+      setTimeout(() => {
+        const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        const newMessage: Message = {
+          id: Date.now() + index,
+          text: msg.text,
+          sender: 'other',
+          senderName: msg.sender,
+          senderImage: senderAvatars[msg.sender],
+          time
+        };
+
+        setMessagesPerChat(prev => ({
+          ...prev,
+          [community.id]: [...(prev[community.id] || []), newMessage]
+        }));
+
+        setChats(prev => prev.map(chat => {
+          if (chat.id === community.id) {
+            return {
+              ...chat,
+              message: msg.text,
+              time,
+              unread: (chat.unread || 0) + 1,
+              status: 'received'
+            };
+          }
+          return chat;
+        }));
+      }, msg.delay);
+    });
+  };
+
+  const handleJoinCommunityRequest = (community: Community) => {
+    if (communityStatuses[community.id] === 'requesting' || communityStatuses[community.id] === 'joined') return;
+
+    // 1. Set status to requesting
+    setCommunityStatuses(prev => ({ ...prev, [community.id]: 'requesting' }));
+
+    // 2. Simulate acceptance after 1 minute (for demo sake, let's keep it 1 min as requested)
+    setTimeout(() => {
+      setCommunityStatuses(prev => ({ ...prev, [community.id]: 'joined' }));
+
+      // Add notification
+      const newNotification: Notification = {
+        id: `joined-${community.id}-${Date.now()}`,
+        recipient_id: 'me',
+        title: "Join Request Accepted!",
+        message: `You are now a member of ${community.name}. Welcome aboard!`,
+        is_read: false,
+        type: "system",
+        created_at: new Date().toISOString()
+      };
+      setNotifications(prev => [newNotification, ...prev]);
+
+      // Add community chat
+      handleJoinCommunity(community);
+
+      // Start live chat simulation
+      setTimeout(() => simulateLiveCommunityChat(community), 5000);
+    }, 60000);
+  };
 
   // Bookings state
   const [bookings, setBookings] = useState<BookingEntry[]>(INITIAL_BOOKINGS);
@@ -775,7 +794,7 @@ export default function App() {
   if (currentView === 'home') {
     return (
       <div className="bg-[#fafafa] h-screen flex items-center justify-center p-4 overflow-hidden">
-        <div className="w-[360px] h-full max-h-[800px] bg-white relative overflow-hidden flex flex-col shadow-2xl rounded-[32px] border border-gray-100">
+        <div className="w-[360px] h-full max-h-[800px] bg-[#f8f7f3] relative overflow-hidden flex flex-col shadow-2xl rounded-[32px] border border-gray-100">
           <HomeScreen
             onSearch={(query) => {
               setSearchQuery(query);
@@ -808,7 +827,7 @@ export default function App() {
   if (currentView === 'teamup') {
     return (
       <div className="bg-[#fafafa] h-screen flex items-center justify-center p-4 overflow-hidden">
-        <div className="w-[360px] h-full max-h-[800px] bg-white relative overflow-hidden flex flex-col shadow-2xl rounded-[32px] border border-gray-100">
+        <div className="w-[360px] h-full max-h-[800px] bg-[#f8f7f3] relative overflow-hidden flex flex-col shadow-2xl rounded-[32px] border border-gray-100">
           <TeamUp
             onNavigate={handleNavigate}
             hasUnreadChats={hasUnreadChats}
@@ -816,6 +835,8 @@ export default function App() {
             onSelectCommunity={handleSelectCommunity}
             bookedEventTitles={bookings.filter(b => b.type === 'event').map(b => b.title)}
             unreadNotificationsCount={unreadNotificationsCount}
+            communityStatuses={communityStatuses}
+            onJoinRequest={handleJoinCommunityRequest}
           />
 
           <AnimatePresence>
@@ -884,7 +905,7 @@ export default function App() {
   if (currentView === 'bookings') {
     return (
       <div className="bg-[#fafafa] h-screen flex items-center justify-center p-4 overflow-hidden">
-        <div className="w-[360px] h-full max-h-[800px] bg-white relative overflow-hidden flex flex-col shadow-2xl rounded-[32px] border border-gray-100">
+        <div className="w-[360px] h-full max-h-[800px] bg-[#f8f7f3] relative overflow-hidden flex flex-col shadow-2xl rounded-[32px] border border-gray-100">
           <Bookings onNavigate={handleNavigate} bookings={bookings} hasUnreadChats={hasUnreadChats} initialTab={bookingsInitialTab} unreadNotificationsCount={unreadNotificationsCount} />
         </div>
         <Toaster position="top-center" />
@@ -895,7 +916,7 @@ export default function App() {
   if (currentView === 'account') {
     return (
       <div className="bg-[#fafafa] h-screen flex items-center justify-center p-4 overflow-hidden">
-        <div className="w-[360px] h-full max-h-[800px] bg-white relative overflow-hidden flex flex-col shadow-2xl rounded-[32px] border border-gray-100">
+        <div className="w-[360px] h-full max-h-[800px] bg-[#f8f7f3] relative overflow-hidden flex flex-col shadow-2xl rounded-[32px] border border-gray-100">
           <AccountScreen
             onNavigate={handleNavigate}
             hasUnreadChats={hasUnreadChats}
@@ -910,7 +931,7 @@ export default function App() {
   if (currentView === 'chat') {
     return (
       <div className="bg-[#fafafa] h-screen flex items-center justify-center p-4 overflow-hidden">
-        <div className="w-[360px] h-full max-h-[800px] bg-white relative overflow-hidden flex flex-col shadow-2xl rounded-[32px] border border-gray-100">
+        <div className="w-[360px] h-full max-h-[800px] bg-[#f8f7f3] relative overflow-hidden flex flex-col shadow-2xl rounded-[32px] border border-gray-100">
           <ChatList
             onNavigate={handleNavigate}
             onSelectChat={(user) => {
@@ -930,7 +951,7 @@ export default function App() {
   if (currentView === 'chat-detail' && selectedChatUser) {
     return (
       <div className="bg-[#fafafa] h-screen flex items-center justify-center p-4 overflow-hidden">
-        <div className="w-[360px] h-full max-h-[800px] bg-white relative overflow-hidden flex flex-col shadow-2xl rounded-[32px] border border-gray-100">
+        <div className="w-[360px] h-full max-h-[800px] bg-[#f8f7f3] relative overflow-hidden flex flex-col shadow-2xl rounded-[32px] border border-gray-100">
           <ChatDetail
             user={selectedChatUser}
             onBack={() => setCurrentView(chatReturnView)}
@@ -946,11 +967,13 @@ export default function App() {
   if (currentView === 'community-profile' && selectedCommunity) {
     return (
       <div className="bg-[#fafafa] h-screen flex items-center justify-center p-4 overflow-hidden">
-        <div className="w-[360px] h-full max-h-[800px] bg-white relative overflow-hidden flex flex-col shadow-2xl rounded-[32px] border border-gray-100">
+        <div className="w-[360px] h-full max-h-[800px] bg-[#f8f7f3] relative overflow-hidden flex flex-col shadow-2xl rounded-[32px] border border-gray-100">
           <CommunityProfile
             community={selectedCommunity}
             onBack={() => setCurrentView('teamup')}
             onJoin={handleJoinCommunity}
+            onJoinRequest={() => handleJoinCommunityRequest(selectedCommunity)}
+            status={communityStatuses[selectedCommunity.id] || 'none'}
             onBookEvent={handleBookEvent}
             bookedEventTitles={bookings.filter(b => b.type === 'event').map(b => b.title)}
           />
@@ -1020,7 +1043,7 @@ export default function App() {
   if (currentView === 'profile' && selectedMentor) {
     return (
       <div className="bg-[#fafafa] h-screen flex items-center justify-center p-4 overflow-hidden">
-        <div className="w-[360px] h-full max-h-[800px] bg-white relative overflow-hidden flex flex-col shadow-2xl rounded-[32px] border border-gray-100">
+        <div className="w-[360px] h-full max-h-[800px] bg-[#f8f7f3] relative overflow-hidden flex flex-col shadow-2xl rounded-[32px] border border-gray-100">
           <MentorProfile
             mentor={selectedMentor}
             onBack={() => setCurrentView(previousView as any)}
@@ -1046,7 +1069,7 @@ export default function App() {
   if (currentView === 'search-results') {
     return (
       <div className="bg-[#fafafa] h-screen flex items-center justify-center p-4 overflow-hidden">
-        <div className="w-[360px] h-full max-h-[800px] bg-white relative overflow-hidden flex flex-col shadow-2xl rounded-[32px] border border-gray-100">
+        <div className="w-[360px] h-full max-h-[800px] bg-[#f8f7f3] relative overflow-hidden flex flex-col shadow-2xl rounded-[32px] border border-gray-100">
           <SearchResults
             query={searchQuery}
             onBack={() => setCurrentView('home')}
@@ -1076,7 +1099,7 @@ export default function App() {
   if (currentView === 'notifications') {
     return (
       <div className="bg-[#fafafa] h-screen flex items-center justify-center p-4 overflow-hidden">
-        <div className="w-[360px] h-full max-h-[800px] bg-white relative overflow-hidden flex flex-col shadow-2xl rounded-[32px] border border-gray-100">
+        <div className="w-[360px] h-full max-h-[800px] bg-[#f8f7f3] relative overflow-hidden flex flex-col shadow-2xl rounded-[32px] border border-gray-100">
           <NotificationScreen
             notifications={notifications}
             onMarkAsRead={handleMarkNotificationRead}
@@ -1097,7 +1120,7 @@ export default function App() {
   if (currentView === 'booking') {
     return (
       <div className="bg-[#fafafa] h-screen flex items-center justify-center p-4 overflow-hidden">
-        <div className="w-[360px] h-full max-h-[800px] bg-white relative overflow-hidden flex flex-col shadow-2xl rounded-[32px] border border-gray-100">
+        <div className="w-[360px] h-full max-h-[800px] bg-[#f8f7f3] relative overflow-hidden flex flex-col shadow-2xl rounded-[32px] border border-gray-100">
 
           {/* Header/Nav */}
           <div className="sticky top-0 bg-white/80 backdrop-blur-md z-30 px-6 pt-[36px] pb-4 flex items-center justify-between">
@@ -1213,7 +1236,7 @@ export default function App() {
 
     return (
       <div className="bg-[#fafafa] h-screen flex items-center justify-center p-4 overflow-hidden">
-        <div className="w-[360px] h-full max-h-[800px] bg-white relative overflow-hidden flex flex-col shadow-2xl rounded-[32px] border border-gray-100">
+        <div className="w-[360px] h-full max-h-[800px] bg-[#f8f7f3] relative overflow-hidden flex flex-col shadow-2xl rounded-[32px] border border-gray-100">
           <PaymentScreen
             amount={amountToPay}
             onBack={() => {
@@ -1261,7 +1284,7 @@ export default function App() {
 
     return (
       <div className="bg-[#fafafa] h-screen flex items-center justify-center p-4 overflow-hidden">
-        <div className="w-[360px] h-full max-h-[800px] bg-white relative overflow-hidden flex flex-col shadow-2xl rounded-[32px] border border-gray-100">
+        <div className="w-[360px] h-full max-h-[800px] bg-[#f8f7f3] relative overflow-hidden flex flex-col shadow-2xl rounded-[32px] border border-gray-100">
           <BookingSuccess
             onClose={() => {
               setBookingsInitialTab(bookingType === 'event' ? 'Events' : 'Sessions');
