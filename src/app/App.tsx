@@ -37,8 +37,13 @@ import { MENTORS } from "./data/mentors";
 import { Mentor } from "./types/mentor";
 import { TeamUpEvent } from "./types/team";
 import { Chat, Message } from "./types/chat";
+import { Notification } from "./types/notification";
+import { MOCK_NOTIFICATIONS } from "./data/notifications";
 // @ts-ignore - Vite handles PNG imports at runtime
 import imgStolenLogo from "../assets/Stolen logo.png";
+import { CommunityProfile } from "./components/CommunityProfile";
+import { Community } from "./types/team";
+import { AlreadyBookedModal } from "./components/AlreadyBookedModal";
 
 // --- Mock Data ---
 const LANGUAGES = ["English", "Spanish", "French", "German", "Chinese", "Hindi", "Japanese", "Portuguese"];
@@ -270,21 +275,42 @@ const ServiceSelection = ({ services, selectedServices, toggleService, sessionTy
   );
 };
 
-const DateTimeSection = ({ selectedDate, onDateChange, selectedTime, onTimeChange, sessionType }: {
+const DateTimeSection = ({ selectedDate, onDateChange, selectedTime, onTimeChange, sessionType, bookings, mentorId }: {
   selectedDate: Date,
   onDateChange: (d: Date) => void,
   selectedTime: string | null,
   onTimeChange: (t: string) => void,
-  sessionType?: 'single' | 'long'
+  sessionType?: 'single' | 'long',
+  bookings: BookingEntry[],
+  mentorId?: string | number
 }) => {
   const dates = useMemo(() => Array.from({ length: 14 }, (_, i) => addDays(startOfToday(), i)), []);
 
   const availableTimes = useMemo(() => {
     const day = selectedDate.getDate();
-    if (day % 3 === 0) return TIME_SLOTS.slice(0, 3);
-    if (day % 2 === 0) return TIME_SLOTS.slice(2, 5);
-    return TIME_SLOTS;
-  }, [selectedDate]);
+    let baseSlots: string[] = [];
+    if (day % 3 === 0) baseSlots = TIME_SLOTS.slice(0, 3);
+    else if (day % 2 === 0) baseSlots = TIME_SLOTS.slice(2, 5);
+    else baseSlots = TIME_SLOTS;
+
+    // Filter out slots already booked for THIS mentor on THIS date
+    return baseSlots.filter(time => {
+      const isBooked = bookings.some(b =>
+        b.type === 'session' &&
+        b.mentorId === mentorId &&
+        b.date === format(selectedDate, 'dd/MM/yyyy') &&
+        b.time.startsWith(time)
+      );
+      return !isBooked;
+    });
+  }, [selectedDate, bookings, mentorId]);
+
+  // Reset selectedTime if it's no longer available
+  useEffect(() => {
+    if (selectedTime && !availableTimes.includes(selectedTime)) {
+      onTimeChange('');
+    }
+  }, [availableTimes, selectedTime, onTimeChange]);
 
   return (
     <div className="content-stretch flex flex-col gap-[20px] items-start relative shrink-0 w-full">
@@ -424,6 +450,7 @@ interface BookingEntry {
   duration: string;
   type: 'session' | 'event';
   status?: 'join' | 'upcoming';
+  mentorId?: string | number;
 }
 
 const INITIAL_BOOKINGS: BookingEntry[] = [
@@ -435,7 +462,8 @@ const INITIAL_BOOKINGS: BookingEntry[] = [
     time: '08:00 PM (IST)',
     duration: '2 Hr',
     type: 'session',
-    status: 'join'
+    status: 'join',
+    mentorId: '1'
   },
   {
     id: '2',
@@ -460,13 +488,24 @@ const INITIAL_BOOKINGS: BookingEntry[] = [
 // --- Main App ---
 
 export default function App() {
-  const [currentView, setCurrentView] = useState<'home' | 'search-results' | 'profile' | 'booking' | 'payment' | 'booking-success' | 'teamup' | 'bookings' | 'chat' | 'chat-detail' | 'account' | 'notifications'>('home');
+  const [currentView, setCurrentView] = useState<'home' | 'search-results' | 'profile' | 'community-profile' | 'booking' | 'payment' | 'booking-success' | 'teamup' | 'bookings' | 'chat' | 'chat-detail' | 'account' | 'notifications'>('home');
   const [selectedChatUser, setSelectedChatUser] = useState<{ id: string | number, name: string, image: string, isGroup?: boolean } | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedMentor, setSelectedMentor] = useState<Mentor | null>(null);
   const [mentorProfileInitialTab, setMentorProfileInitialTab] = useState('Overview');
   const [previousView, setPreviousView] = useState<string>('home');
   const [chatReturnView, setChatReturnView] = useState<'chat' | 'profile'>('chat');
+
+  const [selectedCommunity, setSelectedCommunity] = useState<Community | null>(null);
+
+  const handleSelectCommunity = (community: Community) => {
+    setSelectedCommunity(community);
+    setCurrentView('community-profile');
+  };
+
+  const handleJoinCommunity = (community: Community) => {
+    toast.success(`You've joined ${community.name}!`);
+  };
 
   const [recentMentors, setRecentMentors] = useState<Mentor[]>([]);
   const [favouriteMentors, setFavouriteMentors] = useState<Mentor[]>([]);
@@ -480,6 +519,26 @@ export default function App() {
 
   // Compute unread chat indicator
   const hasUnreadChats = useMemo(() => chats.some(c => c.unread > 0), [chats]);
+
+  // Notifications state
+  const [notifications, setNotifications] = useState<Notification[]>(MOCK_NOTIFICATIONS);
+
+  const unreadNotificationsCount = useMemo(() =>
+    notifications.filter(n => !n.is_read).length,
+    [notifications]
+  );
+
+  const handleMarkNotificationRead = (id: string) => {
+    setNotifications(prev => prev.map(n => n.id === id ? { ...n, is_read: true } : n));
+  };
+
+  const handleMarkAllNotificationsRead = () => {
+    setNotifications(prev => prev.map(n => ({ ...n, is_read: true })));
+  };
+
+  const handleDeleteAllNotifications = () => {
+    setNotifications([]);
+  };
 
   const handleSendMessage = (userId: string | number, text: string) => {
     const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
@@ -560,10 +619,17 @@ export default function App() {
   const [selectedEventBooking, setSelectedEventBooking] = useState<TeamUpEvent | null>(null);
   const [bookingsInitialTab, setBookingsInitialTab] = useState('All');
   const [isBookingProcessing, setIsBookingProcessing] = useState(false);
+  const [showAlreadyBooked, setShowAlreadyBooked] = useState(false);
 
   const handleSetSessionType = (type: 'single' | 'long') => {
     setSessionType(type);
     setSelectedServices([]); // Clear selections when switching type
+  };
+
+  const handleNavigateToBookings = (tab: string = 'All') => {
+    setShowAlreadyBooked(false);
+    setBookingsInitialTab(tab);
+    setCurrentView('bookings');
   };
 
   const toggleService = (id: string) => {
@@ -601,14 +667,18 @@ export default function App() {
   const handleBookEvent = async (event: TeamUpEvent) => {
     setSelectedEventBooking(event);
     setBookingType('event');
+
     if (event.ticket_price === 0) {
       setIsBookingProcessing(true);
       // Give some visual feedback for free events too
       await new Promise(resolve => setTimeout(resolve, 1500));
       setIsBookingProcessing(false);
-      handlePaymentSuccess('free', 'evt-' + Math.random().toString(36).substr(2, 9));
+      handlePaymentSuccess('free', 'evt-' + Math.random().toString(36).substr(2, 9).toUpperCase(), 'event', event);
     } else {
-      setCurrentView('payment');
+      // For paid events, we'll go to a confirmation state or straight to payment
+      // User said: "every confirmation screen should show the exact data related to where it confirmed from"
+      // So let's show the ConfirmationModal for events too.
+      setShowConfirmation(true);
     }
   };
 
@@ -618,24 +688,27 @@ export default function App() {
     setCurrentView('payment');
   };
 
-  const handlePaymentSuccess = (method: string, bookingId: string) => {
+  const handlePaymentSuccess = (method: string, bookingId: string, typeOverride?: 'mentorship' | 'event', eventOverride?: TeamUpEvent) => {
     setLastBookingId(bookingId);
 
+    const activeBookingType = typeOverride || bookingType;
+    const activeEvent = eventOverride || selectedEventBooking;
+
     // Build a new booking entry from current booking flow data
-    const dateStr = bookingType === 'event' && selectedEventBooking
-      ? format(new Date(selectedEventBooking.start_time), 'dd/MM/yyyy')
+    const dateStr = activeBookingType === 'event' && activeEvent
+      ? format(new Date(activeEvent.start_time), 'dd/MM/yyyy')
       : `${String(selectedDate.getDate()).padStart(2, '0')}/${String(selectedDate.getMonth() + 1).padStart(2, '0')}/${selectedDate.getFullYear()}`;
 
     let newBooking: BookingEntry;
 
-    if (bookingType === 'event' && selectedEventBooking) {
+    if (activeBookingType === 'event' && activeEvent) {
       newBooking = {
         id: bookingId,
-        title: selectedEventBooking.title,
-        subtitle: `Hosted by ${selectedEventBooking.host_name}`,
+        title: activeEvent.title,
+        subtitle: `Hosted by ${activeEvent.host_name}`,
         date: dateStr,
-        time: format(new Date(selectedEventBooking.start_time), 'hh:mm a'),
-        duration: '1 Hr', // Simplified duration logic for events
+        time: format(new Date(activeEvent.start_time), 'hh:mm a'),
+        duration: '1 hour',
         type: 'event',
         status: 'upcoming'
       };
@@ -653,26 +726,48 @@ export default function App() {
       };
     } else {
       const serviceNames = selectedServiceObjects.map(s => s.name).join(', ');
-      const durationHrs = totalMinutes >= 60 ? `${(totalMinutes / 60).toFixed(totalMinutes % 60 === 0 ? 0 : 1)} Hr` : `${totalMinutes} Min`;
+      const durationText = bookingType === 'event' ? '1 hour' : (() => {
+        if (totalMinutes < 60) return `${totalMinutes}m`;
+        const h = Math.floor(totalMinutes / 60);
+        const m = totalMinutes % 60;
+        if (m === 0) return `${h} hour${h > 1 ? 's' : ''}`;
+        return `${h} hour${h > 1 ? 's' : ''} : ${m} minutes`;
+      })();
+
       newBooking = {
         id: bookingId,
         title: selectedMentor ? `Session with ${selectedMentor.name}` : 'Mentoring Session',
         subtitle: serviceNames || 'General session',
         date: dateStr,
-        time: selectedTime ? `${selectedTime} (IST)` : 'TBD',
-        duration: durationHrs,
-        type: 'session',
-        status: 'upcoming'
+        time: selectedTime! + ' (IST)',
+        duration: durationText,
+        type: bookingType === 'mentorship' ? 'session' : 'event',
+        status: 'upcoming',
+        mentorId: bookingType === 'mentorship' ? selectedMentor?.id : undefined
       };
     }
 
     setBookings(prev => [newBooking, ...prev]);
 
+    const newNotification: Notification = {
+      id: crypto.randomUUID(),
+      recipient_id: 'user1',
+      type: 'booking_confirmed',
+      title: 'Booking Confirmed',
+      message: `Your booking "${newBooking.title}" on ${newBooking.date} at ${newBooking.time} is confirmed.`,
+      is_read: false,
+      related_id: newBooking.id,
+      created_at: new Date().toISOString()
+    };
+    setNotifications(prev => [newNotification, ...prev]);
     setCurrentView('booking-success');
     toast.success(`Booking successful!`);
   };
 
   const handleNavigate = (view: any) => {
+    if (view === 'bookings') {
+      setBookingsInitialTab('All');
+    }
     setPreviousView(currentView);
     setCurrentView(view);
   };
@@ -702,6 +797,7 @@ export default function App() {
             recentMentors={recentMentors}
             favouriteMentors={favouriteMentors}
             hasUnreadChats={hasUnreadChats}
+            unreadNotificationsCount={unreadNotificationsCount}
           />
         </div>
         <Toaster position="top-center" />
@@ -713,9 +809,34 @@ export default function App() {
     return (
       <div className="bg-[#fafafa] h-screen flex items-center justify-center p-4 overflow-hidden">
         <div className="w-[360px] h-full max-h-[800px] bg-white relative overflow-hidden flex flex-col shadow-2xl rounded-[32px] border border-gray-100">
-          <TeamUp onNavigate={handleNavigate} hasUnreadChats={hasUnreadChats} onBookEvent={handleBookEvent} />
+          <TeamUp
+            onNavigate={handleNavigate}
+            hasUnreadChats={hasUnreadChats}
+            onBookEvent={handleBookEvent}
+            onSelectCommunity={handleSelectCommunity}
+            bookedEventTitles={bookings.filter(b => b.type === 'event').map(b => b.title)}
+            unreadNotificationsCount={unreadNotificationsCount}
+          />
 
           <AnimatePresence>
+            {showConfirmation && (
+              <ConfirmationModal
+                isOpen={showConfirmation}
+                onClose={() => setShowConfirmation(false)}
+                onConfirm={handleGoToPayment}
+                data={{
+                  title: selectedEventBooking?.title,
+                  mentorName: selectedEventBooking?.host_name,
+                  language: 'English',
+                  services: [],
+                  sessionType: 'event',
+                  date: selectedEventBooking ? new Date(selectedEventBooking.start_time) : new Date(),
+                  time: selectedEventBooking ? format(new Date(selectedEventBooking.start_time), 'hh:mm a') : null,
+                  totalDuration: 60,
+                  totalPrice: selectedEventBooking?.ticket_price || 0
+                }}
+              />
+            )}
             {isBookingProcessing && (
               <motion.div
                 initial={{ opacity: 0 }}
@@ -729,7 +850,7 @@ export default function App() {
                     transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
                     className="w-16 h-16 border-4 border-[#2d5a4c]/10 border-t-[#2d5a4c] rounded-full"
                   />
-                  <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="absolute inset-0 z-[110] flex items-center justify-center p-4">
                     <div className="w-8 h-8 bg-[#2d5a4c] rounded-full animate-pulse flex items-center justify-center">
                       <Check size={14} className="text-white" weight="bold" />
                     </div>
@@ -746,6 +867,13 @@ export default function App() {
                 </div>
               </motion.div>
             )}
+            {showAlreadyBooked && (
+              <AlreadyBookedModal
+                isOpen={showAlreadyBooked}
+                onClose={() => setShowAlreadyBooked(false)}
+                onGoToBookings={() => handleNavigateToBookings('Events')}
+              />
+            )}
           </AnimatePresence>
         </div>
         <Toaster position="top-center" />
@@ -757,7 +885,7 @@ export default function App() {
     return (
       <div className="bg-[#fafafa] h-screen flex items-center justify-center p-4 overflow-hidden">
         <div className="w-[360px] h-full max-h-[800px] bg-white relative overflow-hidden flex flex-col shadow-2xl rounded-[32px] border border-gray-100">
-          <Bookings onNavigate={handleNavigate} bookings={bookings} hasUnreadChats={hasUnreadChats} initialTab={bookingsInitialTab} />
+          <Bookings onNavigate={handleNavigate} bookings={bookings} hasUnreadChats={hasUnreadChats} initialTab={bookingsInitialTab} unreadNotificationsCount={unreadNotificationsCount} />
         </div>
         <Toaster position="top-center" />
       </div>
@@ -771,6 +899,7 @@ export default function App() {
           <AccountScreen
             onNavigate={handleNavigate}
             hasUnreadChats={hasUnreadChats}
+            unreadNotificationsCount={unreadNotificationsCount}
           />
         </div>
         <Toaster position="top-center" />
@@ -790,6 +919,7 @@ export default function App() {
             }}
             chats={chats}
             hasUnreadChats={hasUnreadChats}
+            unreadNotificationsCount={unreadNotificationsCount}
           />
         </div>
         <Toaster position="top-center" />
@@ -807,6 +937,80 @@ export default function App() {
             onMessageSent={handleSendMessage}
             initialMessages={messagesPerChat[selectedChatUser.id] || []}
           />
+        </div>
+        <Toaster position="top-center" />
+      </div>
+    );
+  }
+
+  if (currentView === 'community-profile' && selectedCommunity) {
+    return (
+      <div className="bg-[#fafafa] h-screen flex items-center justify-center p-4 overflow-hidden">
+        <div className="w-[360px] h-full max-h-[800px] bg-white relative overflow-hidden flex flex-col shadow-2xl rounded-[32px] border border-gray-100">
+          <CommunityProfile
+            community={selectedCommunity}
+            onBack={() => setCurrentView('teamup')}
+            onJoin={handleJoinCommunity}
+            onBookEvent={handleBookEvent}
+            bookedEventTitles={bookings.filter(b => b.type === 'event').map(b => b.title)}
+          />
+          <AnimatePresence>
+            {showConfirmation && (
+              <ConfirmationModal
+                isOpen={showConfirmation}
+                onClose={() => setShowConfirmation(false)}
+                onConfirm={handleGoToPayment}
+                data={{
+                  title: selectedEventBooking?.title,
+                  mentorName: selectedEventBooking?.host_name,
+                  language: 'English',
+                  services: [],
+                  sessionType: 'event',
+                  date: selectedEventBooking ? new Date(selectedEventBooking.start_time) : new Date(),
+                  time: selectedEventBooking ? format(new Date(selectedEventBooking.start_time), 'hh:mm a') : null,
+                  totalDuration: 60,
+                  totalPrice: selectedEventBooking?.ticket_price || 0
+                }}
+              />
+            )}
+            {isBookingProcessing && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="absolute inset-0 z-[100] flex flex-col items-center justify-center bg-white/90 backdrop-blur-md"
+              >
+                <div className="relative">
+                  <motion.div
+                    animate={{ rotate: 360 }}
+                    transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                    className="w-16 h-16 border-4 border-[#2d5a4c]/10 border-t-[#2d5a4c] rounded-full"
+                  />
+                  <div className="absolute inset-0 z-[110] flex items-center justify-center p-4">
+                    <div className="w-8 h-8 bg-[#2d5a4c] rounded-full animate-pulse flex items-center justify-center">
+                      <Check size={14} className="text-white" weight="bold" />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="mt-8 text-center px-6">
+                  <h3 className="font-['Bricolage_Grotesque:Semi_Bold',sans-serif] text-[20px] text-[#272d2c] mb-2 uppercase tracking-widest">
+                    Booking Event
+                  </h3>
+                  <p className="font-['Figtree:Medium',sans-serif] text-[14px] text-[#3f4544] opacity-60">
+                    Reserving your spot...
+                  </p>
+                </div>
+              </motion.div>
+            )}
+            {showAlreadyBooked && (
+              <AlreadyBookedModal
+                isOpen={showAlreadyBooked}
+                onClose={() => setShowAlreadyBooked(false)}
+                onGoToBookings={() => handleNavigateToBookings('Events')}
+              />
+            )}
+          </AnimatePresence>
         </div>
         <Toaster position="top-center" />
       </div>
@@ -860,6 +1064,7 @@ export default function App() {
             }}
             onNavigate={handleNavigate}
             hasUnreadChats={hasUnreadChats}
+            unreadNotificationsCount={unreadNotificationsCount}
           />
         </div>
         <Toaster position="top-center" />
@@ -873,6 +1078,10 @@ export default function App() {
       <div className="bg-[#fafafa] h-screen flex items-center justify-center p-4 overflow-hidden">
         <div className="w-[360px] h-full max-h-[800px] bg-white relative overflow-hidden flex flex-col shadow-2xl rounded-[32px] border border-gray-100">
           <NotificationScreen
+            notifications={notifications}
+            onMarkAsRead={handleMarkNotificationRead}
+            onMarkAllRead={handleMarkAllNotificationsRead}
+            onDeleteAll={handleDeleteAllNotifications}
             onClose={() => setCurrentView('home')}
             onNavigateToBooking={(id) => {
               setCurrentView('bookings');
@@ -915,7 +1124,15 @@ export default function App() {
             <LanguageSelector selected={language} onSelect={setLanguage} />
             <SessionTypeToggle type={sessionType} setType={handleSetSessionType} />
             <ServiceSelection services={currentServices} selectedServices={selectedServices} toggleService={toggleService} sessionType={sessionType} longTermPackages={LONG_TERM_PACKAGES} />
-            <DateTimeSection selectedDate={selectedDate} onDateChange={setSelectedDate} selectedTime={selectedTime} onTimeChange={setSelectedTime} sessionType={sessionType} />
+            <DateTimeSection
+              selectedDate={selectedDate}
+              onDateChange={setSelectedDate}
+              selectedTime={selectedTime}
+              onTimeChange={setSelectedTime}
+              sessionType={sessionType}
+              bookings={bookings}
+              mentorId={selectedMentor?.id}
+            />
 
             <div className="space-y-4">
               <p className="font-['Bricolage_Grotesque:Medium',sans-serif] font-medium leading-[20px] opacity-90 text-[#272d2c] text-[14px]">Short description</p>
@@ -932,7 +1149,19 @@ export default function App() {
           <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-white via-white to-transparent pt-8">
             <motion.button
               whileTap={{ scale: 0.98 }}
-              onClick={() => setShowConfirmation(true)}
+              onClick={() => {
+                const isAlreadyBooked = bookings.some(b =>
+                  b.type === 'session' &&
+                  b.mentorId === selectedMentor?.id &&
+                  b.date === format(selectedDate, 'dd/MM/yyyy') &&
+                  b.time.startsWith(selectedTime!)
+                );
+                if (isAlreadyBooked) {
+                  setShowAlreadyBooked(true);
+                  return;
+                }
+                setShowConfirmation(true);
+              }}
               className="w-full h-[56px] bg-[#2d5a4c] flex items-center justify-center rounded-[16px] text-white font-semibold text-[16px] shadow-lg font-[Figtree] relative z-[99]"
             >
               Continue for Confirmation
@@ -956,6 +1185,13 @@ export default function App() {
                   totalDuration: totalMinutes,
                   totalPrice: totalPrice
                 }}
+              />
+            )}
+            {showAlreadyBooked && (
+              <AlreadyBookedModal
+                isOpen={showAlreadyBooked}
+                onClose={() => setShowAlreadyBooked(false)}
+                onGoToBookings={() => handleNavigateToBookings('Sessions')}
               />
             )}
           </AnimatePresence>
@@ -1011,12 +1247,16 @@ export default function App() {
 
     const successData = {
       mentorName: lastBooking?.subtitle?.replace('Hosted by ', '') || 'Host',
-      language: 'English',
-      services: [lastBooking?.title || 'Event'],
-      sessionType: lastBooking?.type === 'event' ? 'Event' : 'Mentorship',
-      dateTime: new Date(),
-      duration: lastBooking?.duration || '1 Hr',
-      transactionId: lastBookingId || '123456'
+      language: language,
+      services: bookingType === 'event' && selectedEventBooking
+        ? [selectedEventBooking.title]
+        : (selectedServiceObjects.length > 0 ? selectedServiceObjects.map(s => s.name) : ['General Mentoring']),
+      sessionType: bookingType === 'event' && selectedEventBooking ? (selectedEventBooking.category || 'Event') : (sessionType === 'long' ? 'Long-term' : 'Single Session'),
+      dateTime: bookingType === 'event' && selectedEventBooking ? new Date(selectedEventBooking.start_time) : selectedDate,
+      duration: bookingType === 'event' && selectedEventBooking ? selectedEventBooking.host_name : (lastBooking?.duration || '1 Hr'),
+      transactionId: lastBookingId || Math.random().toString(36).substr(2, 9).toUpperCase(),
+      isEvent: bookingType === 'event',
+      bookedAt: new Date()
     };
 
     return (
@@ -1024,11 +1264,11 @@ export default function App() {
         <div className="w-[360px] h-full max-h-[800px] bg-white relative overflow-hidden flex flex-col shadow-2xl rounded-[32px] border border-gray-100">
           <BookingSuccess
             onClose={() => {
-              setBookingsInitialTab(bookingType === 'event' ? 'Events' : 'All');
+              setBookingsInitialTab(bookingType === 'event' ? 'Events' : 'Sessions');
               setCurrentView('bookings');
             }}
             onGoToGuidelines={() => {
-              setBookingsInitialTab(bookingType === 'event' ? 'Events' : 'All');
+              setBookingsInitialTab(bookingType === 'event' ? 'Events' : 'Sessions');
               setCurrentView('bookings');
             }}
             bookingData={successData}

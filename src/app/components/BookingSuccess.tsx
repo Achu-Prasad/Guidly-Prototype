@@ -14,6 +14,8 @@ interface BookingSuccessProps {
     dateTime: Date;
     duration: string;
     transactionId: string;
+    isEvent?: boolean;
+    bookedAt: Date;
   };
 }
 
@@ -55,7 +57,7 @@ export const BookingSuccess = ({ onClose, onGoToGuidelines, bookingData }: Booki
           transition={{ delay: 0.3 }}
           className="font-['Bricolage_Grotesque'] font-medium text-[20px] text-[#272d2c] mb-2"
         >
-          Session Booking Successful !
+          {bookingData.isEvent ? 'Event' : 'Session'} Booking Successful !
         </motion.h1>
 
         <motion.div
@@ -65,7 +67,7 @@ export const BookingSuccess = ({ onClose, onGoToGuidelines, bookingData }: Booki
           className="text-center space-y-1 mb-10"
         >
           <p className="font-['Figtree'] text-[14px] text-[#3f4544] opacity-60">
-            {format(new Date(), "dd MMM yyyy, h:mm a")}
+            {format(bookingData.bookedAt, "dd MMM yyyy, h:mm a")}
           </p>
           <p className="font-['Figtree'] text-[12px] text-[#3f4544] opacity-40 uppercase tracking-wider">
             TXN-{bookingData.transactionId}
@@ -80,16 +82,22 @@ export const BookingSuccess = ({ onClose, onGoToGuidelines, bookingData }: Booki
           className="w-full bg-white rounded-[24px] shadow-[0px_8px_32px_rgba(0,0,0,0.04)] overflow-hidden border border-white"
         >
           <div className="p-6 text-center border-b border-dashed border-gray-200 relative">
-            <h2 className="font-['Figtree'] font-medium text-[16px] text-[#3f4544] opacity-80">Session Details</h2>
+            <h2 className="font-['Figtree'] font-medium text-[16px] text-[#3f4544] opacity-80">
+              {bookingData.isEvent ? 'Event' : 'Session'} Details
+            </h2>
             {/* Cutout decorations */}
             <div className="absolute -bottom-2 -left-2 w-4 h-4 bg-[#f8f7f3] rounded-full" />
             <div className="absolute -bottom-2 -right-2 w-4 h-4 bg-[#f8f7f3] rounded-full" />
           </div>
 
           <div className="px-6 pt-6 pb-10 space-y-4">
-            <DetailRow label="Language" value={bookingData.language} />
+            {!bookingData.isEvent && (
+              <DetailRow label="Language" value={bookingData.language} />
+            )}
             <div className="flex justify-between items-start">
-              <span className="font-['Figtree'] text-[14px] text-[#3f4544] opacity-40">Services Selected</span>
+              <span className="font-['Figtree'] text-[14px] text-[#3f4544] opacity-40">
+                {bookingData.isEvent ? 'Event Name' : 'Services Selected'}
+              </span>
               <div className="text-right flex flex-col items-end gap-1">
                 {bookingData.services.map((s, i) => (
                   <span key={i} className="font-['Figtree'] text-[14px] text-[#3f4544] opacity-90 leading-tight">
@@ -98,15 +106,10 @@ export const BookingSuccess = ({ onClose, onGoToGuidelines, bookingData }: Booki
                 ))}
               </div>
             </div>
-            <DetailRow label="Session Type" value={bookingData.sessionType} />
+            <DetailRow label={bookingData.isEvent ? 'Category' : 'Session Type'} value={bookingData.sessionType} />
             <DetailRow label="Date & Time" value={format(bookingData.dateTime, "dd MMM yyyy | h:mm a")} />
-            <DetailRow label="Session duration" value={bookingData.duration} />
+            <DetailRow label={bookingData.isEvent ? 'Host' : 'Duration'} value={bookingData.duration} />
 
-            <div className="pt-6 border-t border-gray-100 mt-6">
-              <p className="font-['Figtree'] font-medium text-[15px] text-[#272d2c] text-center leading-relaxed">
-                Check Guidelines before joining the session
-              </p>
-            </div>
           </div>
         </motion.div>
       </div>
@@ -118,7 +121,7 @@ export const BookingSuccess = ({ onClose, onGoToGuidelines, bookingData }: Booki
           onClick={onGoToGuidelines}
           className="w-full h-[56px] bg-[#2d5a4c] rounded-[12px] text-white font-['Figtree'] font-medium text-[16px] shadow-lg shadow-[#2d5a4c]/20"
         >
-          Go to Guidelines
+          Show Bookings
         </motion.button>
       </div>
     </div>

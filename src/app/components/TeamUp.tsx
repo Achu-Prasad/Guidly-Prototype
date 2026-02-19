@@ -21,7 +21,9 @@ import {
   Lightning,
   Crown,
   Ticket,
-  ArrowRight
+  ArrowRight,
+  X,
+  Heart
 } from "@phosphor-icons/react";
 import { Logo } from './Logo';
 import { ImageWithFallback } from './figma/ImageWithFallback';
@@ -38,7 +40,7 @@ import {
   DrawerFooter,
   DrawerClose,
 } from "./ui/drawer";
-import { TeamUpEvent } from "../types/team";
+import { TeamUpEvent, Community } from "../types/team";
 
 // SVG Paths from Figma
 const LOGO_SVG = (
@@ -65,9 +67,12 @@ interface TeamUpProps {
   onNavigate: (view: string) => void;
   hasUnreadChats?: boolean;
   onBookEvent?: (event: TeamUpEvent) => void;
+  onSelectCommunity?: (community: Community) => void;
+  bookedEventTitles?: string[];
+  unreadNotificationsCount?: number;
 }
 
-export const TeamUp = ({ onNavigate, hasUnreadChats, onBookEvent }: TeamUpProps) => {
+export const TeamUp = ({ onNavigate, hasUnreadChats, onBookEvent, onSelectCommunity, bookedEventTitles = [], unreadNotificationsCount = 0 }: TeamUpProps) => {
   const [activeTab, setActiveTab] = useState('Communities');
   const [searchQuery, setSearchQuery] = useState('');
   const [bookmarkedEvents, setBookmarkedEvents] = useState<string[]>([]);
@@ -96,9 +101,11 @@ export const TeamUp = ({ onNavigate, hasUnreadChats, onBookEvent }: TeamUpProps)
             className="relative w-12 h-12 flex items-center justify-center rounded-full hover:bg-gray-50 transition-colors"
           >
             <Bell size={24} weight="regular" className="text-[#0F1615]" />
-            <span className="absolute top-[11px] right-[11px] w-[15px] h-[15px] bg-[#fb2c36] rounded-full flex items-center justify-center text-[10px] text-white font-semibold">
-              4
-            </span>
+            {unreadNotificationsCount > 0 && (
+              <span className="absolute top-[11px] right-[11px] min-w-[15px] h-[15px] px-1 bg-[#fb2c36] rounded-full flex items-center justify-center text-[10px] text-white font-semibold shadow-sm">
+                {unreadNotificationsCount}
+              </span>
+            )}
           </button>
         </header>
 
@@ -144,7 +151,8 @@ export const TeamUp = ({ onNavigate, hasUnreadChats, onBookEvent }: TeamUpProps)
                 key={community.id}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="bg-white rounded-[16px] overflow-hidden shadow-[0px_4px_9px_0px_rgba(0,0,0,0.08)] border border-[rgba(63,69,68,0.1)]"
+                onClick={() => onSelectCommunity?.(community)}
+                className="bg-white rounded-[16px] overflow-hidden shadow-[0px_4px_9px_0px_rgba(0,0,0,0.08)] border border-[rgba(63,69,68,0.1)] cursor-pointer"
               >
                 {/* Image Banner */}
                 <div className="h-[176px] relative">
@@ -219,20 +227,17 @@ export const TeamUp = ({ onNavigate, hasUnreadChats, onBookEvent }: TeamUpProps)
               const isSoon = daysUntil >= 0 && daysUntil <= 3;
 
               return (
-                <motion.div
+                <div
                   key={event.id}
-                  initial={{ opacity: 0, y: 16 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.08, duration: 0.4, ease: [0.25, 0.46, 0.45, 0.94] }}
                   onClick={() => handleEventClick(event)}
-                  className="bg-white rounded-[16px] overflow-hidden border border-[rgba(63,69,68,0.06)] shadow-[0px_2px_8px_rgba(0,0,0,0.04),0px_8px_24px_rgba(0,0,0,0.06)] group/card cursor-pointer active:scale-[0.98] transition-all"
+                  className="bg-white rounded-[16px] overflow-hidden border border-[rgba(63,69,68,0.06)] shadow-[0px_2px_8px_rgba(0,0,0,0.04),0px_8px_24px_rgba(0,0,0,0.06)] group/card cursor-pointer"
                 >
                   {/* Image Banner */}
                   <div className="h-[148px] relative w-full overflow-hidden">
                     <ImageWithFallback
                       src={event.image || "https://images.unsplash.com/photo-1710799885122-428e63eff691?auto=format&fit=crop&q=80&w=800"}
                       alt={event.title}
-                      className="w-full h-full object-cover group-hover/card:scale-[1.03] transition-transform duration-700 ease-out"
+                      className="w-full h-full object-cover transition-transform duration-700 ease-out"
                     />
                     {/* Soft gradient - lighter, warmer */}
                     <div className="absolute inset-0 bg-gradient-to-b from-black/5 via-transparent to-black/30" />
@@ -364,8 +369,7 @@ export const TeamUp = ({ onNavigate, hasUnreadChats, onBookEvent }: TeamUpProps)
                       </div>
 
                       {/* CTA Button */}
-                      <motion.button
-                        whileTap={{ scale: 0.96 }}
+                      <button
                         className="bg-[#2D5A4C] text-white px-[16px] py-[8px] rounded-[10px] text-[13px] font-['Figtree'] font-semibold flex items-center gap-[6px] shadow-[0px_2px_6px_rgba(45,90,76,0.2)] hover:bg-[#244a3e] transition-colors"
                       >
                         {isFree ? (
@@ -379,10 +383,10 @@ export const TeamUp = ({ onNavigate, hasUnreadChats, onBookEvent }: TeamUpProps)
                             Get Ticket
                           </>
                         )}
-                      </motion.button>
+                      </button>
                     </div>
                   </div>
-                </motion.div>
+                </div>
               );
             })}
           </div>
@@ -407,12 +411,25 @@ export const TeamUp = ({ onNavigate, hasUnreadChats, onBookEvent }: TeamUpProps)
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-90" />
 
-                  <div className="absolute bottom-6 left-6 right-6 text-white">
+                  {/* Top Controls */}
+                  <div className="absolute top-6 left-6 right-6 flex justify-between items-center">
+                    <button
+                      onClick={() => setIsDrawerOpen(false)}
+                      className="size-10 rounded-full bg-black/20 backdrop-blur-md flex items-center justify-center border border-white/10 hover:bg-black/40 transition-colors"
+                    >
+                      <X size={20} weight="bold" className="text-white" />
+                    </button>
+                    <button className="size-10 rounded-full bg-black/20 backdrop-blur-md flex items-center justify-center border border-white/10 hover:bg-black/40 transition-colors">
+                      <Heart size={20} className="text-white" />
+                    </button>
+                  </div>
+
+                  <div className="absolute bottom-8 left-6 right-6 text-white">
                     <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-md px-3 py-1.5 rounded-full mb-3 border border-white/10 shadow-sm">
                       <div className="w-2 h-2 rounded-full bg-[#00ff85] shadow-[0_0_8px_rgba(0,255,133,0.8)]" />
                       <span className="text-[11px] font-bold tracking-wider uppercase font-['Figtree'] shadow-sm">{selectedEvent.category}</span>
                     </div>
-                    <h2 className="text-[26px] font-['Bricolage_Grotesque'] font-bold leading-[1.1] text-white drop-shadow-lg tracking-tight">
+                    <h2 className="text-[28px] font-['Bricolage_Grotesque'] font-bold leading-[1.1] text-white drop-shadow-lg tracking-tight">
                       {selectedEvent.title}
                     </h2>
                   </div>
@@ -420,10 +437,10 @@ export const TeamUp = ({ onNavigate, hasUnreadChats, onBookEvent }: TeamUpProps)
               </div>
 
               {/* Scrollable Details */}
-              <div className="flex-1 overflow-y-auto p-5 pb-24">
+              <div className="flex-1 overflow-y-auto p-6 pt-12 pb-32 no-scrollbar">
                 {/* Community Info (was Host Info) */}
-                <div className="flex items-center gap-3 mb-6">
-                  <div className="size-[48px] rounded-[12px] overflow-hidden border border-gray-100 shadow-sm relative">
+                <div className="flex items-center gap-4 mb-8">
+                  <div className="size-[48px] rounded-[12px] overflow-hidden border border-gray-100 shadow-sm relative shrink-0">
                     <ImageWithFallback
                       src={COMMUNITIES.find(c => c.id === selectedEvent.community_id)?.logo}
                       alt="Community"
@@ -442,69 +459,78 @@ export const TeamUp = ({ onNavigate, hasUnreadChats, onBookEvent }: TeamUpProps)
 
                 {/* Info Grid */}
                 <div className="grid grid-cols-2 gap-3 mb-8">
-                  <div className="bg-[#f8f7f3] p-3 rounded-[12px] flex flex-col gap-1 border border-[#ecebe6]">
+                  <div className="bg-[#f8f7f3] p-4 rounded-[16px] flex flex-col gap-1 border border-[#ecebe6]">
                     <div className="flex items-center gap-2 text-[#2D5A4C]">
                       <Calendar size={18} weight="duotone" />
-                      <span className="text-[12px] font-semibold uppercase opacity-80">Date</span>
+                      <span className="text-[12px] font-semibold uppercase opacity-60 font-['Figtree']">Date</span>
                     </div>
-                    <p className="text-[14px] font-medium text-[#272d2c] mt-1">
+                    <p className="text-[14px] font-bold text-[#1b362e] mt-1 font-['Figtree']">
                       {format(new Date(selectedEvent.start_time), 'EEE, d MMM')}
                     </p>
                   </div>
-                  <div className="bg-[#f8f7f3] p-3 rounded-[12px] flex flex-col gap-1 border border-[#ecebe6]">
+                  <div className="bg-[#f8f7f3] p-4 rounded-[16px] flex flex-col gap-1 border border-[#ecebe6]">
                     <div className="flex items-center gap-2 text-[#2D5A4C]">
                       <Clock size={18} weight="duotone" />
-                      <span className="text-[12px] font-semibold uppercase opacity-80">Time</span>
+                      <span className="text-[12px] font-semibold uppercase opacity-60 font-['Figtree']">Time</span>
                     </div>
-                    <p className="text-[14px] font-medium text-[#272d2c] mt-1">
+                    <p className="text-[14px] font-bold text-[#1b362e] mt-1 font-['Figtree']">
                       {format(new Date(selectedEvent.start_time), 'hh:mm a')}
                     </p>
                   </div>
-                  <div className="col-span-2 bg-[#f8f7f3] p-3 rounded-[12px] flex flex-col gap-1 border border-[#ecebe6]">
-                    <div className="flex items-center gap-2 text-[#2D5A4C]">
-                      <VideoConference size={18} weight="duotone" />
-                      <span className="text-[12px] font-semibold uppercase opacity-80">Location</span>
+                  <div className="col-span-2 bg-[#f8f7f3] p-4 rounded-[16px] flex items-center gap-4 border border-[#ecebe6]">
+                    <div className="size-10 bg-white rounded-xl flex items-center justify-center shadow-sm border border-[#ecebe6] shrink-0">
+                      <VideoConference size={20} weight="duotone" className="text-[#2D5A4C]" />
                     </div>
-                    <p className="text-[14px] font-medium text-[#272d2c] mt-1 truncate">
-                      Online Event
-                    </p>
+                    <div className="flex flex-col">
+                      <p className="text-[15px] font-['Figtree'] font-bold text-[#1b362e]">Online Event</p>
+                      <p className="text-[13px] text-[#3f4544] opacity-60 font-['Figtree']">Join from anywhere in the world</p>
+                    </div>
                   </div>
                 </div>
 
                 {/* About Section */}
-                <div className="mb-8">
-                  <h3 className="text-[18px] font-['Bricolage_Grotesque'] font-semibold text-[#1b362e] mb-3">About Event</h3>
-                  <p className="text-[15px] font-['Figtree'] text-[#3f4544] opacity-80 leading-[1.6]">
+                <div className="space-y-3">
+                  <h3 className="text-[18px] font-['Bricolage_Grotesque'] font-bold text-[#1b362e]">About Event</h3>
+                  <p className="text-[15px] font-['Figtree'] text-[#3f4544] leading-[1.6] opacity-80">
                     Join us for an immersive session on {selectedEvent.title}. This event is designed to specific topics related to {selectedEvent.category}, offering deep insights and practical takeaways for all attendees. Whether you are a beginner or an expert, you'll find value in the discussions and networking opportunities.
-                  </p>
-                  <p className="text-[15px] font-['Figtree'] text-[#3f4544] opacity-80 leading-[1.6] mt-3">
-                    Don't miss out on this opportunity to connect with like-minded individuals and learn from industry experts.
                   </p>
                 </div>
               </div>
 
               {/* Fixed Bottom Action */}
-              <div className="absolute bottom-0 left-0 w-full p-5 bg-white/90 backdrop-blur-xl border-t border-gray-100 shadow-[0_-8px_30px_rgba(0,0,0,0.04)] flex items-center justify-between gap-6 pb-8 z-20">
-                <div className="flex flex-col gap-1.5 flex-1">
+              <div className="absolute bottom-0 left-0 w-full p-5 bg-white/95 backdrop-blur-xl border-t border-gray-100 shadow-[0_-8px_30px_rgba(0,0,0,0.04)] flex items-center justify-between gap-6 pb-8 z-20">
+                <div className="flex flex-col gap-1.5 flex-1 pl-1">
                   <div className="flex items-center -space-x-2">
                     {selectedEvent.attendee_ids.slice(0, 4).map((id, i) => (
-                      <div key={id} className={`w-[28px] h-[28px] rounded-full border-[2px] border-white flex items-center justify-center text-[10px] font-bold text-[#1b362e]/70 ${AVATAR_COLORS[i % AVATAR_COLORS.length]}`}>
+                      <div key={id} className={`size-[28px] rounded-full border-2 border-white flex items-center justify-center text-[10px] font-bold text-[#1b362e]/70 ${AVATAR_COLORS[i % AVATAR_COLORS.length]}`}>
                         {AVATAR_INITIALS[i % AVATAR_INITIALS.length]}
                       </div>
                     ))}
                     {selectedEvent.attendee_ids.length > 4 && (
-                      <div className="w-[28px] h-[28px] rounded-full border-[2px] border-white bg-[#f1f5f4] flex items-center justify-center text-[9px] font-bold text-[#3f4544]">
+                      <div className="size-[28px] rounded-full bg-[#f1f5f4] border-2 border-white flex items-center justify-center text-[9px] font-bold text-[#3f4544]">
                         +{selectedEvent.attendee_ids.length - 4}
                       </div>
                     )}
                   </div>
-                  <span className="text-[13px] font-['Figtree'] font-medium text-[#3f4544] opacity-80 pl-1">
+                  <span className="text-[13px] font-['Figtree'] font-medium text-[#3f4544] opacity-60">
                     {selectedEvent.max_attendees ? (selectedEvent.max_attendees - selectedEvent.attendee_ids.length) : 0} spots left
                   </span>
                 </div>
 
-                <button className="flex-[1.6] bg-gradient-to-r from-[#2D5A4C] to-[#1F4439] text-white h-[56px] rounded-[20px] font-['Figtree'] font-bold text-[16px] shadow-[0_8px_24px_-6px_rgba(45,90,76,0.3)] flex items-center justify-center gap-2.5 px-6 whitespace-nowrap hover:shadow-[0_12px_32px_-8px_rgba(45,90,76,0.4)] hover:-translate-y-[1px] active:translate-y-[1px] active:shadow-md transition-all duration-300 group" onClick={() => onBookEvent?.(selectedEvent)}>
-                  {selectedEvent.ticket_price === 0 ? (
+                <button
+                  onClick={() => {
+                    const isAlreadyBooked = bookedEventTitles.includes(selectedEvent.title);
+                    if (!isAlreadyBooked) onBookEvent?.(selectedEvent);
+                  }}
+                  disabled={bookedEventTitles.includes(selectedEvent.title)}
+                  className={`flex-[1.6] h-[56px] rounded-[20px] font-['Figtree'] font-bold text-[16px] flex items-center justify-center gap-2.5 px-6 whitespace-nowrap transition-all group ${bookedEventTitles.includes(selectedEvent.title)
+                    ? 'bg-[#575c5b] text-white opacity-60 cursor-not-allowed'
+                    : 'bg-gradient-to-r from-[#2D5A4C] to-[#1F4439] text-white shadow-[0_8px_24px_-6px_rgba(45,90,76,0.3)] hover:shadow-[0_12px_32px_-8px_rgba(45,90,76,0.4)]'
+                    }`}
+                >
+                  {bookedEventTitles.includes(selectedEvent.title) ? (
+                    <span>Booked</span>
+                  ) : selectedEvent.ticket_price === 0 ? (
                     <span>Get free ticket</span>
                   ) : (
                     <>
@@ -513,9 +539,11 @@ export const TeamUp = ({ onNavigate, hasUnreadChats, onBookEvent }: TeamUpProps)
                     </>
                   )}
 
-                  <div className="bg-white/20 rounded-full p-1 group-hover:bg-white/30 transition-colors ml-1.5">
-                    <ArrowRight size={14} weight="bold" />
-                  </div>
+                  {!bookedEventTitles.includes(selectedEvent.title) && (
+                    <div className="bg-white/20 rounded-full p-1 group-hover:bg-white/30 transition-colors ml-1.5">
+                      <ArrowRight size={14} weight="bold" />
+                    </div>
+                  )}
                 </button>
               </div>
             </div>

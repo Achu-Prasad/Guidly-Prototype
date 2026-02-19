@@ -32,9 +32,10 @@ interface BookingsProps {
     bookings: BookingItem[];
     hasUnreadChats?: boolean;
     initialTab?: string;
+    unreadNotificationsCount?: number;
 }
 
-export const Bookings = ({ onNavigate, bookings, hasUnreadChats, initialTab }: BookingsProps) => {
+export const Bookings = ({ onNavigate, bookings, hasUnreadChats, initialTab, unreadNotificationsCount = 0 }: BookingsProps) => {
     const [activeTab, setActiveTab] = useState(initialTab || 'All');
     const [searchQuery, setSearchQuery] = useState('');
 
@@ -49,9 +50,11 @@ export const Bookings = ({ onNavigate, bookings, hasUnreadChats, initialTab }: B
                         className="relative w-12 h-12 flex items-center justify-center rounded-full hover:bg-gray-50 transition-colors"
                     >
                         <Bell size={24} weight="regular" className="text-[#0F1615]" />
-                        <span className="absolute top-[11px] right-[11px] w-[15px] h-[15px] bg-[#fb2c36] rounded-full flex items-center justify-center text-[10px] text-white font-semibold">
-                            4
-                        </span>
+                        {unreadNotificationsCount > 0 && (
+                            <span className="absolute top-[11px] right-[11px] min-w-[15px] h-[15px] px-1 bg-[#fb2c36] rounded-full flex items-center justify-center text-[10px] text-white font-semibold shadow-sm">
+                                {unreadNotificationsCount}
+                            </span>
+                        )}
                     </button>
                 </header>
 

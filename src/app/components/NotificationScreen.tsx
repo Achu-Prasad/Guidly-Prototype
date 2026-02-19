@@ -10,29 +10,36 @@ import {
     CalendarCheck,
 } from '@phosphor-icons/react';
 import { Notification } from '../types/notification';
-import { MOCK_NOTIFICATIONS } from '../data/notifications';
 import { formatDistanceToNow } from 'date-fns';
 
 interface NotificationScreenProps {
+    notifications: Notification[];
+    onMarkAsRead: (id: string) => void;
+    onMarkAllRead: () => void;
+    onDeleteAll: () => void;
     onClose: () => void;
     onNavigateToBooking?: (bookingId: string) => void;
     onNavigateToReview?: (reviewId: string) => void;
 }
 
 export const NotificationScreen = ({
+    notifications,
+    onMarkAsRead,
+    onMarkAllRead,
+    onDeleteAll,
     onClose,
     onNavigateToBooking,
     onNavigateToReview,
 }: NotificationScreenProps) => {
     const [activeTab, setActiveTab] = useState<'General' | 'Bookings' | 'All read'>('General');
-    const [notifications, setNotifications] = useState<Notification[]>(MOCK_NOTIFICATIONS);
     const [menuOpen, setMenuOpen] = useState(false);
     const [sortOrder, setSortOrder] = useState<'newest' | 'oldest'>('newest');
 
     const filteredNotifications = notifications.filter((n) => {
-        if (activeTab === 'Bookings') return n.type === 'booking_confirmed' || n.type === 'session_reminder';
+        if (activeTab === 'Bookings') return !n.is_read && (n.type === 'booking_confirmed' || n.type === 'session_reminder');
         if (activeTab === 'All read') return n.is_read;
-        return true;
+        // General tab: only unread notifications
+        return !n.is_read;
     }).sort((a, b) => {
         const dateA = new Date(a.created_at).getTime();
         const dateB = new Date(b.created_at).getTime();
@@ -55,19 +62,13 @@ export const NotificationScreen = ({
         }
     };
 
-    const markAsRead = (id: string) => {
-        setNotifications(prev =>
-            prev.map(n => n.id === id ? { ...n, is_read: true } : n)
-        );
-    };
-
     const handleMarkAllRead = () => {
-        setNotifications(prev => prev.map(n => ({ ...n, is_read: true })));
+        onMarkAllRead();
         setMenuOpen(false);
     };
 
     const handleDeleteAll = () => {
-        setNotifications([]);
+        onDeleteAll();
         setMenuOpen(false);
     };
 
@@ -175,7 +176,7 @@ export const NotificationScreen = ({
                                 animate={{ opacity: 1, y: 0 }}
                                 exit={{ opacity: 0, scale: 0.95 }}
                                 onClick={() => {
-                                    markAsRead(notification.id);
+                                    onMarkAsRead(notification.id);
                                     if (notification.type === 'booking_confirmed' && onNavigateToBooking) {
                                         onNavigateToBooking(notification.related_id || '');
                                     }

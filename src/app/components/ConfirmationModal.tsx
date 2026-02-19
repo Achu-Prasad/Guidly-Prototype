@@ -1,11 +1,11 @@
 import React from "react";
 import { motion } from "motion/react";
-import { 
-  CaretLeft as ChevronLeft, 
-  Calendar, 
-  Clock, 
-  Globe, 
-  Stack as Layers, 
+import {
+  CaretLeft as ChevronLeft,
+  Calendar,
+  Clock,
+  Globe,
+  Stack as Layers,
   CheckCircle,
   Wallet
 } from "@phosphor-icons/react";
@@ -24,11 +24,12 @@ interface ConfirmationModalProps {
   onClose: () => void;
   onConfirm: () => void;
   data: {
+    title?: string;
     mentorName?: string;
     mentorImage?: string;
     language: string;
     services: Service[];
-    sessionType: 'single' | 'long';
+    sessionType: 'single' | 'long' | 'event';
     date: Date;
     time: string | null;
     totalDuration: number;
@@ -39,10 +40,12 @@ interface ConfirmationModalProps {
 export const ConfirmationModal = ({ isOpen, onClose, onConfirm, data }: ConfirmationModalProps) => {
   if (!isOpen) return null;
 
+  const isEvent = data.sessionType === 'event';
+
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+    <div className="absolute inset-0 z-[100] flex items-center justify-center p-4">
       {/* Backdrop with a more sophisticated blur */}
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
@@ -51,7 +54,7 @@ export const ConfirmationModal = ({ isOpen, onClose, onConfirm, data }: Confirma
       />
 
       {/* Modal Container */}
-      <motion.div 
+      <motion.div
         initial={{ scale: 0.95, opacity: 0, y: 30 }}
         animate={{ scale: 1, opacity: 1, y: 0 }}
         exit={{ scale: 0.95, opacity: 0, y: 30 }}
@@ -72,7 +75,7 @@ export const ConfirmationModal = ({ isOpen, onClose, onConfirm, data }: Confirma
             </div>
           )}
           <h2 className="font-['Bricolage_Grotesque:Semi_Bold',sans-serif] text-[20px] text-[#272d2c] leading-tight mb-1">
-            {data.mentorName ? `Booking with ${data.mentorName}` : 'Review your booking'}
+            {isEvent ? (data.title || 'Event Booking') : (data.mentorName ? `Booking with ${data.mentorName}` : 'Review your booking')}
           </h2>
           <p className="font-['Figtree:Regular',sans-serif] text-[14px] text-[#3f4544] opacity-60">
             Check your details before payment
@@ -81,7 +84,7 @@ export const ConfirmationModal = ({ isOpen, onClose, onConfirm, data }: Confirma
 
         {/* Details Card */}
         <div className="px-6 space-y-5 flex-1 overflow-y-auto max-h-[60vh] py-2 no-scrollbar">
-          
+
           {/* Date & Time Highlight */}
           <div className="bg-[#f8f9f8] rounded-[16px] p-4 flex items-center justify-between border border-[#eef2f1]">
             <div className="flex items-center gap-3">
@@ -100,47 +103,66 @@ export const ConfirmationModal = ({ isOpen, onClose, onConfirm, data }: Confirma
             </div>
             <div className="text-right">
               <p className="font-['Figtree:Semi_Bold',sans-serif] text-[14px] text-[#2d5a4c]">
-                {(data.totalDuration / 60).toFixed(1)}h
+                {isEvent ? '1 Spot' : (() => {
+                  const mins = data.totalDuration;
+                  if (mins < 60) return `${mins}m`;
+                  const h = Math.floor(mins / 60);
+                  const m = mins % 60;
+                  if (m === 0) return `${h} hour${h > 1 ? 's' : ''}`;
+                  return `${h} hour${h > 1 ? 's' : ''} : ${m} minutes`;
+                })()}
               </p>
-              <p className="text-[10px] text-[#3f4544] opacity-50 uppercase tracking-wider font-medium">Duration</p>
+              <p className="text-[10px] text-[#3f4544] opacity-50 uppercase tracking-wider font-medium">{isEvent ? 'Booking' : 'Duration'}</p>
             </div>
           </div>
 
-          {/* Mentorship Settings */}
-          <div className="grid grid-cols-2 gap-3">
-            <div className="bg-white border border-gray-100 p-3 rounded-[12px] shadow-sm">
-              <div className="flex items-center gap-2 mb-1">
-                <Globe size={14} className="text-[#3f4544] opacity-40" />
-                <p className="text-[11px] font-medium text-[#3f4544] opacity-40 uppercase tracking-tight">Language</p>
-              </div>
-              <p className="font-['Figtree:Medium',sans-serif] text-[13px] text-[#272d2c]">{data.language}</p>
-            </div>
-            <div className="bg-white border border-gray-100 p-3 rounded-[12px] shadow-sm">
-              <div className="flex items-center gap-2 mb-1">
-                <Layers size={14} className="text-[#3f4544] opacity-40" />
-                <p className="text-[11px] font-medium text-[#3f4544] opacity-40 uppercase tracking-tight">Session</p>
-              </div>
-              <p className="font-['Figtree:Medium',sans-serif] text-[13px] text-[#272d2c]">
-                {data.sessionType === 'single' ? 'One-time' : 'Long-term'}
-              </p>
-            </div>
-          </div>
-
-          {/* Services List */}
-          <div className="space-y-3 pt-2">
-            <p className="text-[11px] font-bold text-[#3f4544] opacity-30 uppercase tracking-[0.1em] px-1">Selected Services</p>
-            <div className="space-y-2">
-              {data.services.map((s) => (
-                <div key={s.id} className="flex justify-between items-center group">
-                  <div className="flex items-center gap-2">
-                    <div className="w-1.5 h-1.5 rounded-full bg-[#2d5a4c]/20 group-hover:bg-[#2d5a4c] transition-colors" />
-                    <p className="font-['Figtree:Regular',sans-serif] text-[14px] text-[#3f4544]">{s.name}</p>
-                  </div>
-                  <p className={`font-['Figtree:Medium',sans-serif] text-[14px] ${s.cost > 0 ? 'text-[#272d2c]' : 'text-[#2d5a4c] font-semibold'}`}>
-                    {s.price === 'Free' ? 'Free' : `$${s.cost}`}
-                  </p>
+          {!isEvent && (
+            <div className="grid grid-cols-2 gap-3">
+              <div className="bg-white border border-gray-100 p-3 rounded-[12px] shadow-sm">
+                <div className="flex items-center gap-2 mb-1">
+                  <Globe size={14} className="text-[#3f4544] opacity-40" />
+                  <p className="text-[11px] font-medium text-[#3f4544] opacity-40 uppercase tracking-tight">Language</p>
                 </div>
-              ))}
+                <p className="font-['Figtree:Medium',sans-serif] text-[13px] text-[#272d2c]">{data.language}</p>
+              </div>
+              <div className="bg-white border border-gray-100 p-3 rounded-[12px] shadow-sm">
+                <div className="flex items-center gap-2 mb-1">
+                  <Layers size={14} className="text-[#3f4544] opacity-40" />
+                  <p className="text-[11px] font-medium text-[#3f4544] opacity-40 uppercase tracking-tight">Session</p>
+                </div>
+                <p className="font-['Figtree:Medium',sans-serif] text-[13px] text-[#272d2c]">
+                  {data.sessionType === 'single' ? 'One-time' : 'Long-term'}
+                </p>
+              </div>
+            </div>
+          )}
+
+          {/* Services/Event Info */}
+          <div className="space-y-3 pt-2">
+            <p className="text-[11px] font-bold text-[#3f4544] opacity-30 uppercase tracking-[0.1em] px-1">
+              {isEvent ? 'Event Details' : 'Selected Services'}
+            </p>
+            <div className="space-y-2">
+              {isEvent ? (
+                <div className="flex justify-between items-center group">
+                  <div className="flex items-center gap-2">
+                    <div className="w-1.5 h-1.5 rounded-full bg-[#2d5a4c]/20" />
+                    <p className="font-['Figtree:Regular',sans-serif] text-[14px] text-[#3f4544]">Host: {data.mentorName}</p>
+                  </div>
+                </div>
+              ) : (
+                data.services.map((s) => (
+                  <div key={s.id} className="flex justify-between items-center group">
+                    <div className="flex items-center gap-2">
+                      <div className="w-1.5 h-1.5 rounded-full bg-[#2d5a4c]/20 group-hover:bg-[#2d5a4c] transition-colors" />
+                      <p className="font-['Figtree:Regular',sans-serif] text-[14px] text-[#3f4544]">{s.name}</p>
+                    </div>
+                    <p className={`font-['Figtree:Medium',sans-serif] text-[14px] ${s.cost > 0 ? 'text-[#272d2c]' : 'text-[#2d5a4c] font-semibold'}`}>
+                      {s.price === 'Free' ? 'Free' : `$${s.cost}`}
+                    </p>
+                  </div>
+                ))
+              )}
             </div>
           </div>
         </div>
@@ -148,16 +170,16 @@ export const ConfirmationModal = ({ isOpen, onClose, onConfirm, data }: Confirma
         {/* Footer with Payment Summary */}
         <div className="mt-auto p-6 pt-2 bg-gradient-to-t from-gray-50/50 to-white">
           <div className="flex items-center justify-between mb-6 px-1 pt-4 border-t border-dashed border-gray-200">
-             <div className="flex items-center gap-2 text-[#3f4544]">
-               <Wallet size={16} className="opacity-40" />
-               <span className="text-[14px] font-medium opacity-60">Total Amount</span>
-             </div>
-             <p className="font-['Bricolage_Grotesque:Bold',sans-serif] text-[24px] text-[#2d5a4c]">
-               ${data.totalPrice}
-             </p>
+            <div className="flex items-center gap-2 text-[#3f4544]">
+              <Wallet size={16} className="opacity-40" />
+              <span className="text-[14px] font-medium opacity-60">Total Amount</span>
+            </div>
+            <p className="font-['Bricolage_Grotesque:Bold',sans-serif] text-[24px] text-[#2d5a4c]">
+              ${data.totalPrice}
+            </p>
           </div>
 
-          <motion.button 
+          <motion.button
             whileHover={{ y: -2 }}
             whileTap={{ scale: 0.98 }}
             onClick={onConfirm}
@@ -166,7 +188,7 @@ export const ConfirmationModal = ({ isOpen, onClose, onConfirm, data }: Confirma
             Confirm & Pay
           </motion.button>
 
-          <button 
+          <button
             onClick={onClose}
             className="w-full mt-4 py-2 font-['Figtree:Medium',sans-serif] text-[14px] text-[#3f4544] opacity-50 hover:opacity-100 transition-opacity"
           >

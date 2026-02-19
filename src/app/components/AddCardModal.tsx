@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { 
-  X, 
-  CreditCard, 
-  User, 
-  Calendar, 
+import {
+  X,
+  CreditCard,
+  User,
+  Calendar,
   Lock,
   Plus
 } from "@phosphor-icons/react";
@@ -24,17 +24,17 @@ export const AddCardModal = ({ isOpen, onClose, onAdd }: AddCardModalProps) => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!number || !holder || !expiry) return;
-    
+
     // Determine type based on first digit (just mock logic)
     const type = number.startsWith('4') ? 'visa' : number.startsWith('3') ? 'amex' : 'mastercard';
-    
+
     onAdd({
       last4: number.slice(-4) || "0000",
       holder: holder || "New Card",
       expiry: expiry || "12/30",
       type
     });
-    
+
     setNumber("");
     setHolder("");
     setExpiry("");
@@ -45,16 +45,16 @@ export const AddCardModal = ({ isOpen, onClose, onAdd }: AddCardModalProps) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
-      <motion.div 
+    <div className="absolute inset-0 z-[110] flex items-center justify-center p-4">
+      <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         onClick={onClose}
         className="absolute inset-0 bg-black/60 backdrop-blur-sm"
       />
-      
-      <motion.div 
+
+      <motion.div
         initial={{ scale: 0.9, opacity: 0, y: 20 }}
         animate={{ scale: 1, opacity: 1, y: 0 }}
         exit={{ scale: 0.9, opacity: 0, y: 20 }}
@@ -72,7 +72,7 @@ export const AddCardModal = ({ isOpen, onClose, onAdd }: AddCardModalProps) => {
             <label className="text-[12px] font-medium text-[#3f4544] opacity-60">Card Number</label>
             <div className="relative">
               <CreditCard className="absolute left-3 top-1/2 -translate-y-1/2 text-[#3f4544] opacity-30" size={16} />
-              <input 
+              <input
                 value={number}
                 onChange={(e) => setNumber(e.target.value.replace(/\D/g, '').slice(0, 16))}
                 placeholder="0000 0000 0000 0000"
@@ -85,7 +85,7 @@ export const AddCardModal = ({ isOpen, onClose, onAdd }: AddCardModalProps) => {
             <label className="text-[12px] font-medium text-[#3f4544] opacity-60">Card Holder Name</label>
             <div className="relative">
               <User className="absolute left-3 top-1/2 -translate-y-1/2 text-[#3f4544] opacity-30" size={16} />
-              <input 
+              <input
                 value={holder}
                 onChange={(e) => setHolder(e.target.value)}
                 placeholder="John Doe"
@@ -99,7 +99,7 @@ export const AddCardModal = ({ isOpen, onClose, onAdd }: AddCardModalProps) => {
               <label className="text-[12px] font-medium text-[#3f4544] opacity-60">Expiry Date</label>
               <div className="relative">
                 <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 text-[#3f4544] opacity-30" size={16} />
-                <input 
+                <input
                   value={expiry}
                   onChange={(e) => setExpiry(e.target.value)}
                   placeholder="MM/YY"
@@ -111,7 +111,7 @@ export const AddCardModal = ({ isOpen, onClose, onAdd }: AddCardModalProps) => {
               <label className="text-[12px] font-medium text-[#3f4544] opacity-60">CVV</label>
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-[#3f4544] opacity-30" size={16} />
-                <input 
+                <input
                   value={cvv}
                   onChange={(e) => setCvv(e.target.value.replace(/\D/g, '').slice(0, 3))}
                   type="password"
@@ -122,7 +122,7 @@ export const AddCardModal = ({ isOpen, onClose, onAdd }: AddCardModalProps) => {
             </div>
           </div>
 
-          <button 
+          <button
             type="submit"
             className="w-full h-[52px] bg-[#2d5a4c] text-white rounded-[16px] font-['Figtree:Semi_Bold',sans-serif] font-semibold mt-4 shadow-lg active:shadow-sm transition-all"
           >

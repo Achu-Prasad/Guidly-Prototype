@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import { motion } from "motion/react";
-import { 
-  X, 
-  DeviceMobile as Smartphone, 
-  Bank as Building2, 
-  Plus, 
+import {
+  X,
+  DeviceMobile as Smartphone,
+  Bank as Building2,
+  Plus,
   ArrowRight,
   ShieldCheck
 } from "@phosphor-icons/react";
@@ -33,16 +33,16 @@ export const WalletModal = ({ isOpen, onClose, onAddMoney, currentBalance }: Wal
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[110] flex items-end justify-center">
-      <motion.div 
+    <div className="absolute inset-0 z-[110] flex items-end justify-center">
+      <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         onClick={onClose}
         className="absolute inset-0 bg-black/40 backdrop-blur-sm"
       />
-      
-      <motion.div 
+
+      <motion.div
         initial={{ y: "100%" }}
         animate={{ y: 0 }}
         exit={{ y: "100%" }}
@@ -50,7 +50,7 @@ export const WalletModal = ({ isOpen, onClose, onAddMoney, currentBalance }: Wal
         className="relative w-full max-w-[400px] bg-white rounded-t-[32px] shadow-2xl overflow-hidden p-6 pb-12"
       >
         <div className="w-12 h-1 bg-gray-200 rounded-full mx-auto mb-6" />
-        
+
         <div className="flex items-center justify-between mb-8">
           <div>
             <h3 className="font-['Bricolage_Grotesque:Semi_Bold',sans-serif] text-[20px] text-[#272d2c]">Add Money</h3>
@@ -65,7 +65,7 @@ export const WalletModal = ({ isOpen, onClose, onAddMoney, currentBalance }: Wal
           <div className="space-y-6">
             <div className="relative">
               <span className="absolute left-6 top-1/2 -translate-y-1/2 text-[32px] font-bold text-[#2d5a4c]">$</span>
-              <input 
+              <input
                 autoFocus
                 value={amount}
                 onChange={(e) => setAmount(e.target.value.replace(/[^0-9.]/g, ''))}
@@ -76,7 +76,7 @@ export const WalletModal = ({ isOpen, onClose, onAddMoney, currentBalance }: Wal
 
             <div className="grid grid-cols-3 gap-3">
               {[50, 100, 200].map((val) => (
-                <button 
+                <button
                   key={val}
                   onClick={() => setAmount(val.toString())}
                   className="h-[44px] rounded-full border border-gray-100 font-medium text-[14px] text-[#3f4544] hover:bg-[#2d5a4c] hover:text-white transition-colors"
@@ -86,7 +86,7 @@ export const WalletModal = ({ isOpen, onClose, onAddMoney, currentBalance }: Wal
               ))}
             </div>
 
-            <button 
+            <button
               onClick={() => amount && setStep('method')}
               disabled={!amount}
               className="w-full h-[56px] bg-[#2d5a4c] text-white rounded-[16px] font-['Figtree:Semi_Bold',sans-serif] font-semibold shadow-lg disabled:opacity-50 transition-all flex items-center justify-center gap-2"
@@ -98,7 +98,7 @@ export const WalletModal = ({ isOpen, onClose, onAddMoney, currentBalance }: Wal
         ) : (
           <div className="space-y-4">
             <p className="text-[12px] font-bold text-[#3f4544] opacity-30 uppercase tracking-widest px-1">Select Method</p>
-            
+
             <button onClick={handleAdd} className="w-full group">
               <div className="flex items-center gap-4 p-4 rounded-[16px] border border-gray-100 hover:border-[#2d5a4c]/30 hover:bg-[#f0f4f3] transition-all text-left">
                 <div className="w-12 h-12 rounded-full bg-[#f0f4f3] flex items-center justify-center group-hover:bg-white transition-colors">

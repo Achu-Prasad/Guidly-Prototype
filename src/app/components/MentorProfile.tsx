@@ -1,15 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   Star,
   ChatCircle as MessageCircle,
-  ArrowLeft,
+  CaretLeft as ChevronLeft,
   DotsThreeVertical as MoreVertical,
   GraduationCap,
   TrendUp,
   Microphone as Mic2,
   Folder,
   FileText,
-  CaretLeft as ChevronLeft,
   ThumbsUp,
   ChatText as MessageSquare,
   Heart,
@@ -26,10 +25,12 @@ interface MentorProfileProps {
   mentor: Mentor;
   onBack: () => void;
   onBook: (mentor: Mentor) => void;
-  onChat: (mentor: Mentor) => void;
+  onChat?: (mentor: Mentor) => void;
   initialTab?: string;
-  onToggleFavourite: (mentor: Mentor) => void;
+  favouriteMentors?: Mentor[];
+  onToggleFavourite?: (mentor: Mentor) => void;
   isFavourite: boolean;
+  isAlreadyBooked?: boolean;
 }
 
 const ServiceIcon = ({ type }: { type: Service['icon'] }) => {
@@ -50,21 +51,22 @@ export const MentorProfile = ({
   onChat,
   initialTab = 'Overview',
   onToggleFavourite,
-  isFavourite
+  isFavourite,
+  isAlreadyBooked
 }: MentorProfileProps) => {
   const [activeTab, setActiveTab] = useState(initialTab);
   const [reviewFilter, setReviewFilter] = useState<'Recent' | 'Highest' | 'Lowest'>('Recent');
 
-  const sortedReviews = [...mentor.reviews].sort((a, b) => {
-    if (reviewFilter === 'Highest') return b.rating - a.rating;
-    if (reviewFilter === 'Lowest') return a.rating - b.rating;
-    // For 'Recent', our dummy timestamps are strings, but we can assume the data order is newest first
-    // In a real app, we'd use date objects.
-    return 0;
-  });
+  const sortedReviews = useMemo(() => {
+    return [...mentor.reviews].sort((a, b) => {
+      if (reviewFilter === 'Highest') return b.rating - a.rating;
+      if (reviewFilter === 'Lowest') return a.rating - b.rating;
+      return 0;
+    });
+  }, [mentor.reviews, reviewFilter]);
 
   return (
-    <div className="bg-white flex flex-col h-full relative">
+    <div className="bg-white flex flex-col h-full relative overflow-hidden">
       {/* Sticky Header Actions */}
       <div className="absolute top-0 left-0 right-0 p-4 flex justify-between items-center z-20">
         <button
@@ -87,7 +89,7 @@ export const MentorProfile = ({
               align="end"
             >
               <DropdownMenu.Item
-                onClick={() => onToggleFavourite(mentor)}
+                onClick={() => onToggleFavourite?.(mentor)}
                 className="group text-[14px] leading-none text-[#3f4544] rounded-[8px] flex items-center h-[40px] px-[12px] gap-[12px] relative select-none outline-none hover:bg-[#f1f5f4] hover:text-[#2d5a4c] cursor-pointer transition-colors"
               >
                 <Heart size={18} weight={isFavourite ? "fill" : "regular"} className={`${isFavourite ? 'text-[#2d5a4c]' : 'opacity-70 group-hover:opacity-100'}`} />
@@ -129,7 +131,7 @@ export const MentorProfile = ({
           />
         </div>
 
-        <div className="px-4 -mt-8 relative z-10 bg-white rounded-t-[24px] pt-4">
+        <div className="px-4 -mt-8 relative z-10 bg-white rounded-t-[24px] pt-4 pb-2">
           <div className="flex justify-between items-end mb-4">
             <div className="relative">
               <div className="w-[66px] h-[66px] rounded-full border-4 border-white overflow-hidden shadow-sm bg-white">
@@ -154,15 +156,15 @@ export const MentorProfile = ({
               <p className="text-[14px] font-['Figtree'] text-[#3f4544] opacity-70">{mentor.role}</p>
             </div>
             <button
-              onClick={() => onChat(mentor)}
-              className="bg-[#f3f3f3] h-[40px] px-4 rounded-[8px] flex items-center gap-1 text-[#2D5A4C] font-['Figtree'] text-[14px]"
+              onClick={() => onChat?.(mentor)}
+              className="bg-[#f3f3f3] h-[40px] px-4 rounded-[8px] flex items-center gap-1.5 text-[#2D5A4C] font-['Figtree'] text-[14px]"
             >
               <MessageCircle size={18} />
               Chat
             </button>
           </div>
 
-          <div className="flex flex-wrap gap-2 mb-6">
+          <div className="flex flex-wrap gap-2 mb-4">
             {mentor.languages.map(lang => (
               <span key={lang} className="bg-[#f3f3f3] px-2 py-1 rounded-[4px] text-[12px] text-[#3f4544] font-['Figtree']">
                 {lang}
@@ -176,8 +178,7 @@ export const MentorProfile = ({
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
-                className={`flex-1 py-3 text-[14px] font-['Figtree'] font-medium transition-colors relative ${activeTab === tab ? 'text-[#2D5A4C]' : 'text-[#3f4544] opacity-70'
-                  }`}
+                className={`flex-1 py-3 text-[14px] font-['Figtree'] font-medium transition-colors relative ${activeTab === tab ? 'text-[#2D5A4C]' : 'text-[#3f4544] opacity-70'}`}
               >
                 {tab}
                 {activeTab === tab && (
@@ -193,9 +194,9 @@ export const MentorProfile = ({
       </div>
 
       {/* Scrollable Content */}
-      <div className="flex-1 overflow-y-auto no-scrollbar px-4 pt-6 pb-24 space-y-8">
+      <div className="flex-1 overflow-y-auto no-scrollbar px-4 pt-6 pb-24">
         {activeTab === 'Overview' && (
-          <>
+          <div className="space-y-8">
             {/* Mentor Message */}
             <section className="space-y-4">
               <h2 className="text-[14px] font-['Bricolage_Grotesque'] font-medium text-[#272d2c]">Mentor Message</h2>
@@ -226,8 +227,7 @@ export const MentorProfile = ({
                         <p className="text-[10px] font-['Figtree'] text-[#9fa2a1]">Duration: {service.duration}</p>
                       </div>
                     </div>
-                    <div className={`px-2 py-0.5 rounded-[64px] text-[12px] font-['Figtree'] font-medium ${service.price === 'Free' ? 'bg-[#f1f5f4] text-[#2d5a4c]' : 'text-[#272d2c]'
-                      }`}>
+                    <div className={`px-2 py-0.5 rounded-[64px] text-[12px] font-['Figtree'] font-medium ${service.price === 'Free' ? 'bg-[#f1f5f4] text-[#2d5a4c]' : 'text-[#272d2c]'}`}>
                       {service.price}
                     </div>
                   </div>
@@ -251,12 +251,11 @@ export const MentorProfile = ({
                 ))}
               </div>
             </section>
-          </>
+          </div>
         )}
 
         {activeTab === 'Review' && (
           <div className="space-y-6">
-            {/* Rating Summary & Filters */}
             <div className="flex items-center justify-between">
               <div className="flex flex-col">
                 <div className="flex items-center gap-1">
@@ -272,8 +271,7 @@ export const MentorProfile = ({
                   <button
                     key={filter}
                     onClick={() => setReviewFilter(filter)}
-                    className={`px-4 py-2 rounded-[8px] text-[13px] font-['Figtree'] font-medium transition-all ${reviewFilter === filter ? 'bg-white text-[#2D5A4C] shadow-sm' : 'text-[#3f4544] opacity-60'
-                      }`}
+                    className={`px-4 py-2 rounded-[8px] text-[13px] font-['Figtree'] font-medium transition-all ${reviewFilter === filter ? 'bg-white text-[#2D5A4C] shadow-sm' : 'text-[#3f4544] opacity-60'}`}
                   >
                     {filter}
                   </button>
@@ -281,7 +279,6 @@ export const MentorProfile = ({
               </div>
             </div>
 
-            {/* Reviews List */}
             <div className="space-y-4">
               {sortedReviews.map((review) => (
                 <div key={review.id} className="bg-[#f3f3f3]/50 border border-gray-100 rounded-[16px] p-4 space-y-4">
@@ -315,7 +312,6 @@ export const MentorProfile = ({
                     </div>
                   </div>
 
-                  {/* Mentor Reply */}
                   {review.reply && (
                     <div className="mt-4 bg-[#f1f5f4] rounded-[12px] p-4 border border-[#2d5a4c]/5 space-y-3">
                       <div className="flex justify-between items-center">
@@ -348,19 +344,11 @@ export const MentorProfile = ({
         {activeTab === 'Guidelines' && (
           <div className="space-y-6">
             <p className="text-[14px] font-['Figtree'] text-[#3f4544] leading-relaxed opacity-80">
-              Guidelines helps mentees to understand topics or questions that the mentor prefers not to discuss. This ensures a respectful and productive session.
+              Guidelines helps mentees to understand topics or questions that the mentor prefers not to discuss.
             </p>
 
             <div className="bg-[#f8f9f8] rounded-[24px] p-5 space-y-6">
               <h3 className="text-[16px] font-['Bricolage_Grotesque'] font-medium text-[#272d2c]">Restricted Topics</h3>
-
-              <div className="flex gap-3">
-                <div className="w-[1.5px] bg-[#2d5a4c] rounded-full shrink-0" />
-                <p className="text-[14px] font-['Figtree'] text-[#3f4544] leading-relaxed opacity-80">
-                  To make our session productive and respectful, please avoid asking the following
-                </p>
-              </div>
-
               <div className="space-y-3">
                 {mentor.restricted_topics.map((topic, index) => (
                   <div key={index} className="bg-white rounded-[20px] p-4 flex items-center gap-4 shadow-[0px_2px_10px_rgba(0,0,0,0.02)] border border-white">
@@ -382,7 +370,7 @@ export const MentorProfile = ({
       <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-white via-white to-transparent pt-8 pb-8 z-30">
         <button
           onClick={() => onBook(mentor)}
-          className="w-full h-[52px] bg-[#2d5a4c] rounded-[12px] flex items-center justify-center text-white font-['Figtree'] font-medium text-[16px] shadow-[0px_8px_20px_rgba(45,90,76,0.3)] active:scale-[0.98] transition-all"
+          className={`w-full h-[52px] rounded-[12px] flex items-center justify-center text-white font-['Figtree'] font-medium text-[16px] shadow-[0px_8px_20px_rgba(45,90,76,0.3)] transition-all bg-[#2d5a4c] active:scale-[0.98]`}
         >
           Book a Session
         </button>

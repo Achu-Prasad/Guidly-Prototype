@@ -24,9 +24,10 @@ import dpImage from '../../assets/dp.jpeg';
 interface AccountScreenProps {
     onNavigate: (view: any) => void;
     hasUnreadChats?: boolean;
+    unreadNotificationsCount?: number;
 }
 
-export const AccountScreen = ({ onNavigate, hasUnreadChats }: AccountScreenProps) => {
+export const AccountScreen = ({ onNavigate, hasUnreadChats, unreadNotificationsCount = 0 }: AccountScreenProps) => {
     const [notificationsEnabled, setNotificationsEnabled] = useState(true);
 
     return (
@@ -39,9 +40,11 @@ export const AccountScreen = ({ onNavigate, hasUnreadChats }: AccountScreenProps
                     className="relative w-12 h-12 flex items-center justify-center rounded-full hover:bg-gray-50 transition-colors"
                 >
                     <Bell size={24} className="text-[#3f4544] opacity-80" />
-                    <div className="absolute top-2 right-2 bg-[#fb2c36] text-white text-[10px] font-bold w-[15px] h-[15px] flex items-center justify-center rounded-full">
-                        4
-                    </div>
+                    {unreadNotificationsCount > 0 && (
+                        <div className="absolute top-2 right-2 bg-[#fb2c36] text-white text-[10px] font-bold min-w-[15px] h-[15px] px-1 flex items-center justify-center rounded-full shadow-sm">
+                            {unreadNotificationsCount}
+                        </div>
+                    )}
                 </button>
             </header>
 

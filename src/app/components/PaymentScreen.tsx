@@ -17,7 +17,7 @@ import {
   CircleNotch as Loader2
 } from "@phosphor-icons/react";
 import { toast } from "sonner";
-import { projectId, publicAnonKey } from "/utils/supabase/info";
+import { projectId, publicAnonKey } from "../../../utils/supabase/info";
 
 import { AddCardModal } from "./AddCardModal";
 import { WalletModal } from "./WalletModal";
@@ -329,7 +329,7 @@ export const PaymentScreen = ({ amount, onBack, onSuccess, bookingDetails }: Pay
 
         {/* Other Method Modals (Sub-Sheets) */}
         {activeOtherMethod && (
-          <div className="fixed inset-0 z-[100] flex items-end justify-center">
+          <div className="absolute inset-0 z-[100] flex items-end justify-center">
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setActiveOtherMethod(null)} className="absolute inset-0 bg-black/30 backdrop-blur-sm" />
             <motion.div
               initial={{ y: "100%" }} animate={{ y: 0 }} exit={{ y: "100%" }}
@@ -423,7 +423,7 @@ export const PaymentScreen = ({ amount, onBack, onSuccess, bookingDetails }: Pay
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[200] flex flex-col items-center justify-center bg-white/90 backdrop-blur-md"
+            className="absolute inset-0 z-[200] flex flex-col items-center justify-center bg-white/90 backdrop-blur-md"
           >
             <div className="relative">
               <motion.div

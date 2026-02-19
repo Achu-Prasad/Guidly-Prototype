@@ -32,9 +32,10 @@ interface HomeScreenProps {
   recentMentors: Mentor[];
   favouriteMentors: Mentor[];
   hasUnreadChats?: boolean;
+  unreadNotificationsCount?: number;
 }
 
-export const HomeScreen = ({ onSearch, onSelectMentor, onNavigate, recentMentors, favouriteMentors, hasUnreadChats }: HomeScreenProps) => {
+export const HomeScreen = ({ onSearch, onSelectMentor, onNavigate, recentMentors, favouriteMentors, hasUnreadChats, unreadNotificationsCount = 0 }: HomeScreenProps) => {
   const [activeTab, setActiveTab] = useState('Feed');
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -99,9 +100,11 @@ export const HomeScreen = ({ onSearch, onSelectMentor, onNavigate, recentMentors
             className="relative w-12 h-12 flex items-center justify-center rounded-full hover:bg-gray-50 transition-colors"
           >
             <Bell size={24} weight="regular" className="text-[#0F1615]" />
-            <span className="absolute top-[11px] right-[11px] w-[15px] h-[15px] bg-[#fb2c36] rounded-full flex items-center justify-center text-[10px] text-white font-semibold">
-              4
-            </span>
+            {unreadNotificationsCount > 0 && (
+              <span className="absolute top-[11px] right-[11px] min-w-[15px] h-[15px] px-1 bg-[#fb2c36] rounded-full flex items-center justify-center text-[10px] text-white font-semibold shadow-sm">
+                {unreadNotificationsCount}
+              </span>
+            )}
           </button>
         </header>
 

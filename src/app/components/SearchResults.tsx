@@ -136,9 +136,10 @@ interface SearchResultsProps {
   onSelectMentor: (mentor: Mentor) => void;
   onNavigate: (view: string) => void;
   hasUnreadChats?: boolean;
+  unreadNotificationsCount?: number;
 }
 
-export const SearchResults = ({ query, onBack, onSelectMentor, onNavigate, hasUnreadChats }: SearchResultsProps) => {
+export const SearchResults = ({ query, onBack, onSelectMentor, onNavigate, hasUnreadChats, unreadNotificationsCount = 0 }: SearchResultsProps) => {
   const [searchQuery, setSearchQuery] = useState(query);
   const [filters, setFilters] = useState<Filters>(defaultFilters);
   const [tempFilters, setTempFilters] = useState<Filters>(defaultFilters);
@@ -264,9 +265,11 @@ export const SearchResults = ({ query, onBack, onSelectMentor, onNavigate, hasUn
             className="relative w-12 h-12 flex items-center justify-center rounded-full hover:bg-gray-50 transition-colors"
           >
             <Bell size={24} weight="regular" className="text-[#0F1615]" />
-            <span className="absolute top-[11px] right-[11px] w-[15px] h-[15px] bg-[#fb2c36] rounded-full flex items-center justify-center text-[10px] text-white font-semibold">
-              4
-            </span>
+            {unreadNotificationsCount > 0 && (
+              <span className="absolute top-[11px] right-[11px] min-w-[15px] h-[15px] px-1 bg-[#fb2c36] rounded-full flex items-center justify-center text-[10px] text-white font-semibold shadow-sm">
+                {unreadNotificationsCount}
+              </span>
+            )}
           </button>
         </header>
 
