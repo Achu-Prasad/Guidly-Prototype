@@ -433,9 +433,17 @@ export const TeamUp = ({
 
                       {/* CTA Button */}
                       <button
-                        className="bg-[#2D5A4C] text-white px-[16px] py-[8px] rounded-[10px] text-[13px] font-['Figtree'] font-semibold flex items-center gap-[6px] shadow-[0px_2px_6px_rgba(45,90,76,0.2)] hover:bg-[#244a3e] transition-colors"
+                        className={`px-[16px] py-[8px] rounded-[10px] text-[13px] font-['Figtree'] font-semibold flex items-center gap-[6px] transition-colors ${bookedEventTitles.includes(event.title)
+                          ? 'bg-[#E8F0ED] text-[#2D5A4C] shadow-none'
+                          : 'bg-[#2D5A4C] text-white shadow-[0px_2px_6px_rgba(45,90,76,0.2)] hover:bg-[#244a3e]'
+                          }`}
                       >
-                        {isFree ? (
+                        {bookedEventTitles.includes(event.title) ? (
+                          <>
+                            Booked
+                            <Check size={13} weight="bold" />
+                          </>
+                        ) : isFree ? (
                           <>
                             RSVP
                             <ArrowRight size={13} weight="bold" />
@@ -657,7 +665,10 @@ export const TeamUp = ({
                 <button
                   onClick={() => {
                     const isAlreadyBooked = bookedEventTitles.includes(selectedEvent.title);
-                    if (!isAlreadyBooked) onBookEvent?.(selectedEvent);
+                    if (!isAlreadyBooked) {
+                      onBookEvent?.(selectedEvent);
+                      setIsDrawerOpen(false);
+                    }
                   }}
                   disabled={bookedEventTitles.includes(selectedEvent.title)}
                   className={`flex-[1.6] h-[56px] rounded-[20px] font-['Figtree'] font-bold text-[16px] flex items-center justify-center gap-2.5 px-6 whitespace-nowrap transition-all group ${bookedEventTitles.includes(selectedEvent.title)
@@ -666,7 +677,10 @@ export const TeamUp = ({
                     }`}
                 >
                   {bookedEventTitles.includes(selectedEvent.title) ? (
-                    <span>Booked</span>
+                    <>
+                      <span>Booked</span>
+                      <Check size={16} weight="bold" className="ml-1" />
+                    </>
                   ) : selectedEvent.ticket_price === 0 ? (
                     <span>Get free ticket</span>
                   ) : (

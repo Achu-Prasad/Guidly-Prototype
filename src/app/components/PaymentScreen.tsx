@@ -457,27 +457,41 @@ export const PaymentScreen = ({ amount, onBack, onSuccess, bookingDetails }: Pay
             exit={{ opacity: 0 }}
             className="absolute inset-0 z-[200] flex flex-col items-center justify-center bg-white/90 backdrop-blur-md"
           >
-            <div className="relative">
-              <motion.div
-                animate={{ rotate: 360 }}
-                transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                className="w-16 h-16 border-4 border-[#2d5a4c]/10 border-t-[#2d5a4c] rounded-full"
-              />
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="w-8 h-8 bg-[#2d5a4c] rounded-full animate-pulse flex items-center justify-center">
-                  <Lock size={14} className="text-white" />
-                </div>
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ duration: 0.5, ease: [0.21, 0.45, 0.32, 0.9] }}
+              className="relative flex flex-col items-center"
+            >
+              <div className="relative w-16 h-16 flex items-center justify-center mb-6 mt-4">
+                <motion.div
+                  animate={{ scale: [1, 1.25, 1], opacity: [0.15, 0.3, 0.15] }}
+                  transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
+                  className="absolute -inset-8 bg-[#2d5a4c] rounded-full blur-xl"
+                />
+                <motion.div
+                  animate={{ rotate: 360 }}
+                  transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
+                  className="absolute inset-0 border-[3px] border-[#2d5a4c]/20 border-t-[#2d5a4c] rounded-full z-10"
+                />
+                <motion.div
+                  animate={{ scale: [1, 1.08, 1] }}
+                  transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                  className="relative z-[110] w-8 h-8 bg-white border border-gray-100 shadow-sm rounded-full flex items-center justify-center"
+                >
+                  <Lock size={14} className="text-[#2d5a4c]" weight="bold" />
+                </motion.div>
               </div>
-            </div>
 
-            <div className="mt-8 text-center">
-              <h3 className="font-heading font-semibold text-[20px] text-[#272d2c] mb-2 uppercase tracking-widest">
-                Processing Payment
-              </h3>
-              <p className="font-body font-medium text-[14px] text-[#3f4544] opacity-60">
-                Please don't close the app or refresh the page
-              </p>
-            </div>
+              <div className="text-center px-6 mt-2 relative z-10">
+                <h3 className="font-['Bricolage_Grotesque'] font-medium text-[22px] text-[#272d2c] tracking-tight mb-2">
+                  {bookingDetails?.service_snapshot?.type === 'Event' ? 'Securing your event ticket' : 'Confirming your session'}
+                </h3>
+                <p className="font-['Figtree'] text-[15px] text-[#3f4544] opacity-70">
+                  Processing your payment securely...
+                </p>
+              </div>
+            </motion.div>
 
             <div className="mt-12 flex gap-2">
               {[0, 1, 2].map((i) => (

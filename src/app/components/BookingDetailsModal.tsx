@@ -175,17 +175,19 @@ export const BookingDetailsModal = ({ isOpen, onClose, booking, onReschedule }: 
                                 {isStarted ? 'Join Session Now' : `Session starts in ${timeLeftStr}`}
                             </button>
 
-                            <button
-                                onClick={() => !isStarted && onReschedule(booking)}
-                                disabled={isStarted}
-                                className={`h-[48px] w-full rounded-[8px] flex items-center justify-center gap-2 font-body font-semibold text-[15px] transition-colors border ${isStarted
-                                    ? 'border-gray-200 text-gray-400 bg-transparent cursor-not-allowed'
-                                    : 'border-[#2D5A4C] text-[#2D5A4C] hover:bg-[#2D5A4C]/5'
-                                    }`}
-                            >
-                                <ArrowsClockwise size={20} weight="bold" />
-                                Reschedule
-                            </button>
+                            {booking.type === 'session' && (
+                                <button
+                                    onClick={() => !isStarted && onReschedule(booking)}
+                                    disabled={isStarted}
+                                    className={`h-[48px] w-full rounded-[8px] flex items-center justify-center gap-2 font-body font-semibold text-[15px] transition-colors border ${isStarted
+                                        ? 'border-gray-200 text-gray-400 bg-transparent cursor-not-allowed'
+                                        : 'border-[#2D5A4C] text-[#2D5A4C] hover:bg-[#2D5A4C]/5'
+                                        }`}
+                                >
+                                    <ArrowsClockwise size={20} weight="bold" />
+                                    Reschedule
+                                </button>
+                            )}
                         </div>
                     </motion.div>
                 </div>

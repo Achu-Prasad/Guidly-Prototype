@@ -158,8 +158,13 @@ export const RescheduleScreen = ({
                     })}
                 </div>
 
+                {/* Text Guide */}
+                <p className="font-['Figtree'] text-[14px] text-[#3f4544] font-medium opacity-80 mb-3 text-center">
+                    Select a date to reschedule your session
+                </p>
+
                 {/* Styled Calendar Box */}
-                <div className="bg-white rounded-[24px] p-5 shadow-[0px_8px_30px_-4px_rgba(0,0,0,0.04)] border border-gray-100/50 mb-6">
+                <div className="bg-white rounded-[24px] p-[14px] shadow-[0px_8px_30px_-4px_rgba(0,0,0,0.04)] border border-gray-100/50 mb-6">
                     <style>{`
                         .rdp { margin: 0; }
                         .rdp-month { width: 100%; }
