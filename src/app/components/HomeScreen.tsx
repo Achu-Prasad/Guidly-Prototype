@@ -67,12 +67,18 @@ export const HomeScreen = ({ onSearch, onSelectMentor, onNavigate, recentMentors
 
       {/* Content Overlay */}
       <div className="absolute inset-0 p-4 flex flex-col justify-between">
-        <div className="flex justify-between items-start">
-          <div className="bg-white/10 backdrop-blur-md border border-white/20 px-2.5 py-1 rounded-full flex items-center gap-1.5 transition-all hover:bg-white/20">
-            <Star size={12} weight="fill" className="text-white" />
-            <span className="text-[12px] font-sans font-medium text-white">{mentor.rating_avg}</span>
+        <div className="flex justify-between items-start w-full">
+          <div
+            className="border-[0.8px] border-white/20 flex gap-[6px] items-center pl-[10.8px] pr-[10.8px] py-[6px] rounded-full backdrop-blur-md"
+            style={{ backgroundImage: "linear-gradient(90deg, rgba(45, 90, 76, 0.5) 0%, rgba(45, 90, 76, 0.5) 100%), linear-gradient(90deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.1) 100%)" }}
+          >
+            <Star size={12} weight="fill" className="text-white shrink-0" />
+            <span className="text-[12px] font-sans font-medium text-white leading-none pt-[1px]">{mentor.rating_avg}</span>
           </div>
-          <div className="bg-white/10 backdrop-blur-md border border-white/20 p-2 rounded-full text-white hover:bg-white/20 transition-all">
+          <div
+            className="border-[0.8px] border-white/20 p-2 rounded-full text-white backdrop-blur-md hover:bg-white/20 transition-all ml-auto flex items-center justify-center"
+            style={{ backgroundImage: "linear-gradient(90deg, rgba(45, 90, 76, 0.5) 0%, rgba(45, 90, 76, 0.5) 100%), linear-gradient(90deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.1) 100%)" }}
+          >
             <CurrencyDollar size={14} weight="bold" />
           </div>
         </div>
