@@ -15,6 +15,7 @@ import {
 } from "@phosphor-icons/react";
 import { Logo } from './Logo';
 import { BottomNav } from './ui/BottomNav';
+import { BookingDetailsModal } from './BookingDetailsModal';
 
 interface BookingItem {
     id: string;
@@ -38,6 +39,8 @@ interface BookingsProps {
 export const Bookings = ({ onNavigate, bookings, hasUnreadChats, initialTab, unreadNotificationsCount = 0 }: BookingsProps) => {
     const [activeTab, setActiveTab] = useState(initialTab || 'All');
     const [searchQuery, setSearchQuery] = useState('');
+    const [selectedBooking, setSelectedBooking] = useState<BookingItem | null>(null);
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
     return (
         <div className="flex flex-col h-full bg-[#f8f7f3] relative">
@@ -113,7 +116,11 @@ export const Bookings = ({ onNavigate, bookings, hasUnreadChats, initialTab, unr
                             key={booking.id}
                             initial={{ opacity: 0, y: 10 }}
                             animate={{ opacity: 1, y: 0 }}
-                            className="bg-white p-2 rounded-[8px] shadow-[0px_2px_2px_rgba(0,0,0,0.05)] border border-gray-100 flex gap-3 h-[98px] relative"
+                            onClick={() => {
+                                setSelectedBooking(booking);
+                                setIsModalOpen(true);
+                            }}
+                            className="bg-white p-2 rounded-[8px] cursor-pointer shadow-[0px_2px_2px_rgba(0,0,0,0.05)] border border-gray-100 flex gap-3 h-[98px] relative transition-transform hover:scale-[1.01]"
                         >
                             {booking.status === 'join' && (
                                 <div className="absolute top-2 right-2 bg-[#00973d]/10 px-2.5 py-1 rounded-full flex items-center gap-1.5 border border-[#00973d]/5">
@@ -171,6 +178,18 @@ export const Bookings = ({ onNavigate, bookings, hasUnreadChats, initialTab, unr
 
             {/* Bottom Navigation */}
             <BottomNav activeView="bookings" onNavigate={onNavigate} hasUnreadChats={hasUnreadChats} />
+
+            {/* Booking Details Modal Popup */}
+            {isModalOpen && (
+                <BookingDetailsModal
+                    isOpen={isModalOpen}
+                    onClose={() => setIsModalOpen(false)}
+                    booking={selectedBooking}
+                    onReschedule={(b) => {
+                        console.log("Rescheduling flow for:", b);
+                    }}
+                />
+            )}
         </div>
     );
 };

@@ -977,6 +977,14 @@ export default function App() {
             status={communityStatuses[selectedCommunity.id] || 'none'}
             onBookEvent={handleBookEvent}
             bookedEventTitles={bookings.filter(b => b.type === 'event').map(b => b.title)}
+            onChatLeader={(leader) => {
+              setChatReturnView('community-profile' as any);
+              handleOpenChat({
+                id: leader.id,
+                name: leader.name,
+                image: leader.image || ''
+              });
+            }}
           />
           <AnimatePresence>
             {showConfirmation && (

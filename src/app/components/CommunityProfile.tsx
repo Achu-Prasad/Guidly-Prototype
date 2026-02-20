@@ -34,7 +34,8 @@ import {
     Clock,
     Plus,
     Minus,
-    CircleNotch
+    CircleNotch,
+    ChatCircle
 } from "@phosphor-icons/react";
 import { motion, AnimatePresence } from 'motion/react';
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
@@ -56,6 +57,7 @@ interface CommunityProfileProps {
     status?: 'none' | 'requesting' | 'joined';
     onBookEvent?: (event: TeamUpEvent) => void;
     bookedEventTitles?: string[];
+    onChatLeader?: (leader: CommunityLeader) => void;
 }
 
 const PerkIcon = ({ type }: { type: CommunityPerk['iconType'] }) => {
@@ -97,7 +99,8 @@ export const CommunityProfile = ({
     onJoinRequest,
     status = 'none',
     onBookEvent,
-    bookedEventTitles = []
+    bookedEventTitles = [],
+    onChatLeader
 }: CommunityProfileProps) => {
     const [activeTab, setActiveTab] = useState('Overview');
     const [reviewFilter, setReviewFilter] = useState('Top Recent');
@@ -469,7 +472,7 @@ export const CommunityProfile = ({
                                     {community.leaders.map((leader, idx) => (
                                         <div
                                             key={leader.id}
-                                            className="shrink-0 bg-white border border-[#e2e8f0] rounded-[16px] shadow-[0px_1px_2px_0px_rgba(0,0,0,0.05)] p-[17px] flex flex-col gap-3 items-center min-w-[140px] h-[196px]"
+                                            className="shrink-0 bg-white border border-[#e2e8f0] rounded-[16px] shadow-[0px_1px_2px_0px_rgba(0,0,0,0.05)] pt-[17px] px-[17px] pb-5 flex flex-col gap-3 items-center min-w-[140px]"
                                         >
                                             {/* Avatar */}
                                             <div className="relative">
@@ -495,9 +498,16 @@ export const CommunityProfile = ({
                                                 <p className="text-[10px] font-['Figtree'] font-medium text-[#64748b] text-center leading-[14px]">{leader.role}</p>
                                             </div>
 
-                                            {/* Follow button */}
-                                            <button className="mt-auto bg-[rgba(45,90,76,0.1)] rounded-full h-8 px-6 flex items-center justify-center hover:bg-[rgba(45,90,76,0.2)] active:scale-95 transition-all w-fit">
-                                                <span className="text-[12px] font-['Figtree'] font-semibold text-[#2d5a4c]">Follow</span>
+                                            {/* Chat button */}
+                                            <button
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    onChatLeader?.(leader);
+                                                }}
+                                                className="mt-auto bg-gray-50 border border-gray-100 rounded-full py-2 px-6 flex items-center gap-2 hover:bg-gray-100 active:scale-95 transition-all w-fit"
+                                            >
+                                                <ChatCircle size={16} weight="bold" className="text-[#3f4544]" />
+                                                <span className="text-[12px] font-body font-semibold text-[#3f4544]">Chat</span>
                                             </button>
                                         </div>
                                     ))}
