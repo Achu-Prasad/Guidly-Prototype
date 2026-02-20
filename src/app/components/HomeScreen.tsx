@@ -70,7 +70,7 @@ export const HomeScreen = ({ onSearch, onSelectMentor, onNavigate, recentMentors
         <div className="flex justify-between items-start">
           <div className="bg-white/10 backdrop-blur-md border border-white/20 px-2.5 py-1 rounded-full flex items-center gap-1.5 transition-all hover:bg-white/20">
             <Star size={12} weight="fill" className="text-white" />
-            <span className="text-[12px] font-['Figtree',sans-serif] font-medium text-white">{mentor.rating_avg}</span>
+            <span className="text-[12px] font-sans font-medium text-white">{mentor.rating_avg}</span>
           </div>
           <div className="bg-white/10 backdrop-blur-md border border-white/20 p-2 rounded-full text-white hover:bg-white/20 transition-all">
             <CurrencyDollar size={14} weight="bold" />
@@ -78,10 +78,10 @@ export const HomeScreen = ({ onSearch, onSelectMentor, onNavigate, recentMentors
         </div>
 
         <div className="space-y-1">
-          <h3 className="text-white text-[18px] font-['Bricolage_Grotesque',sans-serif] font-medium leading-tight">
+          <h3 className="text-white text-[18px] font-heading font-medium leading-tight">
             {mentor.name}
           </h3>
-          <p className="text-white/70 text-[14px] font-['Figtree',sans-serif]">
+          <p className="text-white/70 text-[14px] font-sans">
             {mentor.role} @ {mentor.company}
           </p>
         </div>
@@ -110,18 +110,18 @@ export const HomeScreen = ({ onSearch, onSelectMentor, onNavigate, recentMentors
 
         {/* Search Bar - Figma Style Consistent with TeamUp */}
         <div className="px-4 flex gap-2">
-          <form onSubmit={handleSearchSubmit} className="flex-1 bg-[#f3f3f3] h-[48px] rounded-[4px] flex items-center px-[12px]">
+          <form onSubmit={handleSearchSubmit} className="flex-1 bg-[#f3f3f3] h-[48px] rounded-[8px] flex items-center px-[12px]">
             <input
               type="text"
               placeholder="Search"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-transparent text-[16px] font-['Figtree'] outline-none border-none placeholder-[#3f4544]/40"
+              className="w-full bg-transparent text-[16px] font-sans outline-none border-none placeholder-[#3f4544]/40"
             />
           </form>
           <button
             onClick={() => handleSearchSubmit()}
-            className="w-[51px] h-[48px] bg-[#f3f3f3] rounded-[4px] flex items-center justify-center hover:bg-gray-200 transition-colors"
+            className="w-[51px] h-[48px] bg-[#f3f3f3] rounded-[8px] flex items-center justify-center hover:bg-gray-200 transition-colors"
           >
             <Search size={24} weight="regular" />
           </button>
@@ -133,7 +133,7 @@ export const HomeScreen = ({ onSearch, onSelectMentor, onNavigate, recentMentors
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
-              className={`px-[12px] py-[8px] rounded-[4px] text-[14px] font-['Figtree'] font-medium transition-all whitespace-nowrap ${activeTab === tab
+              className={`px-[12px] py-[8px] rounded-[8px] text-[14px] font-sans font-medium transition-all whitespace-nowrap ${activeTab === tab
                 ? 'bg-[#edebe1] text-[#2D5A4C]'
                 : 'text-[#3f4544] hover:bg-gray-50'
                 }`}
@@ -154,7 +154,7 @@ export const HomeScreen = ({ onSearch, onSelectMentor, onNavigate, recentMentors
               recentMentors.map(renderMentorCard)
             ) : (
               <div className="flex flex-col items-center justify-center py-20 px-8 text-center bg-white/50 rounded-2xl border border-dashed border-gray-200">
-                <p className="text-[14px] font-['Bricolage_Grotesque'] font-medium text-[#3f4544] opacity-70">
+                <p className="text-[14px] font-heading font-medium text-[#3f4544] opacity-70">
                   You haven’t any recent searches
                 </p>
               </div>
@@ -166,7 +166,7 @@ export const HomeScreen = ({ onSearch, onSelectMentor, onNavigate, recentMentors
               favouriteMentors.map(renderMentorCard)
             ) : (
               <div className="flex flex-col items-center justify-center py-20 px-8 text-center bg-white/50 rounded-2xl border border-dashed border-gray-200">
-                <p className="text-[14px] font-['Bricolage_Grotesque'] font-medium text-[#3f4544] opacity-70">
+                <p className="text-[14px] font-heading font-medium text-[#3f4544] opacity-70">
                   No favourites yet
                 </p>
               </div>

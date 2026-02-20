@@ -31,7 +31,7 @@ export const AccountScreen = ({ onNavigate, hasUnreadChats, unreadNotificationsC
     const [notificationsEnabled, setNotificationsEnabled] = useState(true);
 
     return (
-        <div className="flex flex-col h-full bg-[#f3f3f3] relative overflow-hidden font-['Figtree']">
+        <div className="flex flex-col h-full bg-[#f8f7f3] relative overflow-hidden font-['Figtree']">
             {/* Header */}
             <header className="bg-white px-4 pt-10 pb-4 flex justify-between items-center shadow-sm">
                 <Logo />
@@ -39,11 +39,11 @@ export const AccountScreen = ({ onNavigate, hasUnreadChats, unreadNotificationsC
                     onClick={() => onNavigate('notifications')}
                     className="relative w-12 h-12 flex items-center justify-center rounded-full hover:bg-gray-50 transition-colors"
                 >
-                    <Bell size={24} className="text-[#3f4544] opacity-80" />
+                    <Bell size={24} weight="regular" className="text-[#0F1615] opacity-80" />
                     {unreadNotificationsCount > 0 && (
-                        <div className="absolute top-2 right-2 bg-[#fb2c36] text-white text-[10px] font-bold min-w-[15px] h-[15px] px-1 flex items-center justify-center rounded-full shadow-sm">
+                        <span className="absolute top-[11px] right-[11px] min-w-[15px] h-[15px] px-1 bg-[#fb2c36] rounded-full flex items-center justify-center text-[10px] text-white font-semibold shadow-sm">
                             {unreadNotificationsCount}
-                        </div>
+                        </span>
                     )}
                 </button>
             </header>

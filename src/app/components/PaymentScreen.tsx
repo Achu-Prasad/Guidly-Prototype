@@ -133,8 +133,8 @@ export const PaymentScreen = ({ amount, onBack, onSuccess, bookingDetails }: Pay
       {/* Header */}
       <div className="sticky top-0 z-40 bg-[#f8f7f3]/80 backdrop-blur-md px-6 pt-12 pb-6">
         <div className="flex items-center justify-between mb-8">
-          <button onClick={onBack} className="p-2 -ml-2 hover:bg-black/5 rounded-full transition-colors">
-            <CaretLeft size={24} className="text-[#0F1615]" />
+          <button onClick={onBack} className="p-2 -ml-2 hover:bg-black/5 rounded-[8px] transition-colors">
+            <CaretLeft size={24} className="text-[#0F1615]" weight="bold" />
           </button>
           <h2 className="font-['Bricolage_Grotesque:Medium',sans-serif] text-[18px] text-[#272d2c] absolute left-1/2 -translate-x-1/2">
             Checkout

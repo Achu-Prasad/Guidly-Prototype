@@ -74,10 +74,10 @@ export const ConfirmationModal = ({ isOpen, onClose, onConfirm, data }: Confirma
               <CheckCircle className="text-[#2d5a4c]" size={24} />
             </div>
           )}
-          <h2 className="font-['Bricolage_Grotesque:Semi_Bold',sans-serif] text-[20px] text-[#272d2c] leading-tight mb-1">
+          <h2 className="font-heading font-semibold text-[20px] text-[#272d2c] leading-tight mb-1">
             {isEvent ? (data.title || 'Event Booking') : (data.mentorName ? `Booking with ${data.mentorName}` : 'Review your booking')}
           </h2>
-          <p className="font-['Figtree:Regular',sans-serif] text-[14px] text-[#3f4544] opacity-60">
+          <p className="font-sans text-[14px] text-[#3f4544] opacity-60">
             Check your details before payment
           </p>
         </div>
@@ -92,7 +92,7 @@ export const ConfirmationModal = ({ isOpen, onClose, onConfirm, data }: Confirma
                 <Calendar size={18} className="text-[#2d5a4c]" />
               </div>
               <div>
-                <p className="font-['Figtree:Semi_Bold',sans-serif] text-[14px] text-[#272d2c]">
+                <p className="font-sans font-semibold text-[14px] text-[#272d2c]">
                   {format(data.date, 'EEEE, d MMM')}
                 </p>
                 <div className="flex items-center gap-1 text-[#3f4544] opacity-60 text-[12px]">
@@ -102,7 +102,7 @@ export const ConfirmationModal = ({ isOpen, onClose, onConfirm, data }: Confirma
               </div>
             </div>
             <div className="text-right">
-              <p className="font-['Figtree:Semi_Bold',sans-serif] text-[14px] text-[#2d5a4c]">
+              <p className="font-sans font-semibold text-[14px] text-[#2d5a4c]">
                 {isEvent ? '1 Spot' : (() => {
                   const mins = data.totalDuration;
                   if (mins < 60) return `${mins}m`;
@@ -123,14 +123,14 @@ export const ConfirmationModal = ({ isOpen, onClose, onConfirm, data }: Confirma
                   <Globe size={14} className="text-[#3f4544] opacity-40" />
                   <p className="text-[11px] font-medium text-[#3f4544] opacity-40 uppercase tracking-tight">Language</p>
                 </div>
-                <p className="font-['Figtree:Medium',sans-serif] text-[13px] text-[#272d2c]">{data.language}</p>
+                <p className="font-sans font-medium text-[13px] text-[#272d2c]">{data.language}</p>
               </div>
               <div className="bg-white border border-gray-100 p-3 rounded-[12px] shadow-sm">
                 <div className="flex items-center gap-2 mb-1">
                   <Layers size={14} className="text-[#3f4544] opacity-40" />
                   <p className="text-[11px] font-medium text-[#3f4544] opacity-40 uppercase tracking-tight">Session</p>
                 </div>
-                <p className="font-['Figtree:Medium',sans-serif] text-[13px] text-[#272d2c]">
+                <p className="font-sans font-medium text-[13px] text-[#272d2c]">
                   {data.sessionType === 'single' ? 'One-time' : 'Long-term'}
                 </p>
               </div>
@@ -147,7 +147,7 @@ export const ConfirmationModal = ({ isOpen, onClose, onConfirm, data }: Confirma
                 <div className="flex justify-between items-center group">
                   <div className="flex items-center gap-2">
                     <div className="w-1.5 h-1.5 rounded-full bg-[#2d5a4c]/20" />
-                    <p className="font-['Figtree:Regular',sans-serif] text-[14px] text-[#3f4544]">Host: {data.mentorName}</p>
+                    <p className="font-sans text-[14px] text-[#3f4544]">Host: {data.mentorName}</p>
                   </div>
                 </div>
               ) : (
@@ -155,9 +155,9 @@ export const ConfirmationModal = ({ isOpen, onClose, onConfirm, data }: Confirma
                   <div key={s.id} className="flex justify-between items-center group">
                     <div className="flex items-center gap-2">
                       <div className="w-1.5 h-1.5 rounded-full bg-[#2d5a4c]/20 group-hover:bg-[#2d5a4c] transition-colors" />
-                      <p className="font-['Figtree:Regular',sans-serif] text-[14px] text-[#3f4544]">{s.name}</p>
+                      <p className="font-sans text-[14px] text-[#3f4544]">{s.name}</p>
                     </div>
-                    <p className={`font-['Figtree:Medium',sans-serif] text-[14px] ${s.cost > 0 ? 'text-[#272d2c]' : 'text-[#2d5a4c] font-semibold'}`}>
+                    <p className={`font-sans font-medium text-[14px] ${s.cost > 0 ? 'text-[#272d2c]' : 'text-[#2d5a4c] font-semibold'}`}>
                       {s.price === 'Free' ? 'Free' : `$${s.cost}`}
                     </p>
                   </div>
@@ -174,7 +174,7 @@ export const ConfirmationModal = ({ isOpen, onClose, onConfirm, data }: Confirma
               <Wallet size={16} className="opacity-40" />
               <span className="text-[14px] font-medium opacity-60">Total Amount</span>
             </div>
-            <p className="font-['Bricolage_Grotesque:Bold',sans-serif] text-[24px] text-[#2d5a4c]">
+            <p className="font-heading font-bold text-[24px] text-[#2d5a4c]">
               ${data.totalPrice}
             </p>
           </div>
@@ -183,14 +183,14 @@ export const ConfirmationModal = ({ isOpen, onClose, onConfirm, data }: Confirma
             whileHover={{ y: -2 }}
             whileTap={{ scale: 0.98 }}
             onClick={onConfirm}
-            className="w-full h-[56px] bg-[#2d5a4c] rounded-[16px] flex items-center justify-center text-white font-['Figtree:Semi_Bold',sans-serif] font-semibold text-[16px] shadow-[0px_10px_20px_rgba(45,90,76,0.25)] hover:shadow-[0px_15px_30px_rgba(45,90,76,0.3)] transition-all"
+            className="w-full h-[56px] bg-[#2d5a4c] rounded-[16px] flex items-center justify-center text-white font-sans font-semibold text-[16px] shadow-[0px_10px_20px_rgba(45,90,76,0.25)] hover:shadow-[0px_15px_30px_rgba(45,90,76,0.3)] transition-all"
           >
             Confirm & Pay
           </motion.button>
 
           <button
             onClick={onClose}
-            className="w-full mt-4 py-2 font-['Figtree:Medium',sans-serif] text-[14px] text-[#3f4544] opacity-50 hover:opacity-100 transition-opacity"
+            className="w-full mt-4 py-2 font-sans font-medium text-[14px] text-[#3f4544] opacity-50 hover:opacity-100 transition-opacity"
           >
             Go back to editing
           </button>

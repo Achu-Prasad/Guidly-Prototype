@@ -33,7 +33,8 @@ import {
     X,
     Clock,
     Plus,
-    Minus
+    Minus,
+    CircleNotch
 } from "@phosphor-icons/react";
 import { motion, AnimatePresence } from 'motion/react';
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
@@ -51,6 +52,8 @@ interface CommunityProfileProps {
     community: Community;
     onBack: () => void;
     onJoin: (community: Community) => void;
+    onJoinRequest?: () => void;
+    status?: 'none' | 'requesting' | 'joined';
     onBookEvent?: (event: TeamUpEvent) => void;
     bookedEventTitles?: string[];
 }
@@ -91,13 +94,25 @@ export const CommunityProfile = ({
     community,
     onBack,
     onJoin,
+    onJoinRequest,
+    status = 'none',
     onBookEvent,
     bookedEventTitles = []
 }: CommunityProfileProps) => {
     const [activeTab, setActiveTab] = useState('Overview');
     const [reviewFilter, setReviewFilter] = useState('Top Recent');
     const [showRateError, setShowRateError] = useState(false);
-    const [isMember, setIsMember] = useState(false); // Default to false to show the error logic
+    const isMember = status === 'joined';
+    const [isJoining, setIsJoining] = useState(false);
+
+    const handleJoinClick = () => {
+        if (status !== 'none' || isJoining) return;
+        setIsJoining(true);
+        onJoinRequest?.();
+        // Visual loading for 1.5s
+        setTimeout(() => setIsJoining(false), 1500);
+    };
+
     const [likedReviews, setLikedReviews] = useState<Record<string, boolean>>({});
     const [selectedEvent, setSelectedEvent] = useState<TeamUpEvent | null>(null);
     const [isDrawerOpen, setIsDrawerOpen] = useState(false);
@@ -153,7 +168,7 @@ export const CommunityProfile = ({
                             className="size-[40px] rounded-[8px] flex items-center justify-center"
                             style={{ backgroundImage: "linear-gradient(90deg, rgba(45, 90, 76, 0.2) 0%, rgba(45, 90, 76, 0.2) 100%), linear-gradient(90deg, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0.4) 100%)" }}
                         >
-                            <DotsThreeVertical size={24} className="text-white" />
+                            <DotsThreeVertical size={24} className="text-white" weight="bold" />
                         </button>
                     </DropdownMenu.Trigger>
 
@@ -633,7 +648,7 @@ export const CommunityProfile = ({
                         </div>
 
                         {/* Restricted Topics / Summary Section */}
-                        <div className="bg-[#f8f7f3] border-b border-[rgba(63,69,68,0.1)] rounded-[12px] p-6 flex flex-col gap-6 items-start">
+                        <div className="bg-[#f8f7f3] border-b border-[rgba(63,69,68,0.1)] rounded-[12px] p-[14px] flex flex-col gap-6 items-start">
                             <div className="flex flex-col gap-[15px] items-start w-full">
                                 <p className="font-['Figtree'] font-medium h-[20px] leading-[20px] text-[#3f4544] text-[14px]">
                                     {community.guidelines.summaryTitle}
@@ -746,13 +761,36 @@ export const CommunityProfile = ({
                 )}
             </div>
 
-            {/* Footer Action */}
             <div className="absolute bottom-0 left-0 right-0 px-4 pt-4 pb-4 bg-gradient-to-t from-white via-white to-transparent z-40">
                 <button
-                    onClick={() => onJoin(community)}
-                    className="w-full h-[52px] bg-[#2d5a4c] rounded-[12px] flex items-center justify-center text-white font-['Figtree'] font-medium text-[16px] shadow-[0px_8px_20px_0px_rgba(45,90,76,0.3)] active:scale-[0.98] transition-all"
+                    onClick={handleJoinClick}
+                    disabled={status === 'joined' || status === 'requesting' || isJoining}
+                    className={`w-full h-[52px] rounded-[12px] flex items-center justify-center text-white font-['Figtree'] font-medium text-[16px] shadow-[0px_8px_20px_0px_rgba(45,90,76,0.3)] active:scale-[0.98] transition-all gap-2.5 ${status === 'joined' ? 'bg-[#9ca3af] opacity-90 cursor-not-allowed shadow-none' : status === 'requesting' ? 'bg-[#9ca3af] opacity-90 cursor-not-allowed shadow-none' : 'bg-[#2d5a4c]'
+                        }`}
                 >
-                    Join  Community
+                    {isJoining ? (
+                        <>
+                            <motion.div
+                                animate={{ rotate: 360 }}
+                                transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                            >
+                                <CircleNotch size={20} weight="bold" />
+                            </motion.div>
+                            <span>Sending...</span>
+                        </>
+                    ) : status === 'requesting' ? (
+                        <>
+                            <Check size={20} weight="bold" />
+                            <span>Requested</span>
+                        </>
+                    ) : status === 'joined' ? (
+                        <>
+                            <Check size={20} weight="bold" />
+                            <span>Joined</span>
+                        </>
+                    ) : (
+                        "Join Community"
+                    )}
                 </button>
             </div>
             {/* Rate Error Popup */}

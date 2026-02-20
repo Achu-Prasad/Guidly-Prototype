@@ -60,7 +60,7 @@ export const Bookings = ({ onNavigate, bookings, hasUnreadChats, initialTab, unr
 
                 {/* Search Bar */}
                 <div className="px-4 flex gap-2">
-                    <div className="flex-1 bg-[#f3f3f3] h-[48px] rounded-[4px] flex items-center px-[12px]">
+                    <div className="flex-1 bg-[#f3f3f3] h-[48px] rounded-[8px] flex items-center px-[12px]">
                         <input
                             type="text"
                             placeholder="Search Bookings"
@@ -69,7 +69,7 @@ export const Bookings = ({ onNavigate, bookings, hasUnreadChats, initialTab, unr
                             className="w-full bg-transparent text-[16px] font-['Figtree'] outline-none border-none placeholder-[#3f4544]/40"
                         />
                     </div>
-                    <button className="w-[51px] h-[48px] bg-[#f3f3f3] rounded-[4px] flex items-center justify-center hover:bg-gray-200 transition-colors">
+                    <button className="w-[51px] h-[48px] bg-[#f3f3f3] rounded-[8px] flex items-center justify-center hover:bg-gray-200 transition-colors">
                         <Search size={24} weight="regular" />
                     </button>
                 </div>
@@ -80,7 +80,7 @@ export const Bookings = ({ onNavigate, bookings, hasUnreadChats, initialTab, unr
                         <button
                             key={tab}
                             onClick={() => setActiveTab(tab)}
-                            className={`px-[12px] py-[8px] rounded-[4px] text-[14px] font-['Figtree'] font-medium transition-all whitespace-nowrap ${activeTab === tab
+                            className={`px-[12px] py-[8px] rounded-[8px] text-[14px] font-['Figtree'] font-medium transition-all whitespace-nowrap ${activeTab === tab
                                 ? 'bg-[#edebe1] text-[#2D5A4C]'
                                 : 'text-[#3f4544] hover:bg-gray-50'
                                 }`}
@@ -93,10 +93,22 @@ export const Bookings = ({ onNavigate, bookings, hasUnreadChats, initialTab, unr
 
             {/* Scrollable Content */}
             <div className="flex-1 overflow-y-auto px-4 pb-[100px] pt-4 space-y-3 no-scrollbar">
-                {bookings
-                    .filter(b => activeTab === 'All' || (activeTab === 'Sessions' && b.type === 'session') || (activeTab === 'Events' && b.type === 'event'))
-                    .filter(b => !searchQuery.trim() || b.title.toLowerCase().includes(searchQuery.toLowerCase()) || b.subtitle.toLowerCase().includes(searchQuery.toLowerCase()))
-                    .map((booking) => (
+                {(() => {
+                    const filteredBookings = bookings
+                        .filter(b => activeTab === 'All' || (activeTab === 'Sessions' && b.type === 'session') || (activeTab === 'Events' && b.type === 'event'))
+                        .filter(b => !searchQuery.trim() || b.title.toLowerCase().includes(searchQuery.toLowerCase()) || b.subtitle.toLowerCase().includes(searchQuery.toLowerCase()));
+
+                    if (filteredBookings.length === 0) {
+                        return (
+                            <div className="flex flex-col items-center justify-center py-20 px-8 text-center bg-white/50 rounded-2xl border border-dashed border-gray-200">
+                                <p className="text-[14px] font-heading font-medium text-[#3f4544] opacity-70">
+                                    You haven't any {activeTab === 'All' ? 'bookings' : activeTab.toLowerCase()}
+                                </p>
+                            </div>
+                        );
+                    }
+
+                    return filteredBookings.map((booking) => (
                         <motion.div
                             key={booking.id}
                             initial={{ opacity: 0, y: 10 }}
@@ -153,7 +165,8 @@ export const Bookings = ({ onNavigate, bookings, hasUnreadChats, initialTab, unr
                                 </div>
                             </div>
                         </motion.div>
-                    ))}
+                    ));
+                })()}
             </div>
 
             {/* Bottom Navigation */}

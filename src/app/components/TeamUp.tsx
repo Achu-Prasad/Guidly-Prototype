@@ -25,7 +25,8 @@ import {
   X,
   Heart,
   CircleNotch,
-  Check
+  Check,
+  Checks
 } from "@phosphor-icons/react";
 import { Logo } from './Logo';
 import { ImageWithFallback } from './figma/ImageWithFallback';
@@ -43,6 +44,7 @@ import {
   DrawerClose,
 } from "./ui/drawer";
 import { TeamUpEvent, Community } from "../types/team";
+import { Chat } from '../types/chat';
 
 // SVG Paths from Figma
 const LOGO_SVG = (
@@ -74,6 +76,7 @@ interface TeamUpProps {
   unreadNotificationsCount?: number;
   communityStatuses?: Record<string, 'none' | 'requesting' | 'joined'>;
   onJoinRequest?: (community: Community) => void;
+  chats?: Chat[];
 }
 
 export const TeamUp = ({
@@ -84,7 +87,8 @@ export const TeamUp = ({
   bookedEventTitles = [],
   unreadNotificationsCount = 0,
   communityStatuses = {},
-  onJoinRequest
+  onJoinRequest,
+  chats = []
 }: TeamUpProps) => {
   const [activeTab, setActiveTab] = useState('Communities');
   const [searchQuery, setSearchQuery] = useState('');
@@ -139,16 +143,16 @@ export const TeamUp = ({
 
         {/* Search Bar - Figma Style */}
         <div className="px-4 flex gap-2">
-          <div className="flex-1 bg-[#f3f3f3] h-[48px] rounded-[4px] flex items-center px-[12px]">
+          <div className="flex-1 bg-[#f3f3f3] h-[48px] rounded-[8px] flex items-center px-[12px]">
             <input
               type="text"
               placeholder={`Search ${activeTab}`}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-transparent text-[16px] font-['Figtree'] outline-none border-none placeholder-[#3f4544]/40"
+              className="w-full bg-transparent text-[16px] font-body outline-none border-none placeholder-[#3f4544]/40"
             />
           </div>
-          <button className="w-[51px] h-[48px] bg-[#f3f3f3] rounded-[4px] flex items-center justify-center hover:bg-gray-200 transition-colors">
+          <button className="w-[51px] h-[48px] bg-[#f3f3f3] rounded-[8px] flex items-center justify-center hover:bg-gray-200 transition-colors">
             <Search size={24} weight="regular" />
           </button>
         </div>
@@ -159,7 +163,7 @@ export const TeamUp = ({
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
-              className={`px-[12px] py-[8px] rounded-[4px] text-[14px] font-['Figtree'] font-medium transition-all whitespace-nowrap ${activeTab === tab
+              className={`px-[12px] py-[8px] rounded-[8px] text-[14px] font-body font-medium transition-all whitespace-nowrap ${activeTab === tab
                 ? 'bg-[#edebe1] text-[#2D5A4C]'
                 : 'text-[#3f4544] hover:bg-gray-50'
                 }`}
@@ -193,8 +197,8 @@ export const TeamUp = ({
 
                   {/* Profile Info inside Banner */}
                   <div className="absolute bottom-4 left-4 flex gap-3 items-center">
-                    <div className="w-[45px] h-[45px] rounded-[12px] overflow-hidden bg-white shadow-lg">
-                      <ImageWithFallback src={community.logo} alt="Logo" className="w-full h-full object-cover" />
+                    <div className="w-[45px] h-[45px] rounded-[12px] overflow-hidden bg-white shadow-lg p-0.5">
+                      <ImageWithFallback src={community.logo} alt="Logo" className="w-full h-full object-cover rounded-lg" />
                     </div>
                     <div className="text-white">
                       <h3 className="text-[16px] font-semibold font-['Figtree'] leading-tight">{community.name}</h3>
@@ -232,10 +236,10 @@ export const TeamUp = ({
                     </button>
                     <button
                       onClick={(e) => handleJoinClick(e, community)}
-                      disabled={communityStatuses[community.id] === 'joined' || joiningIds.includes(community.id)}
-                      className={`px-4 py-2 rounded-[64px] text-[14px] font-medium transition-all flex items-center gap-2 ${communityStatuses[community.id] === 'joined'
-                        ? 'bg-[#575C5B] text-white opacity-60 cursor-not-allowed'
-                        : (communityStatuses[community.id] === 'requesting' || joiningIds.includes(community.id))
+                      disabled={communityStatuses[community.id] === 'joined' || communityStatuses[community.id] === 'requesting' || joiningIds.includes(community.id)}
+                      className={`px-4 py-2 rounded-[64px] text-[14px] font-medium transition-all flex items-center gap-2 ${communityStatuses[community.id] === 'joined' || communityStatuses[community.id] === 'requesting'
+                        ? 'bg-[#9ca3af] text-white opacity-90 cursor-not-allowed shadow-none'
+                        : joiningIds.includes(community.id)
                           ? 'bg-[#2D5A4C] text-white'
                           : 'bg-[#2D5A4C] text-white hover:bg-[#1F4439]'
                         }`}
@@ -253,7 +257,7 @@ export const TeamUp = ({
                       ) : communityStatuses[community.id] === 'requesting' ? (
                         <>
                           <Check size={16} weight="bold" />
-                          <span>Request Sent</span>
+                          <span>Requested</span>
                         </>
                       ) : communityStatuses[community.id] === 'joined' ? (
                         <>
@@ -304,10 +308,10 @@ export const TeamUp = ({
                     {/* Floating Date Badge - top left */}
                     <div className="absolute top-3 left-3">
                       <div className="bg-white/95 backdrop-blur-sm rounded-[10px] px-[10px] py-[6px] flex flex-col items-center min-w-[44px] shadow-[0px_2px_8px_rgba(0,0,0,0.08)]">
-                        <span className="text-[10px] font-['Figtree'] font-semibold text-[#2D5A4C] uppercase leading-none tracking-wide">
+                        <span className="text-[10px] font-body font-semibold text-[#2D5A4C] uppercase leading-none tracking-wide">
                           {format(eventDate, 'MMM')}
                         </span>
-                        <span className="text-[18px] font-['Bricolage_Grotesque'] font-semibold text-[#1b362e] leading-tight">
+                        <span className="text-[18px] font-heading font-semibold text-[#1b362e] leading-tight">
                           {format(eventDate, 'd')}
                         </span>
                       </div>
@@ -359,7 +363,7 @@ export const TeamUp = ({
                     </div>
 
                     {/* Title */}
-                    <h4 className="text-[16px] font-['Bricolage_Grotesque'] font-semibold text-[#1b362e] leading-[1.3] line-clamp-2" style={{ fontVariationSettings: "'opsz' 16, 'wdth' 100" }}>
+                    <h4 className="text-[16px] font-heading font-semibold text-[#1b362e] leading-[1.3] line-clamp-2" style={{ fontVariationSettings: "'opsz' 16, 'wdth' 100" }}>
                       {event.title}
                     </h4>
 
@@ -451,42 +455,74 @@ export const TeamUp = ({
           </div>
         )}
         {activeTab === 'Joined' && (
-          <div className="space-y-6">
+          <div className="space-y-2 px-0">
             {COMMUNITIES.filter(c => communityStatuses[c.id] === 'joined').length > 0 ? (
-              COMMUNITIES.filter(c => communityStatuses[c.id] === 'joined').map((community) => (
-                <motion.div
-                  key={community.id}
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  onClick={() => onSelectCommunity?.(community)}
-                  className="bg-white rounded-[16px] overflow-hidden shadow-[0px_4px_9px_0px_rgba(0,0,0,0.08)] border border-[rgba(63,69,68,0.1)] cursor-pointer"
-                >
-                  <div className="p-4 flex gap-4 items-center">
-                    <div className="size-[64px] rounded-[12px] overflow-hidden bg-[#f3f3f3] shrink-0">
-                      <ImageWithFallback src={community.logo} alt="" className="w-full h-full object-cover" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center justify-between mb-1">
-                        <h3 className="text-[16px] font-bold text-[#1b362e] truncate">{community.name}</h3>
-                        <div className="bg-[#e8f0ed] px-2 py-0.5 rounded-full flex items-center gap-1">
-                          <Check size={10} weight="bold" className="text-[#2d5a4c]" />
-                          <span className="text-[10px] font-bold text-[#2d5a4c] uppercase">Member</span>
-                        </div>
+              COMMUNITIES.filter(c => communityStatuses[c.id] === 'joined').map((community) => {
+                const chat = chats.find(c => c.id === community.id);
+                return (
+                  <motion.div
+                    key={community.id}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={() => onSelectCommunity?.(community)}
+                    className="bg-white rounded-[12px] p-3 flex items-center gap-3 cursor-pointer hover:bg-white/80 transition-colors shadow-sm"
+                  >
+                    <div className="relative">
+                      <div className="w-[47px] h-[47px] rounded-full overflow-hidden shrink-0 bg-[#f3f3f3]">
+                        <ImageWithFallback
+                          src={community.logo}
+                          alt={community.name}
+                          className="w-full h-full object-cover"
+                        />
                       </div>
-                      <p className="text-[13px] text-[#3f4544] opacity-60 line-clamp-1">{community.description}</p>
+                      <div className="absolute -bottom-1 -right-1 bg-white p-1 rounded-full shadow-sm border border-gray-50">
+                        <Users size={12} weight="bold" className="text-[#2d5a4c]" />
+                      </div>
                     </div>
-                    <CaretRight size={20} className="text-[#3f4544] opacity-30" />
-                  </div>
-                </motion.div>
-              ))
+
+                    <div className="flex-1 min-w-0">
+                      <div className="flex justify-between items-center mb-0.5">
+                        <div className="flex items-center gap-2 min-w-0">
+                          <h3 className="text-[14px] font-['Figtree'] font-medium text-[#272d2c] truncate">
+                            {community.name}
+                          </h3>
+                          <div className="bg-[#e8f0ed] px-1.5 py-0.5 rounded-full flex items-center gap-1 shrink-0">
+                            <Check size={8} weight="bold" className="text-[#2d5a4c]" />
+                            <span className="text-[8px] font-bold text-[#2d5a4c] uppercase tracking-wider">Member</span>
+                          </div>
+                        </div>
+                        <span className="text-[11px] font-['Figtree'] text-[#b7b9b9]">
+                          {chat?.time || 'Now'}
+                        </span>
+                      </div>
+                      <div className="flex items-center justify-between gap-2">
+                        <div className="flex items-center gap-1.5 min-w-0">
+                          {chat?.status === 'read' ? (
+                            <Checks size={16} className="text-[#2d5a4c] shrink-0" />
+                          ) : (
+                            <Check size={16} className="text-[#b7b9b9] shrink-0" />
+                          )}
+                          <p className="text-[14px] font-['Figtree'] text-[#3f4544] truncate opacity-70">
+                            {chat?.message || community.description}
+                          </p>
+                        </div>
+                        {chat && chat.unread > 0 && (
+                          <div className="min-w-[18px] h-[18px] bg-[#2d5a4c] rounded-full flex items-center justify-center px-1">
+                            <span className="text-[10px] font-['Figtree'] font-medium text-white">
+                              {chat.unread}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </motion.div>
+                );
+              })
             ) : (
-              <div className="flex flex-col items-center justify-center py-20 text-center px-6">
-                <div className="size-16 rounded-full bg-[#f1f5f4] flex items-center justify-center mb-4">
-                  <Users size={32} weight="thin" className="text-[#2d5a4c] opacity-40" />
-                </div>
-                <h3 className="text-[16px] font-['Bricolage_Grotesque'] font-semibold text-[#272d2c] mb-1">No joined communities</h3>
-                <p className="text-[13px] font-['Figtree'] text-[#3f4544] opacity-60 leading-relaxed">
-                  Join communities to connect with other designers and share your work.
+              <div className="flex flex-col items-center justify-center py-20 px-8 text-center bg-white/50 rounded-2xl border border-dashed border-gray-200">
+                <p className="text-[14px] font-heading font-medium text-[#3f4544] opacity-70">
+                  You haven't joined any communities
                 </p>
               </div>
             )}
@@ -530,7 +566,7 @@ export const TeamUp = ({
                       <div className="w-2 h-2 rounded-full bg-[#00ff85] shadow-[0_0_8px_rgba(0,255,133,0.8)]" />
                       <span className="text-[11px] font-bold tracking-wider uppercase font-['Figtree'] shadow-sm">{selectedEvent.category}</span>
                     </div>
-                    <h2 className="text-[28px] font-['Bricolage_Grotesque'] font-bold leading-[1.1] text-white drop-shadow-lg tracking-tight">
+                    <h2 className="text-[28px] font-heading font-bold leading-[1.1] text-white drop-shadow-lg tracking-tight">
                       {selectedEvent.title}
                     </h2>
                   </div>
@@ -549,7 +585,7 @@ export const TeamUp = ({
                     />
                   </div>
                   <div>
-                    <p className="text-[16px] font-['Bricolage_Grotesque'] font-semibold text-[#1b362e] leading-tight">
+                    <p className="text-[16px] font-heading font-semibold text-[#1b362e] leading-tight">
                       {COMMUNITIES.find(c => c.id === selectedEvent.community_id)?.name}
                     </p>
                     <p className="text-[12px] text-[#3f4544] opacity-60 font-medium mt-0.5">
@@ -591,7 +627,7 @@ export const TeamUp = ({
 
                 {/* About Section */}
                 <div className="space-y-3">
-                  <h3 className="text-[18px] font-['Bricolage_Grotesque'] font-bold text-[#1b362e]">About Event</h3>
+                  <h3 className="text-[18px] font-heading font-bold text-[#1b362e]">About Event</h3>
                   <p className="text-[15px] font-['Figtree'] text-[#3f4544] leading-[1.6] opacity-80">
                     Join us for an immersive session on {selectedEvent.title}. This event is designed to specific topics related to {selectedEvent.category}, offering deep insights and practical takeaways for all attendees. Whether you are a beginner or an expert, you'll find value in the discussions and networking opportunities.
                   </p>

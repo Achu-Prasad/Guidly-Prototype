@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useRef, useEffect } from "react";
+﻿import React, { useState, useMemo, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import {
   CaretDown,
@@ -71,14 +71,14 @@ const TIME_SLOTS = [
 const LanguageSelector = ({ selected, onSelect }: { selected: string, onSelect: (val: string) => void }) => (
   <div className="content-stretch flex flex-col gap-[16px] items-start relative shrink-0 w-full">
     <div className="content-stretch flex items-center relative shrink-0 w-full">
-      <p className="font-heading font-medium leading-[20px] opacity-90 relative shrink-0 text-[#272d2c] text-[14px] w-[256px] whitespace-pre-wrap" style={{ fontVariationSettings: "'opsz' 14, 'wdth' 100" }}>
+      <p className="font-['Bricolage_Grotesque:Medium',sans-serif] font-medium leading-[20px] opacity-90 relative shrink-0 text-[#272d2c] text-[14px] w-[256px] whitespace-pre-wrap" style={{ fontVariationSettings: "'opsz' 14, 'wdth' 100" }}>
         Choose the language you're most comfortable with.
       </p>
     </div>
     <DropdownMenu.Root>
       <DropdownMenu.Trigger asChild>
         <button className="h-[50px] relative rounded-[4px] shrink-0 w-full border border-[rgba(63,69,68,0.25)] flex items-center justify-between px-[16px] py-[8px] bg-white cursor-pointer hover:bg-gray-50 transition-colors">
-          <span className="font-sans font-normal leading-[20px] text-[#3f4544] text-[14px]">{selected}</span>
+          <span className="font-['Figtree:Regular',sans-serif] font-normal leading-[20px] text-[#3f4544] text-[14px]">{selected}</span>
           <CaretDown size={16} className="text-[#3f4544] opacity-50" />
         </button>
       </DropdownMenu.Trigger>
@@ -102,7 +102,7 @@ const LanguageSelector = ({ selected, onSelect }: { selected: string, onSelect: 
 
 const SessionTypeToggle = ({ type, setType }: { type: 'single' | 'long', setType: (t: 'single' | 'long') => void }) => (
   <div className="content-stretch flex flex-col gap-[16px] items-start relative shrink-0 w-full">
-    <p className="font-heading font-medium leading-[20px] opacity-90 relative shrink-0 text-[#272d2c] text-[14px] w-full whitespace-pre-wrap" style={{ fontVariationSettings: "'opsz' 14, 'wdth' 100" }}>
+    <p className="font-['Bricolage_Grotesque:Medium',sans-serif] font-medium leading-[20px] opacity-90 relative shrink-0 text-[#272d2c] text-[14px] w-full whitespace-pre-wrap" style={{ fontVariationSettings: "'opsz' 14, 'wdth' 100" }}>
       Session type
     </p>
     <div className="bg-[#f3f3f3] h-[54px] relative rounded-[12px] shrink-0 w-full p-[4px] flex">
@@ -117,13 +117,13 @@ const SessionTypeToggle = ({ type, setType }: { type: 'single' | 'long', setType
 
         <button
           onClick={() => setType('single')}
-          className={`z-10 flex-[1] h-full flex items-center justify-center font-sans font-medium text-[14px] transition-colors duration-200 ${type === 'single' ? 'text-[#1b362e]' : 'text-[#3f4544] opacity-80'}`}
+          className={`z-10 flex-[1] h-full flex items-center justify-center font-['Figtree:Medium',sans-serif] text-[14px] transition-colors duration-200 ${type === 'single' ? 'text-[#1b362e]' : 'text-[#3f4544] opacity-80'}`}
         >
           Single Session
         </button>
         <button
           onClick={() => setType('long')}
-          className={`z-10 flex-[1] h-full flex items-center justify-center font-sans font-medium text-[14px] transition-colors duration-200 ${type === 'long' ? 'text-[#1b362e]' : 'text-[#3f4544] opacity-80'}`}
+          className={`z-10 flex-[1] h-full flex items-center justify-center font-['Figtree:Medium',sans-serif] text-[14px] transition-colors duration-200 ${type === 'long' ? 'text-[#1b362e]' : 'text-[#3f4544] opacity-80'}`}
         >
           Long-Term
         </button>
@@ -132,13 +132,13 @@ const SessionTypeToggle = ({ type, setType }: { type: 'single' | 'long', setType
 
     {/* Description points */}
     <div className="flex flex-col gap-[6px] w-full">
-      <p className="font-sans text-[13px] leading-[18px]">
+      <p className="font-['Figtree',sans-serif] text-[13px] leading-[18px]">
         <span className="font-semibold text-[#272d2c]">Long-term Sessions:</span>{' '}
         <span className="text-[#3f4544] opacity-70">For buying a mentorship package</span>
       </p>
     </div>
 
-    {/* Info card — only when Long-Term is selected */}
+    {/* Info card ÔÇö only when Long-Term is selected */}
     <AnimatePresence>
       {type === 'long' && (
         <motion.div
@@ -152,7 +152,7 @@ const SessionTypeToggle = ({ type, setType }: { type: 'single' | 'long', setType
             <div className="w-[20px] h-[20px] rounded-full bg-[#2d5a4c]/15 flex items-center justify-center shrink-0 mt-0.5">
               <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M6 1C3.24 1 1 3.24 1 6C1 8.76 3.24 11 6 11C8.76 11 11 8.76 11 6C11 3.24 8.76 1 6 1ZM6.5 8.5H5.5V5.5H6.5V8.5ZM6.5 4.5H5.5V3.5H6.5V4.5Z" fill="#2d5a4c" /></svg>
             </div>
-            <p className="font-sans text-[12px] leading-[18px] text-[#3f4544]">
+            <p className="font-['Figtree',sans-serif] text-[12px] leading-[18px] text-[#3f4544]">
               In long-term sessions, your mentor will create a personalised roadmap with clear milestones. You'll discuss and agree on goals together before starting, ensuring every session adds real value to your growth.
             </p>
           </div>
@@ -178,7 +178,7 @@ const ServiceSelection = ({ services, selectedServices, toggleService, sessionTy
   if (sessionType === 'long' && longTermPackages) {
     return (
       <div className="content-stretch flex flex-col gap-[16px] items-start relative shrink-0 w-full">
-        <p className="font-heading font-medium leading-[20px] opacity-90 relative shrink-0 text-[#272d2c] text-[14px] w-full whitespace-pre-wrap" style={{ fontVariationSettings: "'opsz' 14, 'wdth' 100" }}>
+        <p className="font-['Bricolage_Grotesque:Medium',sans-serif] font-medium leading-[20px] opacity-90 relative shrink-0 text-[#272d2c] text-[14px] w-full whitespace-pre-wrap" style={{ fontVariationSettings: "'opsz' 14, 'wdth' 100" }}>
           Choose your package
         </p>
 
@@ -193,11 +193,11 @@ const ServiceSelection = ({ services, selectedServices, toggleService, sessionTy
               >
                 <div className="content-stretch flex items-center justify-between p-[16px] relative w-full">
                   <div className="content-stretch flex gap-[8px] items-center relative shrink-0">
-                    <p className="font-sans font-medium leading-[20px] text-[#272d2c] text-[14px]">
+                    <p className="font-['Figtree:Medium',sans-serif] font-medium leading-[20px] text-[#272d2c] text-[14px]">
                       {pkg.name}
                     </p>
                   </div>
-                  <p className={`font-sans font-normal leading-[16px] text-[14px] ${isSelected ? 'font-semibold text-[#272d2c]' : 'opacity-50 text-[#3f4544]'}`}>
+                  <p className={`font-['Figtree:Regular',sans-serif] font-normal leading-[16px] text-[14px] ${isSelected ? 'font-semibold text-[#272d2c]' : 'opacity-50 text-[#3f4544]'}`}>
                     {pkg.price}
                   </p>
                 </div>
@@ -214,7 +214,7 @@ const ServiceSelection = ({ services, selectedServices, toggleService, sessionTy
   // Single session mode (original)
   return (
     <div className="content-stretch flex flex-col gap-[16px] items-start relative shrink-0 w-full">
-      <p className="font-heading font-medium leading-[20px] opacity-90 relative shrink-0 text-[#272d2c] text-[14px] w-full whitespace-pre-wrap" style={{ fontVariationSettings: "'opsz' 14, 'wdth' 100" }}>
+      <p className="font-['Bricolage_Grotesque:Medium',sans-serif] font-medium leading-[20px] opacity-90 relative shrink-0 text-[#272d2c] text-[14px] w-full whitespace-pre-wrap" style={{ fontVariationSettings: "'opsz' 14, 'wdth' 100" }}>
         Select Service you need.
       </p>
 
@@ -222,8 +222,8 @@ const ServiceSelection = ({ services, selectedServices, toggleService, sessionTy
         <div className="bg-white relative rounded-[12px] shrink-0 w-full border border-[rgba(63,69,68,0.1)] p-[16px]">
           <div className="content-stretch flex flex-col gap-[10px] items-start relative w-full">
             <div className="content-stretch flex items-center justify-between leading-[20px] relative shrink-0 text-[#272d2c] text-[14px] text-justify w-full">
-              <p className="font-sans font-medium">Session Capacity</p>
-              <p className={`font-sans font-semibold ${isExceeded ? 'text-red-500' : ''}`}>
+              <p className="font-['Figtree:Medium',sans-serif] font-medium">Session Capacity</p>
+              <p className={`font-['Figtree:Semi_Bold',sans-serif] font-semibold ${isExceeded ? 'text-red-500' : ''}`}>
                 {(totalMinutes / 60).toFixed(1)} / 2 Hours used
               </p>
             </div>
@@ -237,7 +237,7 @@ const ServiceSelection = ({ services, selectedServices, toggleService, sessionTy
               />
             </div>
             {isExceeded && (
-              <motion.p initial={{ opacity: 0, y: -5 }} animate={{ opacity: 1, y: 0 }} className="text-red-500 font-sans text-[12px] font-semibold">
+              <motion.p initial={{ opacity: 0, y: -5 }} animate={{ opacity: 1, y: 0 }} className="text-red-500 font-['Figtree:Semi_Bold',sans-serif] text-[12px] font-semibold">
                 you exceeded the limit
               </motion.p>
             )}
@@ -255,14 +255,14 @@ const ServiceSelection = ({ services, selectedServices, toggleService, sessionTy
               >
                 <div className="content-stretch flex items-center justify-between p-[16px] relative w-full">
                   <div className="content-stretch flex gap-[8px] items-center relative shrink-0">
-                    <p className="font-sans font-medium leading-[20px] text-[#272d2c] text-[14px]">
+                    <p className="font-['Figtree:Medium',sans-serif] font-medium leading-[20px] text-[#272d2c] text-[14px]">
                       {service.name}
                     </p>
                     <div className={`${isSelected ? 'bg-[#2d5a4c] text-white' : 'bg-white text-[#1b362e]'} flex items-center justify-center px-[8px] py-[4px] relative rounded-[64px] shrink-0 transition-colors`}>
-                      <p className="font-sans font-medium leading-[14px] text-[10px]">{service.duration} Min</p>
+                      <p className="font-['Figtree:Medium',sans-serif] font-medium leading-[14px] text-[10px]">{service.duration} Min</p>
                     </div>
                   </div>
-                  <p className={`font-sans font-normal leading-[16px] text-[14px] ${isSelected ? 'font-semibold text-[#272d2c]' : 'opacity-50 text-[#3f4544]'}`}>
+                  <p className={`font-['Figtree:Regular',sans-serif] font-normal leading-[16px] text-[14px] ${isSelected ? 'font-semibold text-[#272d2c]' : 'opacity-50 text-[#3f4544]'}`}>
                     {service.price}
                   </p>
                 </div>
@@ -316,12 +316,12 @@ const DateTimeSection = ({ selectedDate, onDateChange, selectedTime, onTimeChang
     <div className="content-stretch flex flex-col gap-[20px] items-start relative shrink-0 w-full">
       <div className="content-stretch flex flex-col gap-[16px] items-start relative shrink-0 w-full">
         <div className="flex items-center justify-between w-full">
-          <p className="font-heading font-medium leading-[20px] opacity-90 text-[#272d2c] text-[14px]">
+          <p className="font-['Bricolage_Grotesque:Medium',sans-serif] font-medium leading-[20px] opacity-90 text-[#272d2c] text-[14px]">
             {sessionType === 'long' ? 'Date & Time to start' : 'Date & Time'}
           </p>
           <Popover.Root>
             <Popover.Trigger asChild>
-              <button className="font-sans font-medium text-[#2d5a4c] text-[12px] flex items-center gap-1">Change Date</button>
+              <button className="font-['Figtree:Medium',sans-serif] font-medium text-[#2d5a4c] text-[12px] flex items-center gap-1">Change Date</button>
             </Popover.Trigger>
             <Popover.Portal>
               <Popover.Content className="bg-white p-4 rounded-[24px] shadow-[0px_20px_50px_rgba(0,0,0,0.1)] border border-gray-100 z-50" sideOffset={5} align="end">
@@ -334,17 +334,17 @@ const DateTimeSection = ({ selectedDate, onDateChange, selectedTime, onTimeChang
                     months: "flex flex-col space-y-4",
                     month: "space-y-4",
                     caption: "flex justify-center pt-1 relative items-center",
-                    caption_label: "text-[16px] font-heading font-medium text-[#272d2c]",
+                    caption_label: "text-[16px] font-['Bricolage_Grotesque',sans-serif] font-medium text-[#272d2c]",
                     nav: "space-x-1 flex items-center",
                     nav_button: "h-8 w-8 bg-transparent p-0 opacity-50 hover:opacity-100 transition-opacity flex items-center justify-center rounded-lg border border-gray-100",
                     nav_button_previous: "absolute left-1",
                     nav_button_next: "absolute right-1",
                     table: "w-full border-collapse space-y-1",
                     head_row: "flex",
-                    head_cell: "text-[#3f4544] opacity-40 rounded-md w-9 font-normal text-[11px] font-sans uppercase tracking-wider",
+                    head_cell: "text-[#3f4544] opacity-40 rounded-md w-9 font-normal text-[11px] font-['Figtree',sans-serif] uppercase tracking-wider",
                     row: "flex w-full mt-2",
                     cell: "text-center text-sm p-0 relative focus-within:relative focus-within:z-20",
-                    day: "h-9 w-9 p-0 font-normal aria-selected:opacity-100 hover:bg-[#2d5a4c]/10 rounded-full transition-all duration-200 font-sans text-[#272d2c] flex items-center justify-center",
+                    day: "h-9 w-9 p-0 font-normal aria-selected:opacity-100 hover:bg-[#2d5a4c]/10 rounded-full transition-all duration-200 font-['Figtree',sans-serif] text-[#272d2c] flex items-center justify-center",
                     day_selected: "bg-[#2d5a4c]! text-white! hover:bg-[#2d5a4c]! hover:text-white! focus:bg-[#2d5a4c]! focus:text-white! rounded-full shadow-lg shadow-[#2d5a4c]/20",
                     day_today: "bg-[#f3f3f3] text-[#2d5a4c] font-bold",
                     day_disabled: "text-[#3f4544] opacity-20 cursor-not-allowed",
@@ -379,7 +379,7 @@ const DateTimeSection = ({ selectedDate, onDateChange, selectedTime, onTimeChang
           const isSelected = selectedTime === time;
           return (
             <button key={time} onClick={() => onTimeChange(time)} className={`flex items-center justify-center p-[8px] rounded-[4px] transition-colors w-full ${isSelected ? 'bg-[#2d5a4c] text-white' : 'bg-[#f3f3f3] text-[#3f4544]'}`}>
-              <p className="font-sans font-normal leading-[20px] text-[14px]">{time}</p>
+              <p className="font-['Figtree:Regular',sans-serif] font-normal leading-[20px] text-[14px]">{time}</p>
             </button>
           );
         })}
@@ -389,8 +389,56 @@ const DateTimeSection = ({ selectedDate, onDateChange, selectedTime, onTimeChang
 };
 
 // --- Chat Initial Data ---
-const INITIAL_CHATS: Chat[] = [];
-const INITIAL_MESSAGES: Record<string | number, Message[]> = {};
+const INITIAL_CHATS: Chat[] = [
+  {
+    id: 1,
+    name: "Charles",
+    message: "That's great! Portfolio is key. I'll quickly search for some resources I have on that.",
+    time: "10:06 AM",
+    unread: 2,
+    status: 'read',
+    image: "https://i.pravatar.cc/150?u=charles",
+    type: 'mentor'
+  },
+  {
+    id: 2,
+    name: "Achu Prasad",
+    message: "Do you need help ?",
+    time: "09:52 AM",
+    unread: 0,
+    status: 'sent',
+    image: "https://i.pravatar.cc/150?u=achu",
+    type: 'mentor'
+  },
+  {
+    id: 3,
+    name: "Stolen & Friends",
+    message: "That would be awesome! Thanks!",
+    time: "09:36 AM",
+    unread: 0,
+    status: 'sent',
+    image: imgStolenLogo,
+    type: 'community',
+    isGroup: true
+  }
+];
+
+const INITIAL_MESSAGES: Record<string | number, Message[]> = {
+  1: [
+    { id: 1, text: "Hi! Welcome to Guidly coaching.", sender: 'other', time: "10:00 AM" },
+    { id: 2, text: "How can I help you today with your career goals?", sender: 'other', time: "10:01 AM" },
+    { id: 3, text: "I'm looking for some advice on UI/UX portfolio structure.", sender: 'me', time: "10:05 AM" },
+    { id: 4, text: "That's great! Portfolio is key. I'll quickly search for some resources I have on that.", sender: 'other', time: "10:06 AM" },
+    { id: 5, text: "Otherwise, you can type \"session\" to book a live 1:1 with me.", sender: 'other', time: "10:06 AM" },
+  ],
+  3: [
+    { id: 1, text: "Hey everyone! How can we actually start a research before designing something?", sender: 'other', senderName: "Achu Prasad", senderImage: "https://i.pravatar.cc/150?u=achu", time: "09:26 AM" },
+    { id: 2, text: "I usually start with competitive analysis.", sender: 'other', senderName: "Charles", senderImage: "https://i.pravatar.cc/150?u=charles", time: "09:28 AM" },
+    { id: 3, text: "Have you guys checked out the Nielsen Norman Group resources?", sender: 'other', senderName: "Esther Howard", senderImage: "https://i.pravatar.cc/150?u=esther", time: "09:30 AM" },
+    { id: 4, text: "I'm working on a template for that! I'll share it here once it's done.", sender: 'me', time: "09:35 AM" },
+    { id: 5, text: "That would be awesome! Thanks!", sender: 'other', senderName: "Stolen", senderImage: "https://i.pravatar.cc/150?u=stolen", time: "09:36 AM" },
+  ]
+};
 
 // --- Booking Types ---
 interface BookingEntry {
@@ -405,7 +453,37 @@ interface BookingEntry {
   mentorId?: string | number;
 }
 
-const INITIAL_BOOKINGS: BookingEntry[] = [];
+const INITIAL_BOOKINGS: BookingEntry[] = [
+  {
+    id: '1',
+    title: 'Mentoring Session',
+    subtitle: 'Interview prep & mock interview',
+    date: '02/06/2025',
+    time: '08:00 PM (IST)',
+    duration: '2 Hr',
+    type: 'session',
+    status: 'join',
+    mentorId: '1'
+  },
+  {
+    id: '2',
+    title: 'FIGWAR 3.0',
+    subtitle: 'By Stolen and Friends',
+    date: '04/06/2025',
+    time: '08:00 PM (IST)',
+    duration: '2 Hr',
+    type: 'event'
+  },
+  {
+    id: '3',
+    title: 'Mentoring Session',
+    subtitle: 'Interview prep & mock interview',
+    date: '06/06/2025',
+    time: '10:00 PM (IST)',
+    duration: '2 Hr',
+    type: 'session'
+  }
+];
 
 // --- Main App ---
 
@@ -427,21 +505,6 @@ export default function App() {
 
   const handleJoinCommunity = (community: Community) => {
     toast.success(`You've joined ${community.name}!`);
-    const chatExists = chats.find(c => c.id === community.id);
-    if (!chatExists) {
-      const newChat: Chat = {
-        id: community.id,
-        name: community.name,
-        image: community.logo,
-        message: "You joined this community",
-        time: "Now",
-        unread: 0,
-        status: 'read',
-        type: 'community',
-        isGroup: true
-      };
-      setChats(prev => [newChat, ...prev]);
-    }
   };
 
   const [recentMentors, setRecentMentors] = useState<Mentor[]>([]);
@@ -450,88 +513,6 @@ export default function App() {
   // Chat state
   const [chats, setChats] = useState<Chat[]>(INITIAL_CHATS);
   const [messagesPerChat, setMessagesPerChat] = useState<Record<string | number, Message[]>>(INITIAL_MESSAGES);
-
-  // Community Join Status: 'none' | 'requesting' | 'joined'
-  const [communityStatuses, setCommunityStatuses] = useState<Record<string, 'none' | 'requesting' | 'joined'>>({});
-
-  const simulateLiveCommunityChat = (community: Community) => {
-    const senderAvatars: Record<string, string> = {
-      "Sarah Chen": "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&h=150&fit=crop",
-      "Marcus": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop",
-      "Elena R.": "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop",
-      "Devin": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop"
-    };
-
-    const trendMessages = [
-      { sender: "Sarah Chen", text: "Hey everyone! Just saw the new Figma AI features 🚀. What do we think?", delay: 3000 },
-      { sender: "Marcus", text: "They look promising! Especially the auto-layout improvements.", delay: 8000 },
-      { sender: "Elena R.", text: "Anyone else struggling with variable spacing in Tailwind? 😅", delay: 15000 },
-      { sender: "Devin", text: "Check out this new design system documentation style: [link]", delay: 25000 },
-      { sender: "Sarah Chen", text: "Minimalism is making a huge comeback this year, have you noticed?", delay: 40000 }
-    ];
-
-    trendMessages.forEach((msg, index) => {
-      setTimeout(() => {
-        const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-        const newMessage: Message = {
-          id: Date.now() + index,
-          text: msg.text,
-          sender: 'other',
-          senderName: msg.sender,
-          senderImage: senderAvatars[msg.sender],
-          time
-        };
-
-        setMessagesPerChat(prev => ({
-          ...prev,
-          [community.id]: [...(prev[community.id] || []), newMessage]
-        }));
-
-        setChats(prev => prev.map(chat => {
-          if (chat.id === community.id) {
-            return {
-              ...chat,
-              message: msg.text,
-              time,
-              unread: (chat.unread || 0) + 1,
-              status: 'received'
-            };
-          }
-          return chat;
-        }));
-      }, msg.delay);
-    });
-  };
-
-  const handleJoinCommunityRequest = (community: Community) => {
-    if (communityStatuses[community.id] === 'requesting' || communityStatuses[community.id] === 'joined') return;
-
-    // 1. Set status to requesting
-    setCommunityStatuses(prev => ({ ...prev, [community.id]: 'requesting' }));
-
-    // 2. Simulate acceptance after 1 minute (for demo sake, let's keep it 1 min as requested)
-    setTimeout(() => {
-      setCommunityStatuses(prev => ({ ...prev, [community.id]: 'joined' }));
-
-      // Add notification
-      const newNotification: Notification = {
-        id: `joined-${community.id}-${Date.now()}`,
-        recipient_id: 'me',
-        title: "Join Request Accepted!",
-        message: `You are now a member of ${community.name}. Welcome aboard!`,
-        is_read: false,
-        type: "system",
-        created_at: new Date().toISOString()
-      };
-      setNotifications(prev => [newNotification, ...prev]);
-
-      // Add community chat
-      handleJoinCommunity(community);
-
-      // Start live chat simulation
-      setTimeout(() => simulateLiveCommunityChat(community), 5000);
-    }, 60000);
-  };
 
   // Bookings state
   const [bookings, setBookings] = useState<BookingEntry[]>(INITIAL_BOOKINGS);
@@ -794,7 +775,7 @@ export default function App() {
   if (currentView === 'home') {
     return (
       <div className="bg-[#fafafa] h-screen flex items-center justify-center p-4 overflow-hidden">
-        <div className="w-[360px] h-full max-h-[800px] bg-[#f8f7f3] relative overflow-hidden flex flex-col shadow-2xl rounded-[32px] border border-gray-100">
+        <div className="w-[360px] h-full max-h-[800px] bg-white relative overflow-hidden flex flex-col shadow-2xl rounded-[32px] border border-gray-100">
           <HomeScreen
             onSearch={(query) => {
               setSearchQuery(query);
@@ -827,7 +808,7 @@ export default function App() {
   if (currentView === 'teamup') {
     return (
       <div className="bg-[#fafafa] h-screen flex items-center justify-center p-4 overflow-hidden">
-        <div className="w-[360px] h-full max-h-[800px] bg-[#f8f7f3] relative overflow-hidden flex flex-col shadow-2xl rounded-[32px] border border-gray-100">
+        <div className="w-[360px] h-full max-h-[800px] bg-white relative overflow-hidden flex flex-col shadow-2xl rounded-[32px] border border-gray-100">
           <TeamUp
             onNavigate={handleNavigate}
             hasUnreadChats={hasUnreadChats}
@@ -835,9 +816,6 @@ export default function App() {
             onSelectCommunity={handleSelectCommunity}
             bookedEventTitles={bookings.filter(b => b.type === 'event').map(b => b.title)}
             unreadNotificationsCount={unreadNotificationsCount}
-            communityStatuses={communityStatuses}
-            onJoinRequest={handleJoinCommunityRequest}
-            chats={chats}
           />
 
           <AnimatePresence>
@@ -880,10 +858,10 @@ export default function App() {
                 </div>
 
                 <div className="mt-8 text-center px-6">
-                  <h3 className="font-heading font-semibold text-[20px] text-[#272d2c] mb-2 uppercase tracking-widest">
+                  <h3 className="font-['Bricolage_Grotesque:Semi_Bold',sans-serif] text-[20px] text-[#272d2c] mb-2 uppercase tracking-widest">
                     Booking Event
                   </h3>
-                  <p className="font-sans font-medium text-[14px] text-[#3f4544] opacity-60">
+                  <p className="font-['Figtree:Medium',sans-serif] text-[14px] text-[#3f4544] opacity-60">
                     Reserving your spot...
                   </p>
                 </div>
@@ -906,7 +884,7 @@ export default function App() {
   if (currentView === 'bookings') {
     return (
       <div className="bg-[#fafafa] h-screen flex items-center justify-center p-4 overflow-hidden">
-        <div className="w-[360px] h-full max-h-[800px] bg-[#f8f7f3] relative overflow-hidden flex flex-col shadow-2xl rounded-[32px] border border-gray-100">
+        <div className="w-[360px] h-full max-h-[800px] bg-white relative overflow-hidden flex flex-col shadow-2xl rounded-[32px] border border-gray-100">
           <Bookings onNavigate={handleNavigate} bookings={bookings} hasUnreadChats={hasUnreadChats} initialTab={bookingsInitialTab} unreadNotificationsCount={unreadNotificationsCount} />
         </div>
         <Toaster position="top-center" />
@@ -917,7 +895,7 @@ export default function App() {
   if (currentView === 'account') {
     return (
       <div className="bg-[#fafafa] h-screen flex items-center justify-center p-4 overflow-hidden">
-        <div className="w-[360px] h-full max-h-[800px] bg-[#f8f7f3] relative overflow-hidden flex flex-col shadow-2xl rounded-[32px] border border-gray-100">
+        <div className="w-[360px] h-full max-h-[800px] bg-white relative overflow-hidden flex flex-col shadow-2xl rounded-[32px] border border-gray-100">
           <AccountScreen
             onNavigate={handleNavigate}
             hasUnreadChats={hasUnreadChats}
@@ -932,7 +910,7 @@ export default function App() {
   if (currentView === 'chat') {
     return (
       <div className="bg-[#fafafa] h-screen flex items-center justify-center p-4 overflow-hidden">
-        <div className="w-[360px] h-full max-h-[800px] bg-[#f8f7f3] relative overflow-hidden flex flex-col shadow-2xl rounded-[32px] border border-gray-100">
+        <div className="w-[360px] h-full max-h-[800px] bg-white relative overflow-hidden flex flex-col shadow-2xl rounded-[32px] border border-gray-100">
           <ChatList
             onNavigate={handleNavigate}
             onSelectChat={(user) => {
@@ -952,7 +930,7 @@ export default function App() {
   if (currentView === 'chat-detail' && selectedChatUser) {
     return (
       <div className="bg-[#fafafa] h-screen flex items-center justify-center p-4 overflow-hidden">
-        <div className="w-[360px] h-full max-h-[800px] bg-[#f8f7f3] relative overflow-hidden flex flex-col shadow-2xl rounded-[32px] border border-gray-100">
+        <div className="w-[360px] h-full max-h-[800px] bg-white relative overflow-hidden flex flex-col shadow-2xl rounded-[32px] border border-gray-100">
           <ChatDetail
             user={selectedChatUser}
             onBack={() => setCurrentView(chatReturnView)}
@@ -968,13 +946,11 @@ export default function App() {
   if (currentView === 'community-profile' && selectedCommunity) {
     return (
       <div className="bg-[#fafafa] h-screen flex items-center justify-center p-4 overflow-hidden">
-        <div className="w-[360px] h-full max-h-[800px] bg-[#f8f7f3] relative overflow-hidden flex flex-col shadow-2xl rounded-[32px] border border-gray-100">
+        <div className="w-[360px] h-full max-h-[800px] bg-white relative overflow-hidden flex flex-col shadow-2xl rounded-[32px] border border-gray-100">
           <CommunityProfile
             community={selectedCommunity}
             onBack={() => setCurrentView('teamup')}
             onJoin={handleJoinCommunity}
-            onJoinRequest={() => handleJoinCommunityRequest(selectedCommunity)}
-            status={communityStatuses[selectedCommunity.id] || 'none'}
             onBookEvent={handleBookEvent}
             bookedEventTitles={bookings.filter(b => b.type === 'event').map(b => b.title)}
           />
@@ -1018,10 +994,10 @@ export default function App() {
                 </div>
 
                 <div className="mt-8 text-center px-6">
-                  <h3 className="font-heading font-semibold text-[20px] text-[#272d2c] mb-2 uppercase tracking-widest">
+                  <h3 className="font-['Bricolage_Grotesque:Semi_Bold',sans-serif] text-[20px] text-[#272d2c] mb-2 uppercase tracking-widest">
                     Booking Event
                   </h3>
-                  <p className="font-sans font-medium text-[14px] text-[#3f4544] opacity-60">
+                  <p className="font-['Figtree:Medium',sans-serif] text-[14px] text-[#3f4544] opacity-60">
                     Reserving your spot...
                   </p>
                 </div>
@@ -1044,7 +1020,7 @@ export default function App() {
   if (currentView === 'profile' && selectedMentor) {
     return (
       <div className="bg-[#fafafa] h-screen flex items-center justify-center p-4 overflow-hidden">
-        <div className="w-[360px] h-full max-h-[800px] bg-[#f8f7f3] relative overflow-hidden flex flex-col shadow-2xl rounded-[32px] border border-gray-100">
+        <div className="w-[360px] h-full max-h-[800px] bg-white relative overflow-hidden flex flex-col shadow-2xl rounded-[32px] border border-gray-100">
           <MentorProfile
             mentor={selectedMentor}
             onBack={() => setCurrentView(previousView as any)}
@@ -1070,7 +1046,7 @@ export default function App() {
   if (currentView === 'search-results') {
     return (
       <div className="bg-[#fafafa] h-screen flex items-center justify-center p-4 overflow-hidden">
-        <div className="w-[360px] h-full max-h-[800px] bg-[#f8f7f3] relative overflow-hidden flex flex-col shadow-2xl rounded-[32px] border border-gray-100">
+        <div className="w-[360px] h-full max-h-[800px] bg-white relative overflow-hidden flex flex-col shadow-2xl rounded-[32px] border border-gray-100">
           <SearchResults
             query={searchQuery}
             onBack={() => setCurrentView('home')}
@@ -1100,7 +1076,7 @@ export default function App() {
   if (currentView === 'notifications') {
     return (
       <div className="bg-[#fafafa] h-screen flex items-center justify-center p-4 overflow-hidden">
-        <div className="w-[360px] h-full max-h-[800px] bg-[#f8f7f3] relative overflow-hidden flex flex-col shadow-2xl rounded-[32px] border border-gray-100">
+        <div className="w-[360px] h-full max-h-[800px] bg-white relative overflow-hidden flex flex-col shadow-2xl rounded-[32px] border border-gray-100">
           <NotificationScreen
             notifications={notifications}
             onMarkAsRead={handleMarkNotificationRead}
@@ -1127,7 +1103,7 @@ export default function App() {
           <div className="sticky top-0 bg-white/80 backdrop-blur-md z-30 px-6 pt-[36px] pb-4 flex items-center justify-between">
             <button
               onClick={() => setCurrentView('home')}
-              className="p-2 -ml-2 hover:bg-gray-100 rounded-[8px] transition-colors"
+              className="p-2 -ml-2 hover:bg-gray-100 rounded-full transition-colors"
             >
               <CaretLeft className="text-[#0F1615]" size={24} weight="bold" />
             </button>
@@ -1159,7 +1135,7 @@ export default function App() {
             />
 
             <div className="space-y-4">
-              <p className="font-heading font-medium leading-[20px] opacity-90 text-[#272d2c] text-[14px]">Short description</p>
+              <p className="font-['Bricolage_Grotesque:Medium',sans-serif] font-medium leading-[20px] opacity-90 text-[#272d2c] text-[14px]">Short description</p>
               <textarea
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
@@ -1186,7 +1162,7 @@ export default function App() {
                 }
                 setShowConfirmation(true);
               }}
-              className="w-full h-[56px] bg-[#2d5a4c] flex items-center justify-center rounded-[16px] text-white font-semibold text-[16px] shadow-lg font-body relative z-[99]"
+              className="w-full h-[56px] bg-[#2d5a4c] flex items-center justify-center rounded-[16px] text-white font-semibold text-[16px] shadow-lg font-[Figtree] relative z-[99]"
             >
               Continue for Confirmation
             </motion.button>
@@ -1237,7 +1213,7 @@ export default function App() {
 
     return (
       <div className="bg-[#fafafa] h-screen flex items-center justify-center p-4 overflow-hidden">
-        <div className="w-[360px] h-full max-h-[800px] bg-[#f8f7f3] relative overflow-hidden flex flex-col shadow-2xl rounded-[32px] border border-gray-100">
+        <div className="w-[360px] h-full max-h-[800px] bg-white relative overflow-hidden flex flex-col shadow-2xl rounded-[32px] border border-gray-100">
           <PaymentScreen
             amount={amountToPay}
             onBack={() => {
@@ -1285,7 +1261,7 @@ export default function App() {
 
     return (
       <div className="bg-[#fafafa] h-screen flex items-center justify-center p-4 overflow-hidden">
-        <div className="w-[360px] h-full max-h-[800px] bg-[#f8f7f3] relative overflow-hidden flex flex-col shadow-2xl rounded-[32px] border border-gray-100">
+        <div className="w-[360px] h-full max-h-[800px] bg-white relative overflow-hidden flex flex-col shadow-2xl rounded-[32px] border border-gray-100">
           <BookingSuccess
             onClose={() => {
               setBookingsInitialTab(bookingType === 'event' ? 'Events' : 'Sessions');

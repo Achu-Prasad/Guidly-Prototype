@@ -183,6 +183,20 @@ export const COMMUNITIES: Community[] = [
                 subtitle: 'Technical mocks',
                 iconType: 'interview',
                 isFree: true
+            },
+            {
+                id: 'p6a',
+                title: 'Pair Programming',
+                subtitle: 'Find partners',
+                iconType: 'referral',
+                isFree: true
+            },
+            {
+                id: 'p6b',
+                title: 'Resume Review',
+                subtitle: 'By hiring managers',
+                iconType: 'mock',
+                isFree: true
             }
         ],
         reviews: [
@@ -194,6 +208,24 @@ export const COMMUNITIES: Community[] = [
                 text: "Great community for developers. The code reviews alone are worth it!",
                 timeAgo: '1 day ago',
                 likes: 8
+            },
+            {
+                id: 'r5',
+                name: 'Sarah M',
+                initials: 'SM',
+                rating: 5,
+                text: "Found my co-founder here. Amazing people and great advice for technical interviews.",
+                timeAgo: '3 hr ago',
+                likes: 5
+            },
+            {
+                id: 'r6',
+                name: 'Alex D',
+                initials: 'AD',
+                rating: 4,
+                text: "Very active community. The daily coding challenges help me stay sharp.",
+                timeAgo: '5 hr ago',
+                likes: 12
             }
         ],
         leaders: [
@@ -201,6 +233,18 @@ export const COMMUNITIES: Community[] = [
                 id: 'l4',
                 name: 'CodeMaster',
                 role: 'Admin',
+                isOnline: true
+            },
+            {
+                id: 'l5',
+                name: 'Priya Tech',
+                role: 'Moderator',
+                isOnline: false
+            },
+            {
+                id: 'l6',
+                name: 'DevGuru',
+                role: 'Community Lead',
                 isOnline: true
             }
         ],
@@ -224,11 +268,27 @@ export const COMMUNITIES: Community[] = [
                     id: '03',
                     title: 'No Language Wars',
                     description: 'Respect all programming languages and frameworks. Focus on solving problems rather than debating tool choices.'
+                },
+                {
+                    id: '04',
+                    title: 'Keep it Open',
+                    description: 'Share knowledge publicly rather than in direct messages so everyone can learn together.'
+                },
+                {
+                    id: '05',
+                    title: 'Search Before Asking',
+                    description: 'Try to find existing answers before posting new questions to reduce spam.'
+                },
+                {
+                    id: '06',
+                    title: 'Share Resources',
+                    description: 'Found a cool dev tool? Let the community know in the resources channel.'
                 }
             ],
             faqs: [
                 { id: 'q1', question: 'How can I contribute to community projects?', answer: 'We have a dedicated projects channel where we list open source and internal projects looking for contributors. Just introduce yourself there!' },
-                { id: 'q2', question: 'What is the policy on sharing commercial products?', answer: 'We allow sharing commercial products only if they are genuinely useful to developers and are posted in the designated show-and-tell channel.' }
+                { id: 'q2', question: 'What is the policy on sharing commercial products?', answer: 'We allow sharing commercial products only if they are genuinely useful to developers and are posted in the designated show-and-tell channel.' },
+                { id: 'q3', question: 'Can I find a mentor here?', answer: 'Yes! Check our mentorship program channel to connect with senior developers.' }
             ]
         }
     },
@@ -258,10 +318,71 @@ export const COMMUNITIES: Community[] = [
                 subtitle: 'Top startups',
                 iconType: 'referral',
                 isFree: true
+            },
+            {
+                id: 'p9',
+                title: 'Design Jams',
+                subtitle: 'Weekly challenges',
+                iconType: 'career',
+                isFree: true
+            },
+            {
+                id: 'p10',
+                title: 'Figma Auto-layout Tricks',
+                subtitle: 'By community pros',
+                iconType: 'interview',
+                isFree: true
             }
         ],
-        reviews: [],
-        leaders: [],
+        reviews: [
+            {
+                id: 'r7',
+                name: 'Elena V',
+                initials: 'EV',
+                rating: 5,
+                text: "The portfolio reviews completely transformed my case studies. I just landed my first UX role!",
+                timeAgo: '2 days ago',
+                likes: 15
+            },
+            {
+                id: 'r8',
+                name: 'Marcus J',
+                initials: 'MJ',
+                rating: 5,
+                text: "Love the design jams. It's the best place to practice and get actionable feedback.",
+                timeAgo: '4 hr ago',
+                likes: 7
+            },
+            {
+                id: 'r9',
+                name: 'Anita B',
+                initials: 'AB',
+                rating: 4,
+                text: "Incredibly supportive community. The resources shared here are top-notch.",
+                timeAgo: '1 day ago',
+                likes: 4
+            }
+        ],
+        leaders: [
+            {
+                id: 'l7',
+                name: 'DesignLead',
+                role: 'Admin',
+                isOnline: true
+            },
+            {
+                id: 'l8',
+                name: 'PixelPerfect',
+                role: 'Creative Director',
+                isOnline: true
+            },
+            {
+                id: 'l9',
+                name: 'VectorKing',
+                role: 'Community Manager',
+                isOnline: false
+            }
+        ],
         gallery: [],
         guidelines: {
             intro: "Designers Hub is a safe space for creative expression and growth. Our guidelines help maintain this atmosphere.",
@@ -282,11 +403,27 @@ export const COMMUNITIES: Community[] = [
                     id: '03',
                     title: 'Diversity in Design',
                     description: 'Celebrate different perspectives and design styles from all over the world.'
+                },
+                {
+                    id: '04',
+                    title: 'Accessibility First',
+                    description: 'Always consider accessibility guidelines when proposing design solutions.'
+                },
+                {
+                    id: '05',
+                    title: 'Show Your Process',
+                    description: 'We care about your thinking! Share your wireframes and rough sketches, not just the final UI.'
+                },
+                {
+                    id: '06',
+                    title: 'Encourage Beginners',
+                    description: 'We all started somewhere. Be patient and encouraging to new designers.'
                 }
             ],
             faqs: [
                 { id: 'q1', question: 'How do I request a formal portfolio review?', answer: 'You can submit your portfolio link in the #portfolio-review channel. We have weekly sessions where experts provide detailed feedback.' },
-                { id: 'q2', question: 'Are there any restrictions on design tools used?', answer: 'No, we celebrate all tools! Whether you use Figma, Adobe XD, Sketch, or even pen and paper, you are welcome here.' }
+                { id: 'q2', question: 'Are there any restrictions on design tools used?', answer: 'No, we celebrate all tools! Whether you use Figma, Adobe XD, Sketch, or even pen and paper, you are welcome here.' },
+                { id: 'q3', question: 'Can I post my freelance services?', answer: 'Yes, but please keep it strictly to the #freelance-gigs channel to avoid spam.' }
             ]
         }
     }

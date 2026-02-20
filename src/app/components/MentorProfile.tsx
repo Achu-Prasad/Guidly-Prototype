@@ -73,12 +73,12 @@ export const MentorProfile = ({
           onClick={onBack}
           className="bg-white/40 backdrop-blur-md p-2 rounded-[8px] hover:bg-white/60 transition-colors"
         >
-          <ChevronLeft size={24} className="text-black" />
+          <ChevronLeft size={24} className="text-black" weight="bold" />
         </button>
         <DropdownMenu.Root>
           <DropdownMenu.Trigger asChild>
             <button className="p-2 bg-white/40 backdrop-blur-md rounded-[8px] hover:bg-white/60 transition-colors">
-              <MoreVertical size={24} className="text-black" />
+              <MoreVertical size={24} className="text-black" weight="bold" />
             </button>
           </DropdownMenu.Trigger>
 
@@ -93,7 +93,7 @@ export const MentorProfile = ({
                 className="group text-[14px] leading-none text-[#3f4544] rounded-[8px] flex items-center h-[40px] px-[12px] gap-[12px] relative select-none outline-none hover:bg-[#f1f5f4] hover:text-[#2d5a4c] cursor-pointer transition-colors"
               >
                 <Heart size={18} weight={isFavourite ? "fill" : "regular"} className={`${isFavourite ? 'text-[#2d5a4c]' : 'opacity-70 group-hover:opacity-100'}`} />
-                <span className="font-['Figtree'] font-medium">{isFavourite ? 'Remove Favourite' : 'Add Favourite'}</span>
+                <span className="font-sans font-medium">{isFavourite ? 'Remove Favourite' : 'Add Favourite'}</span>
               </DropdownMenu.Item>
 
               <DropdownMenu.Item
@@ -104,7 +104,7 @@ export const MentorProfile = ({
                 className="group text-[14px] leading-none text-[#3f4544] rounded-[8px] flex items-center h-[40px] px-[12px] gap-[12px] relative select-none outline-none hover:bg-[#f1f5f4] hover:text-[#2d5a4c] cursor-pointer transition-colors"
               >
                 <ShareNetwork size={18} className="opacity-70 group-hover:opacity-100" />
-                <span className="font-['Figtree'] font-medium">Share Mentor Profile</span>
+                <span className="font-sans font-medium">Share Mentor Profile</span>
               </DropdownMenu.Item>
 
               <DropdownMenu.Separator className="h-[1px] bg-gray-100 m-[4px]" />
@@ -114,7 +114,7 @@ export const MentorProfile = ({
                 className="group text-[14px] leading-none text-[#fb2c36] rounded-[8px] flex items-center h-[40px] px-[12px] gap-[12px] relative select-none outline-none hover:bg-red-50 cursor-pointer transition-colors"
               >
                 <WarningCircle size={18} className="opacity-70 group-hover:opacity-100" />
-                <span className="font-['Figtree'] font-medium">Report Mentor</span>
+                <span className="font-sans font-medium">Report Mentor</span>
               </DropdownMenu.Item>
             </DropdownMenu.Content>
           </DropdownMenu.Portal>
@@ -146,18 +146,18 @@ export const MentorProfile = ({
 
             <div className="bg-[#f3f3f3]/50 backdrop-blur-[10px] px-2.5 py-1 rounded-full flex items-center gap-1.5 border border-[#2d5a4c]/5">
               <Star size={12} weight="fill" className="text-[#2D5A4C]" />
-              <span className="text-[12px] font-['Figtree'] font-semibold text-[#2D5A4C]">{mentor.rating_avg}</span>
+              <span className="text-[12px] font-sans font-semibold text-[#2D5A4C]">{mentor.rating_avg}</span>
             </div>
           </div>
 
           <div className="flex justify-between items-start mb-4">
             <div>
-              <h1 className="text-[20px] font-['Figtree'] font-medium text-[#3f4544] leading-tight">{mentor.name}</h1>
-              <p className="text-[14px] font-['Figtree'] text-[#3f4544] opacity-70">{mentor.role}</p>
+              <h1 className="text-[20px] font-sans font-medium text-[#3f4544] leading-tight">{mentor.name}</h1>
+              <p className="text-[14px] font-sans text-[#3f4544] opacity-70">{mentor.role}</p>
             </div>
             <button
               onClick={() => onChat?.(mentor)}
-              className="bg-[#f3f3f3] h-[40px] px-4 rounded-[8px] flex items-center gap-1.5 text-[#2D5A4C] font-['Figtree'] text-[14px]"
+              className="bg-[#f3f3f3] h-[40px] px-4 rounded-[8px] flex items-center gap-1.5 text-[#2D5A4C] font-sans text-[14px]"
             >
               <MessageCircle size={18} />
               Chat
@@ -166,7 +166,7 @@ export const MentorProfile = ({
 
           <div className="flex flex-wrap gap-2 mb-4">
             {mentor.languages.map(lang => (
-              <span key={lang} className="bg-[#f3f3f3] px-2 py-1 rounded-[4px] text-[12px] text-[#3f4544] font-['Figtree']">
+              <span key={lang} className="bg-[#f3f3f3] px-2 py-1 rounded-[4px] text-[12px] text-[#3f4544] font-sans">
                 {lang}
               </span>
             ))}
@@ -178,7 +178,7 @@ export const MentorProfile = ({
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
-                className={`flex-1 py-3 text-[14px] font-['Figtree'] font-medium transition-colors relative ${activeTab === tab ? 'text-[#2D5A4C]' : 'text-[#3f4544] opacity-70'}`}
+                className={`flex-1 py-3 text-[14px] font-sans font-medium transition-colors relative ${activeTab === tab ? 'text-[#2D5A4C]' : 'text-[#3f4544] opacity-70'}`}
               >
                 {tab}
                 {activeTab === tab && (
@@ -199,14 +199,14 @@ export const MentorProfile = ({
           <div className="space-y-8">
             {/* Mentor Message */}
             <section className="space-y-4">
-              <h2 className="text-[14px] font-['Bricolage_Grotesque'] font-medium text-[#272d2c]">Mentor Message</h2>
+              <h2 className="text-[14px] font-heading font-medium text-[#272d2c]">Mentor Message</h2>
               <div className="bg-[#f3f3f3] rounded-[12px] p-6 relative">
                 <div className="text-[#ABBDB7] mb-2">
                   <svg width="23" height="20" viewBox="0 0 23 20" fill="currentColor">
                     <path d="M7.1875 0C3.21875 0 0 3.21875 0 7.1875V12.8125C0 16.7812 3.21875 20 7.1875 20H10V17.1875H7.1875C4.78125 17.1875 2.8125 15.2187 2.8125 12.8125V10H7.1875C9.09375 10 10.625 8.46875 10.625 6.5625V3.4375C10.625 1.53125 9.09375 0 7.1875 0ZM19.6875 0C15.7188 0 12.5 3.21875 12.5 7.1875V12.8125C12.5 16.7812 15.7188 20 19.6875 20H22.5V17.1875H19.6875C17.2812 17.1875 15.3125 15.2187 15.3125 12.8125V10H19.6875C21.5938 10 23.125 8.46875 23.125 6.5625V3.4375C23.125 1.53125 21.5938 0 19.6875 0Z" />
                   </svg>
                 </div>
-                <p className="text-[14px] font-['Figtree'] text-[#575c5b] leading-[20px] text-justify">
+                <p className="text-[14px] font-sans text-[#575c5b] leading-[20px] text-justify">
                   {mentor.about}
                 </p>
               </div>
@@ -214,7 +214,7 @@ export const MentorProfile = ({
 
             {/* Services Offered */}
             <section className="space-y-4">
-              <h2 className="text-[14px] font-['Bricolage_Grotesque'] font-medium text-[#272d2c]">Service Offered</h2>
+              <h2 className="text-[14px] font-heading font-medium text-[#272d2c]">Service Offered</h2>
               <div className="space-y-2">
                 {mentor.services.map(service => (
                   <div key={service.id} className="bg-white border border-gray-100 rounded-[12px] p-3 flex justify-between items-center shadow-[0px_4px_20px_-4px_rgba(0,0,0,0.06)]">
@@ -223,11 +223,11 @@ export const MentorProfile = ({
                         <ServiceIcon type={service.icon} />
                       </div>
                       <div>
-                        <p className="text-[14px] font-['Figtree'] font-medium text-[#272d2c]">{service.title}</p>
-                        <p className="text-[10px] font-['Figtree'] text-[#9fa2a1]">Duration: {service.duration}</p>
+                        <p className="text-[14px] font-sans font-medium text-[#272d2c]">{service.title}</p>
+                        <p className="text-[10px] font-sans text-[#9fa2a1]">Duration: {service.duration}</p>
                       </div>
                     </div>
-                    <div className={`px-2 py-0.5 rounded-[64px] text-[12px] font-['Figtree'] font-medium ${service.price === 'Free' ? 'bg-[#f1f5f4] text-[#2d5a4c]' : 'text-[#272d2c]'}`}>
+                    <div className={`px-2 py-0.5 rounded-[64px] text-[12px] font-sans font-medium ${service.price === 'Free' ? 'bg-[#f1f5f4] text-[#2d5a4c]' : 'text-[#272d2c]'}`}>
                       {service.price}
                     </div>
                   </div>
@@ -238,15 +238,15 @@ export const MentorProfile = ({
             {/* Experience */}
             <section className="space-y-4">
               <div className="flex justify-between items-center">
-                <h2 className="text-[14px] font-['Bricolage_Grotesque'] font-medium text-[#272d2c]">Experience</h2>
-                <span className="text-[14px] font-['Figtree'] text-[#3f4544] opacity-60 font-medium">{mentor.experience_years} YOE</span>
+                <h2 className="text-[14px] font-heading font-medium text-[#272d2c]">Experience</h2>
+                <span className="text-[14px] font-sans text-[#3f4544] opacity-60 font-medium">{mentor.experience_years} YOE</span>
               </div>
               <div className="border border-gray-100 rounded-[12px] p-3 space-y-4">
                 {mentor.work_history.map((work, idx) => (
                   <div key={idx} className={`space-y-1 ${idx !== mentor.work_history.length - 1 ? 'border-b border-gray-100 pb-4' : ''}`}>
-                    <p className="text-[14px] font-['Figtree'] font-medium text-[#272d2c]">{work.role}</p>
-                    <p className="text-[14px] font-['Figtree'] text-[#3f4544] opacity-70">{work.company} . {work.location}</p>
-                    <p className="text-[12px] font-['Figtree'] text-[#3f4544] opacity-70">{work.period}</p>
+                    <p className="text-[14px] font-sans font-medium text-[#272d2c]">{work.role}</p>
+                    <p className="text-[14px] font-sans text-[#3f4544] opacity-70">{work.company} . {work.location}</p>
+                    <p className="text-[12px] font-sans text-[#3f4544] opacity-70">{work.period}</p>
                   </div>
                 ))}
               </div>
@@ -259,11 +259,11 @@ export const MentorProfile = ({
             <div className="flex items-center justify-between">
               <div className="flex flex-col">
                 <div className="flex items-center gap-1">
-                  <span className="text-[18px] font-['Figtree'] font-bold text-[#272d2c]">{mentor.rating_avg}</span>
+                  <span className="text-[18px] font-sans font-bold text-[#272d2c]">{mentor.rating_avg}</span>
                   <Star size={16} className="fill-[#2D5A4C] text-[#2D5A4C]" />
-                  <span className="text-[14px] font-['Figtree'] text-[#3f4544] opacity-70">({mentor.review_count})</span>
+                  <span className="text-[14px] font-sans text-[#3f4544] opacity-70">({mentor.review_count})</span>
                 </div>
-                <span className="text-[12px] font-['Figtree'] text-[#3f4544] opacity-60">Reviews</span>
+                <span className="text-[12px] font-sans text-[#3f4544] opacity-60">Reviews</span>
               </div>
 
               <div className="bg-[#f3f3f3] p-1 rounded-[12px] flex gap-1">
@@ -288,20 +288,20 @@ export const MentorProfile = ({
                         {review.userInitials}
                       </div>
                       <div>
-                        <h4 className="text-[15px] font-['Figtree'] font-semibold text-[#272d2c]">{review.userName}</h4>
+                        <h4 className="text-[15px] font-sans font-semibold text-[#272d2c]">{review.userName}</h4>
                         <div className="flex items-center gap-1">
-                          <span className="text-[12px] font-['Figtree'] font-medium text-[#272d2c]">{review.rating}</span>
+                          <span className="text-[12px] font-sans font-medium text-[#272d2c]">{review.rating}</span>
                           <Star size={12} className="fill-[#2D5A4C] text-[#2D5A4C]" />
                         </div>
                       </div>
                     </div>
                   </div>
 
-                  <p className="text-[14px] font-['Figtree'] text-[#575c5b] leading-relaxed">
+                  <p className="text-[14px] font-sans text-[#575c5b] leading-relaxed">
                     {review.comment}
                   </p>
 
-                  <div className="pt-2 flex items-center justify-between text-[12px] font-['Figtree'] text-[#3f4544] opacity-60 border-t border-gray-200/50 pt-3">
+                  <div className="pt-2 flex items-center justify-between text-[12px] font-sans text-[#3f4544] opacity-60 border-t border-gray-200/50 pt-3">
                     <span>{review.timestamp}</span>
                     <div className="flex items-center gap-4">
                       <div className="flex items-center gap-1.5">
@@ -343,19 +343,19 @@ export const MentorProfile = ({
 
         {activeTab === 'Guidelines' && (
           <div className="space-y-6">
-            <p className="text-[14px] font-['Figtree'] text-[#3f4544] leading-relaxed opacity-80">
+            <p className="text-[14px] font-sans text-[#3f4544] leading-relaxed opacity-80">
               Guidelines helps mentees to understand topics or questions that the mentor prefers not to discuss.
             </p>
 
             <div className="bg-[#f8f9f8] rounded-[24px] p-5 space-y-6">
-              <h3 className="text-[16px] font-['Bricolage_Grotesque'] font-medium text-[#272d2c]">Restricted Topics</h3>
+              <h3 className="text-[16px] font-heading font-medium text-[#272d2c]">Restricted Topics</h3>
               <div className="space-y-3">
                 {mentor.restricted_topics.map((topic, index) => (
                   <div key={index} className="bg-white rounded-[20px] p-4 flex items-center gap-4 shadow-[0px_2px_10px_rgba(0,0,0,0.02)] border border-white">
-                    <div className="w-11 h-11 rounded-full bg-[#f1f5f4] flex items-center justify-center text-[15px] font-['Bricolage_Grotesque'] font-bold text-[#2d5a4c] shrink-0">
+                    <div className="w-11 h-11 rounded-full bg-[#f1f5f4] flex items-center justify-center text-[15px] font-heading font-bold text-[#2d5a4c] shrink-0">
                       {String(index + 1).padStart(2, '0')}
                     </div>
-                    <p className="text-[15px] font-['Figtree'] font-medium text-[#272d2c] leading-tight">
+                    <p className="text-[15px] font-sans font-medium text-[#272d2c] leading-tight">
                       {topic}
                     </p>
                   </div>
@@ -370,7 +370,7 @@ export const MentorProfile = ({
       <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-white via-white to-transparent pt-8 pb-8 z-30">
         <button
           onClick={() => onBook(mentor)}
-          className={`w-full h-[52px] rounded-[12px] flex items-center justify-center text-white font-['Figtree'] font-medium text-[16px] shadow-[0px_8px_20px_rgba(45,90,76,0.3)] transition-all bg-[#2d5a4c] active:scale-[0.98]`}
+          className={`w-full h-[52px] rounded-[12px] flex items-center justify-center text-white font-sans font-medium text-[16px] shadow-[0px_8px_20px_rgba(45,90,76,0.3)] transition-all bg-[#2d5a4c] active:scale-[0.98]`}
         >
           Book a Session
         </button>

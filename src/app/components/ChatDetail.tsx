@@ -54,7 +54,7 @@ export const ChatDetail = ({ user, onBack, onMessageSent, initialMessages }: Cha
                 <div className="flex items-center gap-3">
                     <button
                         onClick={onBack}
-                        className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors"
+                        className="w-10 h-10 flex items-center justify-center rounded-[8px] hover:bg-gray-100 transition-colors"
                     >
                         <CaretLeft size={24} weight="bold" />
                     </button>
@@ -78,7 +78,7 @@ export const ChatDetail = ({ user, onBack, onMessageSent, initialMessages }: Cha
                         </div>
                     </div>
                 </div>
-                <button className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors">
+                <button className="w-10 h-10 flex items-center justify-center rounded-[8px] hover:bg-gray-100 transition-colors">
                     <DotsThreeVertical size={24} weight="bold" />
                 </button>
             </header>
