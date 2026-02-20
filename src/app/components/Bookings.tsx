@@ -26,6 +26,7 @@ interface BookingItem {
     duration: string;
     type: 'session' | 'event';
     status?: 'join' | 'upcoming';
+    isNew?: boolean;
 }
 
 interface BookingsProps {
@@ -136,7 +137,7 @@ export const Bookings = ({ onNavigate, bookings, hasUnreadChats, initialTab, unr
                                     <span className="text-[10px] font-bold text-[#00973d] uppercase tracking-wider font-['Figtree']">Join</span>
                                 </div>
                             )}
-                            {booking.status === 'upcoming' && (
+                            {booking.isNew && (
                                 <div className="absolute top-2 right-2 bg-[#2d5a4c]/10 px-2.5 py-1 rounded-full flex items-center gap-1.5 border border-[#2d5a4c]/5">
                                     <div className="w-1.5 h-1.5 bg-[#2d5a4c] rounded-full" />
                                     <span className="text-[10px] font-bold text-[#2d5a4c] uppercase tracking-wider font-['Figtree']">New</span>

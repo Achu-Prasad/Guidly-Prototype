@@ -404,6 +404,7 @@ interface BookingEntry {
   type: 'session' | 'event';
   status?: 'join' | 'upcoming';
   mentorId?: string | number;
+  isNew?: boolean;
 }
 
 const INITIAL_BOOKINGS: BookingEntry[] = [];
@@ -779,7 +780,12 @@ export default function App() {
       };
     }
 
-    setBookings(prev => [newBooking, ...prev]);
+    setBookings(prev => [{ ...newBooking, isNew: true }, ...prev]);
+
+    // Remove the "NEW" badge from this booking after 2 minutes
+    setTimeout(() => {
+      setBookings(current => current.map(b => b.id === bookingId ? { ...b, isNew: false } : b));
+    }, 120000);
 
     const newNotification: Notification = {
       id: crypto.randomUUID(),
@@ -1337,12 +1343,46 @@ export default function App() {
         <div className="w-[360px] h-full max-h-[800px] bg-[#f8f7f3] relative overflow-hidden flex flex-col shadow-2xl rounded-[32px] border border-gray-100">
           <RescheduleScreen
             booking={currentRescheduleBooking}
+            bookings={bookings}
             onBack={() => setCurrentView('bookings')}
             onNavigate={handleNavigate}
             hasUnreadChats={hasUnreadChats}
             unreadNotificationsCount={unreadNotificationsCount}
             onConfirm={(date, time) => {
-              toast.success(`Booking rescheduled to ${date} Jun 2025`);
+              // Properly update bookings array to modify the date/time natively
+              setBookings(prev => {
+                const updated = prev.map(b => b.id === currentRescheduleBooking?.id ? { ...b, date, time, isNew: true } : b);
+
+                // Keep the bookings array sorted by date (parsed from dd/MM/yyyy)
+                return updated.sort((a, b) => {
+                  const parseDate = (str: string) => {
+                    const parts = str.split('/');
+                    if (parts.length === 3) return new Date(+parts[2], +parts[1] - 1, +parts[0]).getTime();
+                    return 0; // fallback if string is unstructured
+                  };
+                  return parseDate(a.date) - parseDate(b.date);
+                });
+              });
+
+              // Remove the "NEW" badge strictly for this booking after 2 minutes
+              setTimeout(() => {
+                setBookings(current => current.map(b => b.id === currentRescheduleBooking?.id ? { ...b, isNew: false } : b));
+              }, 120000);
+
+              // Construct a realistic notification to inform user on timeline
+              const sessionTitle = currentRescheduleBooking?.title || 'your session';
+              const newNotification: Notification = {
+                id: `reschedule-${currentRescheduleBooking?.id}-${Date.now()}`,
+                recipient_id: 'me',
+                title: "Session Rescheduled Successfully",
+                message: `Your appointment for ${sessionTitle} has been legally moved to ${date} at ${time}. Check Bookings for details.`,
+                is_read: false,
+                type: "system",
+                created_at: new Date().toISOString()
+              };
+              setNotifications(prev => [newNotification, ...prev]);
+
+              toast.success(`Booking properly rescheduled to ${date}`);
               setCurrentView('bookings');
             }}
           />
