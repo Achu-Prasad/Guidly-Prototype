@@ -13,7 +13,9 @@ import {
   ChatText as MessageSquare,
   Heart,
   ShareNetwork,
-  WarningCircle
+  WarningCircle,
+  Plus,
+  Minus
 } from "@phosphor-icons/react";
 import { motion, AnimatePresence } from 'motion/react';
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
@@ -56,6 +58,7 @@ export const MentorProfile = ({
 }: MentorProfileProps) => {
   const [activeTab, setActiveTab] = useState(initialTab);
   const [reviewFilter, setReviewFilter] = useState<'Recent' | 'Highest' | 'Lowest'>('Recent');
+  const [expandedFaqId, setExpandedFaqId] = useState<string | null>(null);
 
   const sortedReviews = useMemo(() => {
     return [...mentor.reviews].sort((a, b) => {
@@ -343,24 +346,77 @@ export const MentorProfile = ({
 
         {activeTab === 'Guidelines' && (
           <div className="space-y-6">
-            <p className="text-[14px] font-sans text-[#3f4544] leading-relaxed opacity-80">
-              Guidelines helps mentees to understand topics or questions that the mentor prefers not to discuss.
+            <p className="text-[14px] font-sans text-[#3f4544] leading-relaxed opacity-90 text-justify">
+              Guidelines helps mentees to understand topics or questions that the mentor prefers not to discuss. This ensures a respectful and productive session.
             </p>
 
-            <div className="bg-[#f8f9f8] rounded-[24px] p-5 space-y-6">
-              <h3 className="text-[16px] font-heading font-medium text-[#272d2c]">Restricted Topics</h3>
-              <div className="space-y-3">
+            <div className="bg-[#f3f3f3] border-b border-[rgba(63,69,68,0.1)] rounded-[12px] px-4 py-6 flex flex-col gap-6 -mx-4">
+              <div className="flex flex-col gap-[15px]">
+                <p className="font-sans font-medium text-[#3f4544] text-[14px]">
+                  Restricted Topics
+                </p>
+                <div className="flex gap-3 items-start">
+                  <div className="flex h-10 w-[2px] bg-[#2d5a4c] opacity-30 shrink-0 self-center rounded-full" />
+                  <p className="font-sans text-[#3f4544] text-[14px] leading-[20px] text-justify">
+                    To make our session productive and respectful, please avoid asking the following
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex flex-col gap-2">
                 {mentor.restricted_topics.map((topic, index) => (
-                  <div key={index} className="bg-white rounded-[20px] p-4 flex items-center gap-4 shadow-[0px_2px_10px_rgba(0,0,0,0.02)] border border-white">
-                    <div className="w-11 h-11 rounded-full bg-[#f1f5f4] flex items-center justify-center text-[15px] font-heading font-bold text-[#2d5a4c] shrink-0">
-                      {String(index + 1).padStart(2, '0')}
+                  <div key={index} className="bg-white border border-[rgba(63,69,68,0.1)] flex items-center p-3 rounded-[12px] shadow-[0px_4px_20px_-4px_rgba(0,0,0,0.06)]">
+                    <div className="flex gap-3 items-center">
+                      <div className="size-8 rounded-full bg-[#f1f5f4] flex items-center justify-center text-[15px] font-heading font-semibold text-[#2d5a4c] shrink-0">
+                        {String(index + 1).padStart(2, '0')}
+                      </div>
+                      <p className="font-sans font-medium text-[#272d2c] text-[14px] leading-[20px]">
+                        {topic}
+                      </p>
                     </div>
-                    <p className="text-[15px] font-sans font-medium text-[#272d2c] leading-tight">
-                      {topic}
-                    </p>
                   </div>
                 ))}
               </div>
+            </div>
+
+            {/* FAQ Section */}
+            <div className="flex flex-col gap-4">
+              {mentor.faqs?.map((faq) => (
+                <motion.div
+                  layout
+                  key={faq.id}
+                  className="border border-[rgba(63,69,68,0.1)] flex flex-col p-4 rounded-[8px] w-full cursor-pointer transition-colors hover:bg-[#fafafa]"
+                  onClick={() => setExpandedFaqId(expandedFaqId === faq.id ? null : faq.id)}
+                >
+                  <div className="flex items-center justify-between w-full">
+                    <p className="font-sans font-medium leading-[20px] text-[#272d2c] text-[16px] pr-4 flex-1">
+                      {faq.question}
+                    </p>
+                    <motion.div
+                      animate={{ rotate: expandedFaqId === faq.id ? 180 : 0 }}
+                      className="shrink-0 size-6 text-[#3f4544] flex items-center justify-center"
+                    >
+                      {expandedFaqId === faq.id ? <Minus size={20} weight="bold" /> : <Plus size={20} weight="bold" />}
+                    </motion.div>
+                  </div>
+                  <AnimatePresence initial={false}>
+                    {expandedFaqId === faq.id && (
+                      <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: "auto", opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        className="overflow-hidden"
+                      >
+                        <div className="border-t border-gray-100 pt-3 mt-3">
+                          <p className="text-[14px] font-sans text-[#3f4544] opacity-70 leading-[22px]">
+                            {faq.answer}
+                          </p>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </motion.div>
+              ))}
             </div>
           </div>
         )}

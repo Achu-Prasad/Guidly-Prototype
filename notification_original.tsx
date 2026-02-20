@@ -10,36 +10,29 @@ import {
     CalendarCheck,
 } from '@phosphor-icons/react';
 import { Notification } from '../types/notification';
+import { MOCK_NOTIFICATIONS } from '../data/notifications';
 import { formatDistanceToNow } from 'date-fns';
 
 interface NotificationScreenProps {
-    notifications: Notification[];
-    onMarkAsRead: (id: string) => void;
-    onMarkAllRead: () => void;
-    onDeleteAll: () => void;
     onClose: () => void;
     onNavigateToBooking?: (bookingId: string) => void;
     onNavigateToReview?: (reviewId: string) => void;
 }
 
 export const NotificationScreen = ({
-    notifications,
-    onMarkAsRead,
-    onMarkAllRead,
-    onDeleteAll,
     onClose,
     onNavigateToBooking,
     onNavigateToReview,
 }: NotificationScreenProps) => {
     const [activeTab, setActiveTab] = useState<'General' | 'Bookings' | 'All read'>('General');
+    const [notifications, setNotifications] = useState<Notification[]>(MOCK_NOTIFICATIONS);
     const [menuOpen, setMenuOpen] = useState(false);
     const [sortOrder, setSortOrder] = useState<'newest' | 'oldest'>('newest');
 
     const filteredNotifications = notifications.filter((n) => {
-        if (activeTab === 'Bookings') return !n.is_read && (n.type === 'booking_confirmed' || n.type === 'session_reminder');
+        if (activeTab === 'Bookings') return n.type === 'booking_confirmed' || n.type === 'session_reminder';
         if (activeTab === 'All read') return n.is_read;
-        // General tab: only unread notifications
-        return !n.is_read;
+        return true;
     }).sort((a, b) => {
         const dateA = new Date(a.created_at).getTime();
         const dateB = new Date(b.created_at).getTime();
@@ -47,7 +40,7 @@ export const NotificationScreen = ({
     });
 
     const getIcon = (type: string) => {
-        const iconSize = 20;
+        const iconSize = 18;
         switch (type) {
             case 'booking_confirmed':
                 return <Book size={iconSize} weight="regular" className="text-[#2d5a4c]" />;
@@ -62,13 +55,19 @@ export const NotificationScreen = ({
         }
     };
 
+    const markAsRead = (id: string) => {
+        setNotifications(prev =>
+            prev.map(n => n.id === id ? { ...n, is_read: true } : n)
+        );
+    };
+
     const handleMarkAllRead = () => {
-        onMarkAllRead();
+        setNotifications(prev => prev.map(n => ({ ...n, is_read: true })));
         setMenuOpen(false);
     };
 
     const handleDeleteAll = () => {
-        onDeleteAll();
+        setNotifications([]);
         setMenuOpen(false);
     };
 
@@ -169,28 +168,22 @@ export const NotificationScreen = ({
             <div className="flex-1 overflow-y-auto p-4 space-y-3 no-scrollbar">
                 <AnimatePresence mode="popLayout">
                     {filteredNotifications.length > 0 ? (
-                        filteredNotifications.map((notification, index) => (
+                        filteredNotifications.map((notification) => (
                             <motion.div
                                 key={notification.id}
-                                initial={{ opacity: 0, y: 15 }}
+                                initial={{ opacity: 0, y: 10 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 exit={{ opacity: 0, scale: 0.95 }}
-                                transition={{
-                                    delay: index * 0.05,
-                                    duration: 0.4,
-                                    ease: [0.21, 0.45, 0.32, 0.9]
-                                }}
-                                whileHover={{ scale: 1.01 }}
-                                whileTap={{ scale: 0.98 }}
                                 onClick={() => {
-                                    onMarkAsRead(notification.id);
+                                    markAsRead(notification.id);
                                     if (notification.type === 'booking_confirmed' && onNavigateToBooking) {
                                         onNavigateToBooking(notification.related_id || '');
                                     }
                                 }}
-                                className={`p-4 rounded-[12px] cursor-pointer relative flex gap-4 bg-white border border-gray-100/50 shadow-sm transition-shadow duration-300`}
+                                className={`p-4 rounded-[16px] transition-all cursor-pointer relative flex gap-4 bg-white border border-gray-100/50 shadow-sm`}
                             >
-                                <div className="w-10 h-10 rounded-full flex items-center justify-center shrink-0 bg-[#f8f7f3]">
+                                <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 transition-colors ${!notification.is_read ? 'bg-white shadow-sm' : 'bg-[#f8f7f3]'
+                                    }`}>
                                     {getIcon(notification.type)}
                                 </div>
                                 <div className="flex-1 min-w-0">
@@ -211,7 +204,8 @@ export const NotificationScreen = ({
                                             }
                                         </span>
                                     </div>
-                                    <p className={`text-[14px] leading-[1.4] text-[#3f4544] opacity-60`}>
+                                    <p className={`text-[14px] leading-[1.4] ${!notification.is_read ? 'text-[#3f4544]' : 'text-[#3f4544] opacity-50'
+                                        }`}>
                                         {notification.message}
                                     </p>
                                 </div>

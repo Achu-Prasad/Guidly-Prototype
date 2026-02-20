@@ -21,6 +21,25 @@ import { projectId, publicAnonKey } from "../../../utils/supabase/info";
 
 import { AddCardModal } from "./AddCardModal";
 import { WalletModal } from "./WalletModal";
+import gpayLogo from "../../assets/payment icons/gpay.png";
+import phonepeLogo from "../../assets/payment icons/phonepe-icon.webp";
+import paytmLogo from "../../assets/payment icons/paytm_icon.png";
+import amazonpayLogo from "../../assets/payment icons/amazone pay.png";
+
+const UPILogos: Record<string, string> = {
+  'Google Pay': gpayLogo,
+  'PhonePe': phonepeLogo,
+  'Paytm': paytmLogo,
+  'Amazon Pay': amazonpayLogo
+};
+
+const BankLogos: Record<string, string> = {
+  'HDFC Bank': 'https://companieslogo.com/img/orig/HDB-63914947.png?t=1633497371',
+  'ICICI Bank': 'https://companieslogo.com/img/orig/IBN-90209669.png?t=1647425141',
+  'SBI': 'https://companieslogo.com/img/orig/SBIN.NS-9da4348a.png?t=161254348a',
+  'Axis Bank': 'https://companieslogo.com/img/orig/AXISBANK.NS-9c3eb875.png?t=1633497371',
+  'Kotak Bank': 'https://companieslogo.com/img/orig/KOTAKBANK.NS-4e5a6796.png?t=1633497371'
+};
 
 interface Card {
   id: string;
@@ -129,90 +148,96 @@ export const PaymentScreen = ({ amount, onBack, onSuccess, bookingDetails }: Pay
   };
 
   return (
-    <div className="bg-[#f8f7f3] h-full flex flex-col relative overflow-hidden">
+    <div className="bg-white h-full flex flex-col relative overflow-hidden">
       {/* Header */}
-      <div className="sticky top-0 z-40 bg-[#f8f7f3]/80 backdrop-blur-md px-6 pt-12 pb-6">
-        <div className="flex items-center justify-between mb-8">
+      <div className="sticky top-0 z-40 bg-white/80 backdrop-blur-md px-6 pt-12 pb-6">
+        <div className="relative flex items-center justify-between">
           <button onClick={onBack} className="p-2 -ml-2 hover:bg-black/5 rounded-[8px] transition-colors">
             <CaretLeft size={24} className="text-[#0F1615]" weight="bold" />
           </button>
-          <h2 className="font-['Bricolage_Grotesque:Medium',sans-serif] text-[18px] text-[#272d2c] absolute left-1/2 -translate-x-1/2">
+
+          <h2 className="font-heading font-medium text-[18px] text-[#272d2c] absolute left-1/2 -translate-x-1/2">
             Checkout
           </h2>
-          <div className="w-10 h-10" /> {/* Spacer */}
-        </div>
 
-        <div className="flex items-center justify-center gap-[12px]">
-          <div className="bg-[#2d5a4c] rounded-[200px] shrink-0 size-[8px]" />
-          <div className="bg-[#2d5a4c] rounded-[200px] shrink-0 size-[8px]" />
-          <div className="bg-[#2d5a4c] h-[8px] rounded-[200px] shrink-0 w-[34px]" />
+          <div className="flex items-center gap-[12px]">
+            <div className="bg-[#2d5a4c] rounded-[200px] size-[8px] shrink-0" />
+            <div className="bg-[#2d5a4c] rounded-[200px] size-[8px] shrink-0" />
+            <div className="bg-[#2d5a4c] rounded-[200px] h-[8px] w-[34px] shrink-0" />
+          </div>
         </div>
       </div>
 
-      <div className="flex-1 px-6 space-y-10 overflow-y-auto no-scrollbar pb-10">
+      <div className="flex-1 px-6 space-y-8 overflow-y-auto no-scrollbar pb-10">
         {/* Your Cards Section */}
         <section className="space-y-4">
           <div className="flex items-center justify-between">
-            <h3 className="font-['Figtree:Semi_Bold',sans-serif] text-[16px] text-[#272d2c]">Your Cards</h3>
+            <h3 className="font-heading font-semibold text-[16px] text-[#272d2c]">Your Cards</h3>
             <button
               onClick={() => setIsAddCardOpen(true)}
-              className="flex items-center gap-1.5 text-[#2d5a4c] font-['Figtree:Medium',sans-serif] text-[13px] hover:opacity-70 transition-opacity"
+              className="flex items-center gap-1.5 text-[#2d5a4c] font-body font-medium text-[13px] hover:opacity-70 transition-opacity"
             >
               <Plus size={16} />
               Add Card
             </button>
           </div>
 
-          <div className="flex gap-4 overflow-x-auto pb-4 -mx-6 px-6 [&::-webkit-scrollbar]:hidden [scrollbar-width:none] [-ms-overflow-style:none]">
-            {cards.map((card) => (
-              <motion.button
-                key={card.id}
-                onClick={() => setSelectedMethod(`card-${card.id}`)}
-                whileTap={{ scale: 0.98 }}
-                className={`relative shrink-0 w-[296px] h-[174px] rounded-[24px] p-5 flex flex-col justify-between text-white text-left transition-all duration-300 ${card.color} ${selectedMethod === `card-${card.id}` ? 'ring-4 ring-[#2d5a4c]/30 scale-100' : 'opacity-90 scale-[0.98]'}`}
-              >
-                <div className="flex justify-between items-center">
-                  <div className="flex items-center gap-1">
-                    {card.type === 'mastercard' ? (
-                      <div className="flex -space-x-2">
-                        <div className="w-7 h-7 rounded-full bg-[#EB001B] opacity-95" />
-                        <div className="w-7 h-7 rounded-full bg-[#F79E1B] opacity-95" />
+          <div className="relative -mx-6">
+            <motion.div
+              drag="x"
+              dragConstraints={{ right: 0, left: -((cards.length * 312) - 344) }}
+              className="flex gap-4 px-6 py-2 cursor-grab active:cursor-grabbing"
+            >
+              {cards.map((card) => (
+                <motion.button
+                  key={card.id}
+                  onClick={() => setSelectedMethod(`card-${card.id}`)}
+                  whileTap={{ scale: 0.98 }}
+                  className={`relative shrink-0 w-[296px] h-[174px] rounded-[24px] p-5 flex flex-col justify-between text-white text-left transition-all duration-400 ${card.color} ${selectedMethod === `card-${card.id}` ? 'ring-4 ring-[#2d5a4c]/40 ring-offset-0 shadow-2xl z-10' : 'opacity-90 scale-[0.98]'}`}
+                >
+                  <div className="flex justify-between items-center">
+                    <div className="flex items-center gap-1">
+                      {card.type === 'mastercard' ? (
+                        <div className="flex -space-x-2">
+                          <div className="w-7 h-7 rounded-full bg-[#EB001B] opacity-95" />
+                          <div className="w-7 h-7 rounded-full bg-[#F79E1B] opacity-95" />
+                        </div>
+                      ) : (
+                        <div className="italic font-bold text-[18px] tracking-tighter">VISA</div>
+                      )}
+                    </div>
+                    {selectedMethod === `card-${card.id}` && (
+                      <div className="bg-white/20 p-1.5 rounded-full backdrop-blur-md border border-white/10">
+                        <CheckCircle size={14} />
                       </div>
-                    ) : (
-                      <div className="italic font-bold text-[18px] tracking-tighter">VISA</div>
                     )}
                   </div>
-                  {selectedMethod === `card-${card.id}` && (
-                    <div className="bg-white/20 p-1.5 rounded-full backdrop-blur-md border border-white/10">
-                      <CheckCircle size={14} />
-                    </div>
-                  )}
-                </div>
 
-                <div className="space-y-4">
-                  <p className="text-[18px] font-['Figtree:Medium',sans-serif] tracking-[4px] opacity-90">
-                    •••• •••• •••• {card.last4}
-                  </p>
+                  <div className="space-y-4">
+                    <p className="text-[18px] font-body font-medium tracking-[4px] opacity-90">
+                      •••• •••• •••• {card.last4}
+                    </p>
 
-                  <div className="flex justify-between items-end">
-                    <div className="space-y-0.5">
-                      <p className="text-[9px] opacity-50 uppercase font-medium tracking-widest">Card Holder</p>
-                      <p className="text-[13px] font-bold uppercase tracking-tight">{card.holder}</p>
-                    </div>
-                    <div className="space-y-0.5">
-                      <p className="text-[9px] opacity-50 uppercase font-medium tracking-widest text-right">Expires</p>
-                      <p className="text-[13px] font-bold text-right">{card.expiry}</p>
+                    <div className="flex justify-between items-end">
+                      <div className="space-y-0.5">
+                        <p className="text-[9px] opacity-50 uppercase font-body font-medium tracking-widest">Card Holder</p>
+                        <p className="text-[13px] font-body font-bold uppercase tracking-tight">{card.holder}</p>
+                      </div>
+                      <div className="space-y-0.5">
+                        <p className="text-[9px] opacity-50 uppercase font-body font-medium tracking-widest text-right">Expires</p>
+                        <p className="text-[13px] font-body font-bold text-right">{card.expiry}</p>
+                      </div>
                     </div>
                   </div>
-                </div>
-              </motion.button>
-            ))}
+                </motion.button>
+              ))}
+            </motion.div>
           </div>
         </section>
 
         {/* Other Ways to Pay */}
         <section className="space-y-4">
-          <h3 className="font-['Figtree:Semi_Bold',sans-serif] text-[16px] text-[#272d2c]">Other Ways to Pay</h3>
+          <h3 className="font-heading font-semibold text-[16px] text-[#272d2c]">Other Ways to Pay</h3>
 
           <div className="grid grid-cols-2 gap-4">
             {/* Guidly Wallet */}
@@ -222,7 +247,7 @@ export const PaymentScreen = ({ amount, onBack, onSuccess, bookingDetails }: Pay
                 setIsWalletModalOpen(true);
               }}
               whileTap={{ scale: 0.98 }}
-              className={`bg-white p-4 rounded-[20px] text-left border-2 transition-all ${selectedMethod === 'wallet' ? 'border-[#2d5a4c] shadow-lg shadow-[#2d5a4c]/5' : 'border-transparent shadow-sm'}`}
+              className={`p-4 rounded-[20px] text-left border-2 transition-all ${selectedMethod === 'wallet' ? 'bg-white border-[#2d5a4c] shadow-lg shadow-[#2d5a4c]/5' : 'bg-transparent border-gray-100 shadow-sm'}`}
             >
               <div className="flex justify-between items-start mb-4">
                 <div className="w-10 h-10 rounded-full bg-[#E6FAEE] flex items-center justify-center">
@@ -230,8 +255,8 @@ export const PaymentScreen = ({ amount, onBack, onSuccess, bookingDetails }: Pay
                 </div>
                 <div className="px-2 py-0.5 rounded-full border border-[#00c951] text-[#00973D] text-[10px] font-medium">Fast</div>
               </div>
-              <p className="font-['Figtree:Semi_Bold',sans-serif] text-[14px] text-[#272d2c] mb-1">Guidly Wallet</p>
-              <p className={`text-[12px] font-medium ${canPayWithWallet ? 'text-[#00973D]' : 'text-red-500'}`}>
+              <p className="font-heading font-semibold text-[14px] text-[#272d2c] mb-1">Guidly Wallet</p>
+              <p className={`text-[12px] font-body font-medium ${canPayWithWallet ? 'text-[#00973D]' : 'text-red-500'}`}>
                 Balance: ${walletBalance.toFixed(2)}
               </p>
               {selectedMethod === 'wallet' && !canPayWithWallet && (
@@ -243,39 +268,39 @@ export const PaymentScreen = ({ amount, onBack, onSuccess, bookingDetails }: Pay
             <motion.button
               onClick={() => setActiveOtherMethod('upi')}
               whileTap={{ scale: 0.98 }}
-              className={`bg-white p-4 rounded-[20px] text-left border-2 transition-all ${selectedMethod?.startsWith('upi') ? 'border-[#2d5a4c] shadow-lg shadow-[#2d5a4c]/5' : 'border-transparent shadow-sm'}`}
+              className={`p-4 rounded-[20px] text-left border-2 transition-all ${selectedMethod?.startsWith('upi') ? 'bg-white border-[#2d5a4c] shadow-lg shadow-[#2d5a4c]/5' : 'bg-transparent border-gray-100 shadow-sm'}`}
             >
               <div className="w-10 h-10 rounded-full bg-[#DBEAFE] flex items-center justify-center mb-4">
                 <Smartphone size={20} className="text-[#2465EC]" />
               </div>
-              <p className="font-['Figtree:Semi_Bold',sans-serif] text-[14px] text-[#272d2c] mb-1">UPI Apps</p>
-              <p className="text-[12px] text-[#3f4544] opacity-50 truncate">Google Pay, PhonePe</p>
+              <p className="font-heading font-semibold text-[14px] text-[#272d2c] mb-1">UPI Apps</p>
+              <p className="text-[12px] font-body text-[#3f4544] opacity-50 truncate">Google Pay, PhonePe</p>
             </motion.button>
 
             {/* Net Banking */}
             <motion.button
               onClick={() => setActiveOtherMethod('netbanking')}
               whileTap={{ scale: 0.98 }}
-              className={`bg-white p-4 rounded-[20px] text-left border-2 transition-all ${selectedMethod?.startsWith('netbanking') ? 'border-[#2d5a4c] shadow-lg shadow-[#2d5a4c]/5' : 'border-transparent shadow-sm'}`}
+              className={`p-4 rounded-[20px] text-left border-2 transition-all ${selectedMethod?.startsWith('netbanking') ? 'bg-white border-[#2d5a4c] shadow-lg shadow-[#2d5a4c]/5' : 'bg-transparent border-gray-100 shadow-sm'}`}
             >
               <div className="w-10 h-10 rounded-full bg-[#FFEDD5] flex items-center justify-center mb-4">
                 <Building2 size={20} className="text-[#EA580C]" />
               </div>
-              <p className="font-['Figtree:Semi_Bold',sans-serif] text-[14px] text-[#272d2c] mb-1">Net Banking</p>
-              <p className="text-[12px] text-[#3f4544] opacity-50">Select your bank</p>
+              <p className="font-heading font-semibold text-[14px] text-[#272d2c] mb-1">Net Banking</p>
+              <p className="text-[12px] font-body text-[#3f4544] opacity-50">Select your bank</p>
             </motion.button>
 
             {/* EMI */}
             <motion.button
               onClick={() => setActiveOtherMethod('emi')}
               whileTap={{ scale: 0.98 }}
-              className={`bg-white p-4 rounded-[20px] text-left border-2 transition-all ${selectedMethod?.startsWith('emi') ? 'border-[#2d5a4c] shadow-lg shadow-[#2d5a4c]/5' : 'border-transparent shadow-sm'}`}
+              className={`p-4 rounded-[20px] text-left border-2 transition-all ${selectedMethod?.startsWith('emi') ? 'bg-white border-[#2d5a4c] shadow-lg shadow-[#2d5a4c]/5' : 'bg-transparent border-gray-100 shadow-sm'}`}
             >
               <div className="w-10 h-10 rounded-full bg-[#F3E8FF] flex items-center justify-center mb-4">
                 <CalendarClock size={20} className="text-[#9333EA]" />
               </div>
-              <p className="font-['Figtree:Semi_Bold',sans-serif] text-[14px] text-[#272d2c] mb-1">EMI</p>
-              <p className="text-[12px] text-[#3f4544] opacity-50">Pay monthly basis</p>
+              <p className="font-heading font-semibold text-[14px] text-[#272d2c] mb-1">EMI</p>
+              <p className="text-[12px] font-body text-[#3f4544] opacity-50">Pay monthly basis</p>
             </motion.button>
           </div>
         </section>
@@ -292,12 +317,12 @@ export const PaymentScreen = ({ amount, onBack, onSuccess, bookingDetails }: Pay
           {isProcessing ? (
             <div className="flex items-center gap-3">
               <Loader2 className="animate-spin" size={20} />
-              <span className="font-['Figtree:Medium',sans-serif] text-[16px]">Processing...</span>
+              <span className="font-body font-medium text-[16px]">Processing...</span>
             </div>
           ) : (
             <>
-              <span className="font-['Figtree:Medium',sans-serif] text-[16px]">Pay Now</span>
-              <span className="font-['Bricolage_Grotesque:Semi_Bold',sans-serif] text-[20px]">${amount}</span>
+              <span className="font-body font-medium text-[16px]">Pay Now</span>
+              <span className="font-heading font-semibold text-[20px]">${amount}</span>
             </>
           )}
         </motion.button>
@@ -332,13 +357,16 @@ export const PaymentScreen = ({ amount, onBack, onSuccess, bookingDetails }: Pay
           <div className="absolute inset-0 z-[100] flex items-end justify-center">
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setActiveOtherMethod(null)} className="absolute inset-0 bg-black/30 backdrop-blur-sm" />
             <motion.div
-              initial={{ y: "100%" }} animate={{ y: 0 }} exit={{ y: "100%" }}
+              initial={{ y: "100%" }}
+              animate={{ y: 0 }}
+              exit={{ y: "100%" }}
+              transition={{ type: "tween", ease: "easeInOut", duration: 0.4 }}
               className="relative w-full max-w-[400px] bg-white rounded-t-[32px] p-6 pb-12 shadow-2xl"
             >
               <div className="w-12 h-1 bg-gray-200 rounded-full mx-auto mb-6" />
 
               <div className="flex items-center justify-between mb-8">
-                <h3 className="font-['Bricolage_Grotesque:Semi_Bold',sans-serif] text-[20px] text-[#272d2c] uppercase tracking-wide">
+                <h3 className="font-heading font-semibold text-[16px] text-[#272d2c]">
                   {activeOtherMethod === 'upi' ? 'Select UPI App' : activeOtherMethod === 'netbanking' ? 'Select Bank' : 'EMI Options'}
                 </h3>
                 <button onClick={() => setActiveOtherMethod(null)} className="p-2 hover:bg-gray-100 rounded-full"><X size={20} /></button>
@@ -354,7 +382,9 @@ export const PaymentScreen = ({ amount, onBack, onSuccess, bookingDetails }: Pay
                         className="w-full flex items-center justify-between p-4 rounded-[16px] border border-gray-100 hover:bg-[#f0f4f3] transition-colors"
                       >
                         <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-full bg-[#DBEAFE]/30 flex items-center justify-center text-[#2465EC] font-bold">{app[0]}</div>
+                          <div className="w-10 h-10 rounded-full bg-white border border-gray-100 flex items-center justify-center overflow-hidden p-2">
+                            <img src={UPILogos[app]} alt={app} className="w-full h-full object-contain" />
+                          </div>
                           <span className="font-semibold text-[#272d2c]">{app}</span>
                         </div>
                         <ChevronRight size={18} className="text-gray-300" />
@@ -379,7 +409,9 @@ export const PaymentScreen = ({ amount, onBack, onSuccess, bookingDetails }: Pay
                         className="w-full flex items-center justify-between p-4 rounded-[16px] border border-gray-100 hover:bg-[#f0f4f3] transition-colors"
                       >
                         <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-full bg-[#FFEDD5]/30 flex items-center justify-center text-[#EA580C] font-bold">{bank[0]}</div>
+                          <div className="w-10 h-10 rounded-full bg-white border border-gray-100 flex items-center justify-center overflow-hidden p-2">
+                            <img src={BankLogos[bank]} alt={bank} className="w-full h-full object-contain" />
+                          </div>
                           <span className="font-semibold text-[#272d2c]">{bank}</span>
                         </div>
                         <ChevronRight size={18} className="text-gray-300" />
@@ -439,10 +471,10 @@ export const PaymentScreen = ({ amount, onBack, onSuccess, bookingDetails }: Pay
             </div>
 
             <div className="mt-8 text-center">
-              <h3 className="font-['Bricolage_Grotesque:Semi_Bold',sans-serif] text-[20px] text-[#272d2c] mb-2 uppercase tracking-widest">
+              <h3 className="font-heading font-semibold text-[20px] text-[#272d2c] mb-2 uppercase tracking-widest">
                 Processing Payment
               </h3>
-              <p className="font-['Figtree:Medium',sans-serif] text-[14px] text-[#3f4544] opacity-60">
+              <p className="font-body font-medium text-[14px] text-[#3f4544] opacity-60">
                 Please don't close the app or refresh the page
               </p>
             </div>

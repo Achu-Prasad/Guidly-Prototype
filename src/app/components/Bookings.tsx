@@ -34,9 +34,10 @@ interface BookingsProps {
     hasUnreadChats?: boolean;
     initialTab?: string;
     unreadNotificationsCount?: number;
+    onReschedule?: (booking: BookingItem) => void;
 }
 
-export const Bookings = ({ onNavigate, bookings, hasUnreadChats, initialTab, unreadNotificationsCount = 0 }: BookingsProps) => {
+export const Bookings = ({ onNavigate, bookings, hasUnreadChats, initialTab, unreadNotificationsCount = 0, onReschedule }: BookingsProps) => {
     const [activeTab, setActiveTab] = useState(initialTab || 'All');
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedBooking, setSelectedBooking] = useState<BookingItem | null>(null);
@@ -111,16 +112,23 @@ export const Bookings = ({ onNavigate, bookings, hasUnreadChats, initialTab, unr
                         );
                     }
 
-                    return filteredBookings.map((booking) => (
+                    return filteredBookings.map((booking, index) => (
                         <motion.div
                             key={booking.id}
-                            initial={{ opacity: 0, y: 10 }}
+                            initial={{ opacity: 0, y: 15 }}
                             animate={{ opacity: 1, y: 0 }}
+                            transition={{
+                                delay: index * 0.05,
+                                duration: 0.4,
+                                ease: [0.21, 0.45, 0.32, 0.9]
+                            }}
+                            whileHover={{ scale: 1.01 }}
+                            whileTap={{ scale: 0.98 }}
                             onClick={() => {
                                 setSelectedBooking(booking);
                                 setIsModalOpen(true);
                             }}
-                            className="bg-white p-2 rounded-[8px] cursor-pointer shadow-[0px_2px_2px_rgba(0,0,0,0.05)] border border-gray-100 flex gap-3 h-[98px] relative transition-transform hover:scale-[1.01]"
+                            className="bg-white p-2 rounded-[12px] cursor-pointer shadow-[0px_2px_4px_rgba(0,0,0,0.04)] border border-gray-100 flex gap-3 h-[98px] relative transition-shadow duration-300"
                         >
                             {booking.status === 'join' && (
                                 <div className="absolute top-2 right-2 bg-[#00973d]/10 px-2.5 py-1 rounded-full flex items-center gap-1.5 border border-[#00973d]/5">
@@ -186,7 +194,8 @@ export const Bookings = ({ onNavigate, bookings, hasUnreadChats, initialTab, unr
                     onClose={() => setIsModalOpen(false)}
                     booking={selectedBooking}
                     onReschedule={(b) => {
-                        console.log("Rescheduling flow for:", b);
+                        setIsModalOpen(false);
+                        onReschedule?.(b);
                     }}
                 />
             )}

@@ -345,7 +345,7 @@ export const SearchResults = ({ query, onBack, onSelectMentor, onNavigate, hasUn
                 transition={{ delay: index * 0.06, duration: 0.35, ease: [0.25, 0.46, 0.45, 0.94] }}
                 whileTap={{ scale: 0.98 }}
                 onClick={() => onSelectMentor(mentor)}
-                className="bg-white rounded-[14px] shadow-[0px_1px_1px_0px_rgba(0,0,0,0.04)] w-full text-left"
+                className="bg-white rounded-[12px] shadow-[0px_1px_1px_0px_rgba(0,0,0,0.04)] w-full text-left"
               >
                 <div className="flex gap-[12px] items-center p-[12px]">
                   {/* Avatar */}

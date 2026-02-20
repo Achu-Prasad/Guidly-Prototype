@@ -61,7 +61,7 @@ export const AddCardModal = ({ isOpen, onClose, onAdd }: AddCardModalProps) => {
         className="relative w-full max-w-[340px] bg-white rounded-[24px] shadow-2xl overflow-hidden p-6"
       >
         <div className="flex items-center justify-between mb-6">
-          <h3 className="font-['Bricolage_Grotesque:Semi_Bold',sans-serif] text-[18px] text-[#272d2c]">Add New Card</h3>
+          <h3 className="font-heading font-semibold text-[16px] text-[#272d2c]">Add New Card</h3>
           <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-full">
             <X size={20} className="text-[#3f4544]" />
           </button>

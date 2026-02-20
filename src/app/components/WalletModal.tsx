@@ -46,14 +46,14 @@ export const WalletModal = ({ isOpen, onClose, onAddMoney, currentBalance }: Wal
         initial={{ y: "100%" }}
         animate={{ y: 0 }}
         exit={{ y: "100%" }}
-        transition={{ type: "spring", damping: 25, stiffness: 300 }}
+        transition={{ type: "tween", ease: "easeInOut", duration: 0.4 }}
         className="relative w-full max-w-[400px] bg-white rounded-t-[32px] shadow-2xl overflow-hidden p-6 pb-12"
       >
         <div className="w-12 h-1 bg-gray-200 rounded-full mx-auto mb-6" />
 
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h3 className="font-['Bricolage_Grotesque:Semi_Bold',sans-serif] text-[20px] text-[#272d2c]">Add Money</h3>
+            <h3 className="font-heading font-semibold text-[16px] text-[#272d2c]">Add Money</h3>
             <p className="text-[13px] text-[#3f4544] opacity-50">Current balance: ${currentBalance.toFixed(2)}</p>
           </div>
           <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-full">

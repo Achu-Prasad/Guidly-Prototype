@@ -228,15 +228,19 @@ export const CommunityProfile = ({
                     className="w-full h-full object-cover"
                 />
                 {/* Best Community Badge */}
-                <div className="absolute left-[14px] top-[98px]">
-                    <div
-                        className="backdrop-blur-[6px] px-3 py-1 rounded-full flex items-center gap-1.5 border border-white/20"
-                        style={{ backgroundImage: "linear-gradient(90deg, rgba(45, 90, 76, 0.7) 0%, rgba(96, 192, 162, 0.7) 100%), linear-gradient(90deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.1) 100%)" }}
-                    >
-                        <Sparkle size={13} weight="fill" className="text-white" />
-                        <span className="text-[12px] font-['Figtree'] font-medium text-white">Best Community 2025</span>
+                {community.name !== 'Designers Hub' && (
+                    <div className="absolute left-[14px] top-[98px]">
+                        <div
+                            className="backdrop-blur-[6px] px-3 py-1 rounded-full flex items-center gap-1.5 border border-white/20"
+                            style={{ backgroundImage: "linear-gradient(90deg, rgba(45, 90, 76, 0.7) 0%, rgba(96, 192, 162, 0.7) 100%), linear-gradient(90deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.1) 100%)" }}
+                        >
+                            <Sparkle size={13} weight="fill" className="text-white" />
+                            <span className="text-[12px] font-['Figtree'] font-medium text-white">
+                                {community.name === 'WeCode' ? 'Best coders community 2025' : 'Best Community 2025'}
+                            </span>
+                        </div>
                     </div>
-                </div>
+                )}
             </div>
 
             {/* Profile Header Card */}

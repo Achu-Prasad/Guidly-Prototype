@@ -139,7 +139,18 @@ export const MENTORS: Mentor[] = [
     restricted_topics: [
       'Basic questions you can Google',
       'Asking for salary breakdowns',
-      'Past interview stories'
+      'Past interview stories',
+      'Personal or family questions',
+      'Sensitive topics',
+      'Directly asking for job referrals',
+      'Homework or assignment help',
+      'Company secrets or private info',
+      'Off-topic chats'
+    ],
+    faqs: [
+      { id: 'q1', question: 'Why should I check Guidelines before booking a session?', answer: 'Checking guidelines ensures you align with the mentor\'s preferences and helps maintain a high-quality, productive environment for the session.' },
+      { id: 'q2', question: 'What if I need to discuss a topic listed in Guidelines ?', answer: 'If a topic is restricted, it means the mentor is not comfortable or permitted to discuss it. Please respect these boundaries.' },
+      { id: 'q3', question: 'Can I ask for clarification on Guidelines topics?', answer: 'Yes, you can briefly ask for clarification during the session if you are unsure why a specific topic is restricted.' }
     ]
   },
   {
@@ -274,6 +285,11 @@ export const MENTORS: Mentor[] = [
       'Internal confidential roadmaps',
       'Referrals on first meeting',
       'Proprietary interview questions'
+    ],
+    faqs: [
+      { id: 'q1', question: 'Why should I check Guidelines before booking a session?', answer: 'Checking guidelines ensures you align with the mentor\'s preferences and helps maintain a high-quality, productive environment for the session.' },
+      { id: 'q2', question: 'What if I need to discuss a topic listed in Guidelines ?', answer: 'If a topic is restricted, it means the mentor is not comfortable or permitted to discuss it. Please respect these boundaries.' },
+      { id: 'q3', question: 'Can I ask for clarification on Guidelines topics?', answer: 'Yes, you can briefly ask for clarification during the session if you are unsure why a specific topic is restricted.' }
     ]
   },
   {
@@ -408,6 +424,11 @@ export const MENTORS: Mentor[] = [
       'Leaked feature code',
       'Netflix compensation data',
       'Non-engineering career advice'
+    ],
+    faqs: [
+      { id: 'q1', question: 'Why should I check Guidelines before booking a session?', answer: 'Checking guidelines ensures you align with the mentor\'s preferences and helps maintain a high-quality, productive environment for the session.' },
+      { id: 'q2', question: 'What if I need to discuss a topic listed in Guidelines ?', answer: 'If a topic is restricted, it means the mentor is not comfortable or permitted to discuss it. Please respect these boundaries.' },
+      { id: 'q3', question: 'Can I ask for clarification on Guidelines topics?', answer: 'Yes, you can briefly ask for clarification during the session if you are unsure why a specific topic is restricted.' }
     ]
   },
   {
@@ -535,6 +556,11 @@ export const MENTORS: Mentor[] = [
       'Airbnb pricing algorithms',
       'Legal marketing disclosures',
       'Competitive campaign budgets'
+    ],
+    faqs: [
+      { id: 'q1', question: 'Why should I check Guidelines before booking a session?', answer: 'Checking guidelines ensures you align with the mentor\'s preferences and helps maintain a high-quality, productive environment for the session.' },
+      { id: 'q2', question: 'What if I need to discuss a topic listed in Guidelines ?', answer: 'If a topic is restricted, it means the mentor is not comfortable or permitted to discuss it. Please respect these boundaries.' },
+      { id: 'q3', question: 'Can I ask for clarification on Guidelines topics?', answer: 'Yes, you can briefly ask for clarification during the session if you are unsure why a specific topic is restricted.' }
     ]
   },
   {
@@ -669,6 +695,11 @@ export const MENTORS: Mentor[] = [
       'Stripe internal design files',
       'Upcoming product launches',
       'Salary negotiation with HR'
+    ],
+    faqs: [
+      { id: 'q1', question: 'Why should I check Guidelines before booking a session?', answer: 'Checking guidelines ensures you align with the mentor\'s preferences and helps maintain a high-quality, productive environment for the session.' },
+      { id: 'q2', question: 'What if I need to discuss a topic listed in Guidelines ?', answer: 'If a topic is restricted, it means the mentor is not comfortable or permitted to discuss it. Please respect these boundaries.' },
+      { id: 'q3', question: 'Can I ask for clarification on Guidelines topics?', answer: 'Yes, you can briefly ask for clarification during the session if you are unsure why a specific topic is restricted.' }
     ]
   }
 ];

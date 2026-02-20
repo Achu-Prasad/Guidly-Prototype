@@ -49,4 +49,5 @@ export interface Mentor {
   work_history: WorkExperience[];
   reviews: Review[];
   restricted_topics: string[];
+  faqs?: { id: string; question: string; answer: string }[];
 }

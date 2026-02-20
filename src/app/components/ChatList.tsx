@@ -90,14 +90,20 @@ export const ChatList = ({ onNavigate, onSelectChat, chats, hasUnreadChats, unre
             </div>
 
             {/* Main Chat List Content */}
-            <div className="flex-1 overflow-y-auto px-4 pt-6 pb-[100px] no-scrollbar">
+            <div className="flex-1 overflow-y-auto px-4 pt-4 pb-[100px] no-scrollbar">
                 <div className="space-y-2">
                     {filteredChats.length > 0 ? (
-                        filteredChats.map((chat) => (
+                        filteredChats.map((chat, index) => (
                             <motion.div
                                 key={chat.id}
-                                initial={{ opacity: 0, y: 10 }}
+                                initial={{ opacity: 0, y: 15 }}
                                 animate={{ opacity: 1, y: 0 }}
+                                transition={{
+                                    delay: index * 0.05,
+                                    duration: 0.4,
+                                    ease: [0.21, 0.45, 0.32, 0.9]
+                                }}
+                                whileHover={{ scale: 1.01 }}
                                 whileTap={{ scale: 0.98 }}
                                 onClick={() => onSelectChat({ id: chat.id, name: chat.name, image: chat.image, isGroup: chat.isGroup })}
                                 className="bg-white rounded-[12px] p-3 flex items-center gap-3 cursor-pointer hover:bg-white/80 transition-colors shadow-sm"

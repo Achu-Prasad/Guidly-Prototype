@@ -44,6 +44,7 @@ import imgStolenLogo from "../assets/Stolen logo.png";
 import { CommunityProfile } from "./components/CommunityProfile";
 import { Community } from "./types/team";
 import { AlreadyBookedModal } from "./components/AlreadyBookedModal";
+import { RescheduleScreen } from "./components/RescheduleScreen";
 
 // --- Mock Data ---
 const LANGUAGES = ["English", "Spanish", "French", "German", "Chinese", "Hindi", "Japanese", "Portuguese"];
@@ -410,13 +411,25 @@ const INITIAL_BOOKINGS: BookingEntry[] = [];
 // --- Main App ---
 
 export default function App() {
-  const [currentView, setCurrentView] = useState<'home' | 'search-results' | 'profile' | 'community-profile' | 'booking' | 'payment' | 'booking-success' | 'teamup' | 'bookings' | 'chat' | 'chat-detail' | 'account' | 'notifications'>('home');
+  const [currentView, setCurrentView] = useState<'home' | 'search-results' | 'profile' | 'community-profile' | 'booking' | 'payment' | 'booking-success' | 'teamup' | 'bookings' | 'chat' | 'chat-detail' | 'account' | 'notifications' | 'reschedule-screen'>('home');
+  const [isRescheduling, setIsRescheduling] = useState(false);
+  const [currentRescheduleBooking, setCurrentRescheduleBooking] = useState<any>(null);
   const [selectedChatUser, setSelectedChatUser] = useState<{ id: string | number, name: string, image: string, isGroup?: boolean } | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedMentor, setSelectedMentor] = useState<Mentor | null>(null);
   const [mentorProfileInitialTab, setMentorProfileInitialTab] = useState('Overview');
   const [previousView, setPreviousView] = useState<string>('home');
   const [chatReturnView, setChatReturnView] = useState<'chat' | 'profile'>('chat');
+
+  const handleReschedule = (booking: any) => {
+    setCurrentRescheduleBooking(booking);
+    setIsRescheduling(true);
+    // Simulate natural loading delay
+    setTimeout(() => {
+      setIsRescheduling(false);
+      setCurrentView('reschedule-screen');
+    }, 1500);
+  };
 
   const [selectedCommunity, setSelectedCommunity] = useState<Community | null>(null);
 
@@ -907,7 +920,14 @@ export default function App() {
     return (
       <div className="bg-[#fafafa] h-screen flex items-center justify-center p-4 overflow-hidden">
         <div className="w-[360px] h-full max-h-[800px] bg-[#f8f7f3] relative overflow-hidden flex flex-col shadow-2xl rounded-[32px] border border-gray-100">
-          <Bookings onNavigate={handleNavigate} bookings={bookings} hasUnreadChats={hasUnreadChats} initialTab={bookingsInitialTab} unreadNotificationsCount={unreadNotificationsCount} />
+          <Bookings
+            onNavigate={handleNavigate}
+            bookings={bookings}
+            hasUnreadChats={hasUnreadChats}
+            initialTab={bookingsInitialTab}
+            unreadNotificationsCount={unreadNotificationsCount}
+            onReschedule={handleReschedule}
+          />
         </div>
         <Toaster position="top-center" />
       </div>
@@ -1140,9 +1160,9 @@ export default function App() {
               <CaretLeft className="text-[#0F1615]" size={24} weight="bold" />
             </button>
             <div className="flex gap-[12px] items-center">
-              <div className={`rounded-[200px] size-[8px] transition-all ${!showConfirmation ? 'bg-[#2d5a4c]' : 'bg-[#e7e8e8]'}`} />
-              <div className={`rounded-[200px] h-[8px] transition-all ${showConfirmation ? 'bg-[#2d5a4c] w-[34px]' : 'bg-[#e7e8e8] w-[8px]'}`} />
-              <div className="bg-[#e7e8e8] h-[8px] rounded-[200px] size-[8px]" />
+              <div className="bg-[#2d5a4c] rounded-[200px] h-[8px] w-[34px] shrink-0" />
+              <div className="bg-[#e7e8e8] rounded-[200px] size-[8px] shrink-0" />
+              <div className="bg-[#e7e8e8] rounded-[200px] size-[8px] shrink-0" />
             </div>
           </div>
 
@@ -1311,14 +1331,89 @@ export default function App() {
     );
   }
 
-  return (
-    <div className="bg-[#fafafa] min-h-screen flex items-center justify-center p-4">
-      <div className="w-[360px] h-[800px] bg-white relative overflow-hidden flex flex-col shadow-2xl rounded-[32px] border border-gray-100">
-        <div className="flex-1 flex items-center justify-center p-8 text-center">
-          <p className="text-[#3f4544]">Screen under construction</p>
-          <button onClick={() => setCurrentView('home')} className="mt-4 text-[#2d5a4c] font-medium underline">Go Home</button>
+  if (currentView === 'reschedule-screen') {
+    return (
+      <div className="bg-[#fafafa] h-screen flex items-center justify-center p-4 overflow-hidden">
+        <div className="w-[360px] h-full max-h-[800px] bg-[#f8f7f3] relative overflow-hidden flex flex-col shadow-2xl rounded-[32px] border border-gray-100">
+          <RescheduleScreen
+            booking={currentRescheduleBooking}
+            onBack={() => setCurrentView('bookings')}
+            onNavigate={handleNavigate}
+            hasUnreadChats={hasUnreadChats}
+            unreadNotificationsCount={unreadNotificationsCount}
+            onConfirm={(date, time) => {
+              toast.success(`Booking rescheduled to ${date} Jun 2025`);
+              setCurrentView('bookings');
+            }}
+          />
         </div>
+        <AnimatePresence>
+          {isRescheduling && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="absolute inset-0 z-[999] flex flex-col items-center justify-center bg-black/20 backdrop-blur-[4px]"
+            >
+              <motion.div
+                animate={{ rotate: 360 }}
+                transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                className="w-10 h-10 border-4 border-white/30 border-t-white rounded-full"
+              />
+            </motion.div>
+          )}
+        </AnimatePresence>
+        <Toaster position="top-center" />
       </div>
+    );
+  }
+
+  return (
+    <div className="bg-[#fafafa] h-screen flex items-center justify-center p-4 overflow-hidden relative">
+      <div className="w-[360px] h-full max-h-[800px] bg-[#f8f7f3] relative overflow-hidden flex flex-col shadow-2xl rounded-[32px] border border-gray-100">
+        <HomeScreen
+          onSearch={(query) => {
+            setSearchQuery(query);
+            setCurrentView('search-results');
+          }}
+          onSelectMentor={(mentor) => {
+            const m = mentor as Mentor;
+            setSelectedMentor(m);
+            setRecentMentors(prev => {
+              const filtered = prev.filter(rm => rm.id !== m.id);
+              return [m, ...filtered].slice(0, 10);
+            });
+            setSelectedServices(m.services.length > 0 ? [m.services[0].id] : []);
+            setMentorProfileInitialTab('Overview');
+            setPreviousView('home');
+            setCurrentView('profile');
+          }}
+          onNavigate={handleNavigate}
+          recentMentors={recentMentors}
+          favouriteMentors={favouriteMentors}
+          hasUnreadChats={hasUnreadChats}
+          unreadNotificationsCount={unreadNotificationsCount}
+        />
+      </div>
+
+      <AnimatePresence>
+        {isRescheduling && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="absolute inset-0 z-[999] flex flex-col items-center justify-center bg-black/20 backdrop-blur-[4px]"
+          >
+            <motion.div
+              animate={{ rotate: 360 }}
+              transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+              className="w-10 h-10 border-4 border-white/30 border-t-white rounded-full"
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <Toaster position="top-center" />
     </div>
   );
 }

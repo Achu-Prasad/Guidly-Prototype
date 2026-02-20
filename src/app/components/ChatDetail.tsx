@@ -113,7 +113,6 @@ export const ChatDetail = ({ user, onBack, onMessageSent, initialMessages }: Cha
                                     key={suggestion}
                                     onClick={() => {
                                         setNewMessage(suggestion);
-                                        toast.info(`Suggestion added: ${suggestion}`);
                                     }}
                                     className="px-4 py-2 bg-white border border-[#2d5a4c]/10 rounded-full text-[13px] text-[#2d5a4c] font-semibold shadow-sm hover:bg-[#f1f5f4] transition-colors active:scale-95"
                                 >
