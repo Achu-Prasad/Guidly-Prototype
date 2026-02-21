@@ -178,366 +178,385 @@ export const TeamUp = ({
       <div className="flex-1 overflow-y-auto px-4 pb-[100px] pt-4 no-scrollbar">
         {activeTab === 'Communities' && (
           <div className="space-y-6">
-            {COMMUNITIES.map((community) => (
-              <motion.div
-                key={community.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                onClick={() => onSelectCommunity?.(community)}
-                className="bg-white rounded-[16px] overflow-hidden shadow-[0px_4px_9px_0px_rgba(0,0,0,0.08)] border border-[rgba(63,69,68,0.1)] cursor-pointer"
-              >
-                {/* Image Banner */}
-                <div className="h-[176px] relative">
-                  <ImageWithFallback
-                    src={community.image}
-                    alt={community.name}
-                    className="w-full h-full object-cover"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-b from-transparent to-[#4b6e68]/80" />
+            {COMMUNITIES.filter(c =>
+              c.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+              c.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+              c.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()))
+            ).length > 0 ? (
+              COMMUNITIES.filter(c =>
+                c.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                c.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                c.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()))
+              ).map((community) => (
+                <motion.div
+                  key={community.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  onClick={() => onSelectCommunity?.(community)}
+                  className="bg-white rounded-[16px] overflow-hidden shadow-[0px_4px_9px_0px_rgba(0,0,0,0.08)] border border-[rgba(63,69,68,0.1)] cursor-pointer"
+                >
+                  {/* Image Banner */}
+                  <div className="h-[176px] relative">
+                    <ImageWithFallback
+                      src={community.image}
+                      alt={community.name}
+                      className="w-full h-full object-cover"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-b from-transparent to-[#4b6e68]/80" />
 
-                  {/* Profile Info inside Banner */}
-                  <div className="absolute bottom-4 left-4 flex gap-3 items-center">
-                    <div className="w-[45px] h-[45px] rounded-[12px] overflow-hidden bg-white shadow-lg p-0.5">
-                      <ImageWithFallback src={community.logo} alt="Logo" className="w-full h-full object-cover rounded-lg" />
-                    </div>
-                    <div className="text-white">
-                      <h3 className="text-[16px] font-semibold font-['Figtree'] leading-tight">{community.name}</h3>
-                      <div className="flex items-center gap-3 mt-0.5">
-                        <div className="flex items-center gap-1">
-                          <div className="w-2 h-2 bg-[#00973d] rounded-full" />
-                          <span className="text-[12px] font-medium opacity-90">{community.isOnlineOnly ? 'Online Only' : 'Hybrid'}</span>
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <Users size={14} />
-                          <span className="text-[12px] font-medium opacity-90">{community.memberCount} Members</span>
+                    {/* Profile Info inside Banner */}
+                    <div className="absolute bottom-4 left-4 flex gap-3 items-center">
+                      <div className="w-[45px] h-[45px] rounded-[12px] overflow-hidden bg-white shadow-lg p-0.5">
+                        <ImageWithFallback src={community.logo} alt="Logo" className="w-full h-full object-cover rounded-lg" />
+                      </div>
+                      <div className="text-white">
+                        <h3 className="text-[16px] font-semibold font-['Figtree'] leading-tight">{community.name}</h3>
+                        <div className="flex items-center gap-3 mt-0.5">
+                          <div className="flex items-center gap-1">
+                            <div className="w-2 h-2 bg-[#00973d] rounded-full" />
+                            <span className="text-[12px] font-medium opacity-90">{community.isOnlineOnly ? 'Online Only' : 'Hybrid'}</span>
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <Users size={14} />
+                            <span className="text-[12px] font-medium opacity-90">{community.memberCount} Members</span>
+                          </div>
                         </div>
                       </div>
                     </div>
                   </div>
-                </div>
 
-                <div className="p-4 space-y-4">
-                  <div className="flex gap-2 overflow-x-auto no-scrollbar -mx-4 px-4 pb-2 pt-1 flex-nowrap scroll-smooth touch-pan-x min-w-0">
-                    {community.tags.map(tag => (
-                      <div key={tag} className="bg-[#f3f3f3] border border-[rgba(63,69,68,0.1)] px-[10px] py-[6px] rounded-[4px] flex items-center gap-1 shrink-0 whitespace-nowrap">
-                        <TagIcon tag={tag} />
-                        <span className="text-[12px] font-['Figtree'] text-[#272d2c]">{tag}</span>
-                      </div>
-                    ))}
+                  <div className="p-4 space-y-4">
+                    <div className="flex gap-2 overflow-x-auto no-scrollbar -mx-4 px-4 pb-2 pt-1 flex-nowrap scroll-smooth touch-pan-x min-w-0">
+                      {community.tags.map(tag => (
+                        <div key={tag} className="bg-[#f3f3f3] border border-[rgba(63,69,68,0.1)] px-[10px] py-[6px] rounded-[4px] flex items-center gap-1 shrink-0 whitespace-nowrap">
+                          <TagIcon tag={tag} />
+                          <span className="text-[12px] font-['Figtree'] text-[#272d2c]">{tag}</span>
+                        </div>
+                      ))}
+                    </div>
+
+                    <p className="text-[14px] font-['Figtree'] text-[#3f4544] opacity-80 leading-relaxed line-clamp-2">
+                      {community.description}
+                    </p>
+
+                    <div className="flex items-center justify-between pt-2">
+                      <button className="text-[12px] font-medium text-[#3f4544] opacity-70">
+                        View page
+                      </button>
+                      <button
+                        onClick={(e) => handleJoinClick(e, community)}
+                        disabled={communityStatuses[community.id] === 'joined' || communityStatuses[community.id] === 'requesting' || joiningIds.includes(community.id)}
+                        className={`px-4 py-2 rounded-[64px] text-[14px] font-medium transition-all flex items-center gap-2 ${communityStatuses[community.id] === 'joined' || communityStatuses[community.id] === 'requesting'
+                          ? 'bg-[#9ca3af] text-white opacity-90 cursor-not-allowed shadow-none'
+                          : joiningIds.includes(community.id)
+                            ? 'bg-[#2D5A4C] text-white'
+                            : 'bg-[#2D5A4C] text-white hover:bg-[#1F4439]'
+                          }`}
+                      >
+                        {joiningIds.includes(community.id) ? (
+                          <>
+                            <motion.div
+                              animate={{ rotate: 360 }}
+                              transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                            >
+                              <CircleNotch size={16} weight="bold" />
+                            </motion.div>
+                            <span>Sending...</span>
+                          </>
+                        ) : communityStatuses[community.id] === 'requesting' ? (
+                          <>
+                            <Check size={16} weight="bold" />
+                            <span>Requested</span>
+                          </>
+                        ) : communityStatuses[community.id] === 'joined' ? (
+                          <>
+                            <Check size={16} weight="bold" />
+                            <span>Joined</span>
+                          </>
+                        ) : (
+                          "Request to Join"
+                        )}
+                      </button>
+                    </div>
                   </div>
-
-                  <p className="text-[14px] font-['Figtree'] text-[#3f4544] opacity-80 leading-relaxed line-clamp-2">
-                    {community.description}
-                  </p>
-
-                  <div className="flex items-center justify-between pt-2">
-                    <button className="text-[12px] font-medium text-[#3f4544] opacity-70">
-                      View page
-                    </button>
-                    <button
-                      onClick={(e) => handleJoinClick(e, community)}
-                      disabled={communityStatuses[community.id] === 'joined' || communityStatuses[community.id] === 'requesting' || joiningIds.includes(community.id)}
-                      className={`px-4 py-2 rounded-[64px] text-[14px] font-medium transition-all flex items-center gap-2 ${communityStatuses[community.id] === 'joined' || communityStatuses[community.id] === 'requesting'
-                        ? 'bg-[#9ca3af] text-white opacity-90 cursor-not-allowed shadow-none'
-                        : joiningIds.includes(community.id)
-                          ? 'bg-[#2D5A4C] text-white'
-                          : 'bg-[#2D5A4C] text-white hover:bg-[#1F4439]'
-                        }`}
-                    >
-                      {joiningIds.includes(community.id) ? (
-                        <>
-                          <motion.div
-                            animate={{ rotate: 360 }}
-                            transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                          >
-                            <CircleNotch size={16} weight="bold" />
-                          </motion.div>
-                          <span>Sending...</span>
-                        </>
-                      ) : communityStatuses[community.id] === 'requesting' ? (
-                        <>
-                          <Check size={16} weight="bold" />
-                          <span>Requested</span>
-                        </>
-                      ) : communityStatuses[community.id] === 'joined' ? (
-                        <>
-                          <Check size={16} weight="bold" />
-                          <span>Joined</span>
-                        </>
-                      ) : (
-                        "Request to Join"
-                      )}
-                    </button>
-                  </div>
-                </div>
-              </motion.div>
-            ))}
+                </motion.div>
+              ))
+            ) : (
+              <div className="flex flex-col items-center justify-center py-20 px-8 text-center bg-white/50 rounded-2xl border border-dashed border-gray-200">
+                <p className="text-[14px] font-heading font-medium text-[#3f4544] opacity-70">
+                  No communities found matching "{searchQuery}"
+                </p>
+              </div>
+            )}
           </div>
         )}
 
         {activeTab === 'Events' && (
           <div className="flex flex-col gap-5">
-            {MOCK_EVENTS.map((event, index) => {
-              const community = COMMUNITIES.find(c => c.id === event.community_id);
-              const catStyle = CATEGORY_STYLES[event.category || 'Workshop'] || CATEGORY_STYLES.Workshop;
-              const isBookmarked = bookmarkedEvents.includes(event.id);
-              const eventDate = new Date(event.start_time);
-              const endDate = new Date(event.end_time);
-              const daysUntil = differenceInDays(eventDate, new Date());
-              const durationHrs = ((endDate.getTime() - eventDate.getTime()) / 3600000).toFixed(1);
-              const spotsLeft = (event.max_attendees || 30) - event.attendee_ids.length;
-              const isFree = event.ticket_price === 0;
-              const isSoon = daysUntil >= 0 && daysUntil <= 3;
+            {MOCK_EVENTS.filter(e =>
+              e.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+              e.host_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+              e.category?.toLowerCase().includes(searchQuery.toLowerCase())
+            ).length > 0 ? (
+              MOCK_EVENTS.filter(e =>
+                e.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                e.host_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                e.category?.toLowerCase().includes(searchQuery.toLowerCase())
+              ).map((event, index) => {
+                const community = COMMUNITIES.find(c => c.id === event.community_id);
+                const catStyle = CATEGORY_STYLES[event.category || 'Workshop'] || CATEGORY_STYLES.Workshop;
+                const eventDate = new Date(event.start_time);
+                const endDate = new Date(event.end_time);
+                const daysUntil = differenceInDays(eventDate, new Date());
+                const durationHrs = ((endDate.getTime() - eventDate.getTime()) / 3600000).toFixed(1);
+                const spotsLeft = (event.max_attendees || 30) - event.attendee_ids.length;
+                const isFree = event.ticket_price === 0;
+                const isSoon = daysUntil >= 0 && daysUntil <= 3;
 
-              return (
-                <div
-                  key={event.id}
-                  onClick={() => handleEventClick(event)}
-                  className="bg-white rounded-[16px] overflow-hidden border border-[rgba(63,69,68,0.06)] shadow-[0px_2px_8px_rgba(0,0,0,0.04),0px_8px_24px_rgba(0,0,0,0.06)] group/card cursor-pointer"
-                >
-                  {/* Image Banner */}
-                  <div className="h-[148px] relative w-full overflow-hidden">
-                    <ImageWithFallback
-                      src={event.image || "https://images.unsplash.com/photo-1710799885122-428e63eff691?auto=format&fit=crop&q=80&w=800"}
-                      alt={event.title}
-                      className="w-full h-full object-cover transition-transform duration-700 ease-out"
-                    />
-                    {/* Soft gradient - lighter, warmer */}
-                    <div className="absolute inset-0 bg-gradient-to-b from-black/5 via-transparent to-black/30" />
-
-                    {/* Floating Date Badge - top left */}
-                    <div className="absolute top-3 left-3">
-                      <div className="bg-white/95 backdrop-blur-sm rounded-[10px] px-[10px] py-[6px] flex flex-col items-center min-w-[44px] shadow-[0px_2px_8px_rgba(0,0,0,0.08)]">
-                        <span className="text-[10px] font-body font-semibold text-[#2D5A4C] uppercase leading-none tracking-wide">
-                          {format(eventDate, 'MMM')}
-                        </span>
-                        <span className="text-[18px] font-heading font-semibold text-[#1b362e] leading-tight">
-                          {format(eventDate, 'd')}
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* "Happening Soon" ribbon */}
-                    {isSoon && (
-                      <div className="absolute bottom-3 left-3">
-
-                      </div>
-                    )}
-
-                    {/* Price badge - top right of image */}
-                    <div className="absolute top-3 right-3">
-                      <div className={`rounded-full px-[10px] py-[5px] backdrop-blur-sm ${isFree ? 'bg-[#E8F0ED]/95' : 'bg-white/95'} shadow-[0px_2px_6px_rgba(0,0,0,0.06)] flex items-center justify-center`}>
-                        <span className={`text-[11px] font-['Figtree'] font-bold leading-[11px] block ${isFree ? 'text-[#2D5A4C]' : 'text-[#272d2c]'}`}>
-                          {isFree ? 'Free' : `$${event.ticket_price}`}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Content */}
-                  <div className="p-4 flex flex-col gap-[10px]">
-                    {/* Category + Community Row */}
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-[8px]">
-                        {/* Category pill */}
-                        <div className={`${catStyle.bg} rounded-full px-[8px] py-[3px] flex items-center gap-[4px]`}>
-                          <div className={`w-[5px] h-[5px] rounded-full ${catStyle.dot}`} />
-                          <span className={`text-[10px] font-['Figtree'] font-semibold ${catStyle.text} tracking-wide uppercase`}>
-                            {event.category}
-                          </span>
-                        </div>
-                        {/* Duration */}
-                        <div className="flex items-center gap-[3px]">
-                          <Clock size={12} className="text-[#3f4544] opacity-35" />
-                          <span className="text-[11px] font-['Figtree'] text-[#3f4544] opacity-50">{durationHrs}h</span>
-                        </div>
-                      </div>
-
-                      {/* Community badge */}
-                      <div className="flex items-center gap-[5px]">
-                        <div className="size-[16px] rounded-full overflow-hidden ring-1 ring-[rgba(63,69,68,0.08)]">
-                          <ImageWithFallback src={community?.logo} alt="" className="size-full object-cover" />
-                        </div>
-                        <span className="text-[11px] font-['Figtree'] text-[#3f4544] opacity-55 max-w-[80px] truncate">{community?.name}</span>
-                      </div>
-                    </div>
-
-                    {/* Title */}
-                    <h4 className="text-[16px] font-heading font-semibold text-[#1b362e] leading-[1.3] line-clamp-2" style={{ fontVariationSettings: "'opsz' 16, 'wdth' 100" }}>
-                      {event.title}
-                    </h4>
-
-                    {/* Meta Row: Time + Platform */}
-                    <div className="flex items-center gap-[12px]">
-                      <div className="flex items-center gap-[4px]">
-                        <Calendar size={13} className="text-[#2D5A4C] opacity-60" />
-                        <span className="text-[12px] font-['Figtree'] font-medium text-[#3f4544] opacity-75">
-                          {format(eventDate, 'EEE, dd MMM')}
-                        </span>
-                      </div>
-                      <div className="w-[3px] h-[3px] bg-[#d4d4d4] rounded-full" />
-                      <span className="text-[12px] font-['Figtree'] font-semibold text-[#2D5A4C]">
-                        {format(eventDate, 'hh:mm a')}
-                      </span>
-                    </div>
-
-                    {/* Host + Location Row */}
-                    <div className="flex items-center gap-[12px]">
-                      <div className="flex items-center gap-[5px]">
-                        <div className="size-[18px] rounded-full bg-[#E8F0ED] flex items-center justify-center">
-                          <Crown size={10} weight="fill" className="text-[#2D5A4C]" />
-                        </div>
-                        <span className="text-[12px] font-['Figtree'] text-[#3f4544] opacity-70">{event.host_name}</span>
-                      </div>
-                      <div className="w-[3px] h-[3px] bg-[#d4d4d4] rounded-full" />
-                      <div className="flex items-center gap-[4px]">
-                        <VideoConference size={13} className="text-[#3f4544] opacity-40" />
-                        <span className="text-[12px] font-['Figtree'] text-[#3f4544] opacity-60">Online</span>
-                      </div>
-                    </div>
-
-                    {/* Divider */}
-                    <div className="w-full h-[1px] bg-[#f0efe9] mt-[2px]" />
-
-                    {/* Bottom Row: Attendees + CTA */}
-                    <div className="flex items-center justify-between mt-[2px]">
-                      {/* Attendee Avatars + Spots */}
-                      <div className="flex items-center gap-[10px]">
-                        {/* Avatar Stack */}
-                        <div className="flex -space-x-[6px]">
-                          {event.attendee_ids.slice(0, 4).map((id, i) => (
-                            <div
-                              key={id}
-                              className={`size-[24px] rounded-full ${AVATAR_COLORS[i % AVATAR_COLORS.length]} flex items-center justify-center ring-[1.5px] ring-white text-[9px] font-['Figtree'] font-bold text-[#3f4544]/60`}
-                              style={{ zIndex: 4 - i }}
-                            >
-                              {AVATAR_INITIALS[i % AVATAR_INITIALS.length]}
-                            </div>
-                          ))}
-                          {event.attendee_ids.length > 4 && (
-                            <div
-                              className="size-[24px] rounded-full bg-[#f3f3f3] flex items-center justify-center ring-[1.5px] ring-white text-[9px] font-['Figtree'] font-bold text-[#3f4544]/50"
-                              style={{ zIndex: 0 }}
-                            >
-                              +{event.attendee_ids.length - 4}
-                            </div>
-                          )}
-                        </div>
-                        {/* Spots left */}
-                        <div className="flex flex-col">
-                          <span className="text-[11px] font-['Figtree'] font-medium text-[#3f4544] opacity-60 leading-tight">
-                            {spotsLeft} spots left
-                          </span>
-                        </div>
-                      </div>
-
-                      {/* CTA Button */}
-                      <button
-                        className={`px-[16px] py-[8px] rounded-[10px] text-[13px] font-['Figtree'] font-semibold flex items-center gap-[6px] transition-colors ${bookedEventTitles.includes(event.title)
-                          ? 'bg-[#E8F0ED] text-[#2D5A4C] shadow-none'
-                          : 'bg-[#2D5A4C] text-white shadow-[0px_2px_6px_rgba(45,90,76,0.2)] hover:bg-[#244a3e]'
-                          }`}
-                      >
-                        {bookedEventTitles.includes(event.title) ? (
-                          <>
-                            Booked
-                            <Check size={13} weight="bold" />
-                          </>
-                        ) : isFree ? (
-                          <>
-                            RSVP
-                            <ArrowRight size={13} weight="bold" />
-                          </>
-                        ) : (
-                          <>
-                            <Ticket size={14} weight="bold" />
-                            Get Ticket
-                          </>
-                        )}
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        )}
-        {activeTab === 'Joined' && (
-          <div className="space-y-2 px-0">
-            {COMMUNITIES.filter(c => communityStatuses[c.id] === 'joined').length > 0 ? (
-              COMMUNITIES.filter(c => communityStatuses[c.id] === 'joined').map((community) => {
-                const chat = chats.find(c => c.id === community.id);
                 return (
-                  <motion.div
-                    key={community.id}
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    whileTap={{ scale: 0.98 }}
-                    onClick={() => onSelectCommunity?.(community)}
-                    className="bg-white rounded-[12px] p-3 flex items-center gap-3 cursor-pointer hover:bg-white/80 transition-colors shadow-sm"
+                  <div
+                    key={event.id}
+                    onClick={() => handleEventClick(event)}
+                    className="bg-white rounded-[16px] overflow-hidden border border-[rgba(63,69,68,0.06)] shadow-[0px_2px_8px_rgba(0,0,0,0.04),0px_8px_24px_rgba(0,0,0,0.06)] group/card cursor-pointer"
                   >
-                    <div className="relative">
-                      <div className="w-[47px] h-[47px] rounded-full overflow-hidden shrink-0 bg-[#f3f3f3]">
-                        <ImageWithFallback
-                          src={community.logo}
-                          alt={community.name}
-                          className="w-full h-full object-cover"
-                        />
+                    {/* Image Banner */}
+                    <div className="h-[148px] relative w-full overflow-hidden">
+                      <ImageWithFallback
+                        src={event.image || "https://images.unsplash.com/photo-1710799885122-428e63eff691?auto=format&fit=crop&q=80&w=800"}
+                        alt={event.title}
+                        className="w-full h-full object-cover transition-transform duration-700 ease-out"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-b from-black/5 via-transparent to-black/30" />
+
+                      {/* Floating Date Badge */}
+                      <div className="absolute top-3 left-3">
+                        <div className="bg-white/95 backdrop-blur-sm rounded-[10px] px-[10px] py-[6px] flex flex-col items-center min-w-[44px] shadow-[0px_2px_8px_rgba(0,0,0,0.08)]">
+                          <span className="text-[10px] font-body font-semibold text-[#2D5A4C] uppercase leading-none tracking-wide">
+                            {format(eventDate, 'MMM')}
+                          </span>
+                          <span className="text-[18px] font-heading font-semibold text-[#1b362e] leading-tight">
+                            {format(eventDate, 'd')}
+                          </span>
+                        </div>
                       </div>
-                      <div className="absolute -bottom-1 -right-1 bg-white p-1 rounded-full shadow-sm border border-gray-50">
-                        <Users size={12} weight="bold" className="text-[#2d5a4c]" />
+
+                      {/* Price badge */}
+                      <div className="absolute top-3 right-3">
+                        <div className={`rounded-full px-[10px] py-[5px] backdrop-blur-sm ${isFree ? 'bg-[#E8F0ED]/95' : 'bg-white/95'} shadow-[0px_2px_6px_rgba(0,0,0,0.06)] flex items-center justify-center`}>
+                          <span className={`text-[11px] font-['Figtree'] font-bold leading-[11px] block ${isFree ? 'text-[#2D5A4C]' : 'text-[#272d2c]'}`}>
+                            {isFree ? 'Free' : `$${event.ticket_price}`}
+                          </span>
+                        </div>
                       </div>
                     </div>
 
-                    <div className="flex-1 min-w-0">
-                      <div className="flex justify-between items-center mb-0.5">
-                        <div className="flex items-center gap-2 min-w-0">
-                          <h3 className="text-[14px] font-['Figtree'] font-medium text-[#272d2c] truncate">
-                            {community.name}
-                          </h3>
-                          <div className="bg-[#e8f0ed] px-1.5 py-0.5 rounded-full flex items-center gap-1 shrink-0">
-                            <Check size={8} weight="bold" className="text-[#2d5a4c]" />
-                            <span className="text-[8px] font-bold text-[#2d5a4c] uppercase tracking-wider">Member</span>
-                          </div>
-                        </div>
-                        <span className="text-[11px] font-['Figtree'] text-[#b7b9b9]">
-                          {chat?.time || 'Now'}
-                        </span>
-                      </div>
-                      <div className="flex items-center justify-between gap-2">
-                        <div className="flex items-center gap-1.5 min-w-0">
-                          {chat?.status === 'read' ? (
-                            <Checks size={16} className="text-[#2d5a4c] shrink-0" />
-                          ) : (
-                            <Check size={16} className="text-[#b7b9b9] shrink-0" />
-                          )}
-                          <p className="text-[14px] font-['Figtree'] text-[#3f4544] truncate opacity-70">
-                            {chat?.message || community.description}
-                          </p>
-                        </div>
-                        {chat && chat.unread > 0 && (
-                          <div className="min-w-[18px] h-[18px] bg-[#2d5a4c] rounded-full flex items-center justify-center px-1">
-                            <span className="text-[10px] font-['Figtree'] font-medium text-white">
-                              {chat.unread}
+                    <div className="p-4 flex flex-col gap-[10px]">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-[8px]">
+                          <div className={`${catStyle.bg} rounded-full px-[8px] py-[3px] flex items-center gap-[4px]`}>
+                            <div className={`w-[5px] h-[5px] rounded-full ${catStyle.dot}`} />
+                            <span className={`text-[10px] font-['Figtree'] font-semibold ${catStyle.text} tracking-wide uppercase`}>
+                              {event.category}
                             </span>
                           </div>
-                        )}
+                          <div className="flex items-center gap-[3px]">
+                            <Clock size={12} className="text-[#3f4544] opacity-35" />
+                            <span className="text-[11px] font-['Figtree'] text-[#3f4544] opacity-50">{durationHrs}h</span>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center gap-[5px]">
+                          <div className="size-[16px] rounded-full overflow-hidden ring-1 ring-[rgba(63,69,68,0.08)]">
+                            <ImageWithFallback src={community?.logo} alt="" className="size-full object-cover" />
+                          </div>
+                          <span className="text-[11px] font-['Figtree'] text-[#3f4544] opacity-55 max-w-[80px] truncate">{community?.name}</span>
+                        </div>
+                      </div>
+
+                      <h4 className="text-[16px] font-heading font-semibold text-[#1b362e] leading-[1.3] line-clamp-2">
+                        {event.title}
+                      </h4>
+
+                      <div className="flex items-center gap-[12px]">
+                        <div className="flex items-center gap-[4px]">
+                          <Calendar size={13} className="text-[#2D5A4C] opacity-60" />
+                          <span className="text-[12px] font-['Figtree'] font-medium text-[#3f4544] opacity-75">
+                            {format(eventDate, 'EEE, dd MMM')}
+                          </span>
+                        </div>
+                        <div className="w-[3px] h-[3px] bg-[#d4d4d4] rounded-full" />
+                        <span className="text-[12px] font-['Figtree'] font-semibold text-[#2D5A4C]">
+                          {format(eventDate, 'hh:mm a')}
+                        </span>
+                      </div>
+
+                      <div className="flex items-center gap-[12px]">
+                        <div className="flex items-center gap-[5px]">
+                          <div className="size-[18px] rounded-full bg-[#E8F0ED] flex items-center justify-center">
+                            <Crown size={10} weight="fill" className="text-[#2D5A4C]" />
+                          </div>
+                          <span className="text-[12px] font-['Figtree'] text-[#3f4544] opacity-70">{event.host_name}</span>
+                        </div>
+                        <div className="w-[3px] h-[3px] bg-[#d4d4d4] rounded-full" />
+                        <div className="flex items-center gap-[4px]">
+                          <VideoConference size={13} className="text-[#3f4544] opacity-40" />
+                          <span className="text-[12px] font-['Figtree'] text-[#3f4544] opacity-60">Online</span>
+                        </div>
+                      </div>
+
+                      <div className="w-full h-[1px] bg-[#f0efe9] mt-[2px]" />
+
+                      <div className="flex items-center justify-between mt-[2px]">
+                        <div className="flex items-center gap-[10px]">
+                          <div className="flex -space-x-[6px]">
+                            {event.attendee_ids.slice(0, 4).map((id, i) => (
+                              <div
+                                key={id}
+                                className={`size-[24px] rounded-full ${AVATAR_COLORS[i % AVATAR_COLORS.length]} flex items-center justify-center ring-[1.5px] ring-white text-[9px] font-['Figtree'] font-bold text-[#3f4544]/60`}
+                                style={{ zIndex: 4 - i }}
+                              >
+                                {AVATAR_INITIALS[i % AVATAR_INITIALS.length]}
+                              </div>
+                            ))}
+                            {event.attendee_ids.length > 4 && (
+                              <div
+                                className="size-[24px] rounded-full bg-[#f3f3f3] flex items-center justify-center ring-[1.5px] ring-white text-[9px] font-['Figtree'] font-bold text-[#3f4544]/50"
+                                style={{ zIndex: 0 }}
+                              >
+                                +{event.attendee_ids.length - 4}
+                              </div>
+                            )}
+                          </div>
+                          <div className="flex flex-col">
+                            <span className="text-[11px] font-['Figtree'] font-medium text-[#3f4544] opacity-60 leading-tight">
+                              {spotsLeft} spots left
+                            </span>
+                          </div>
+                        </div>
+
+                        <button
+                          className={`px-[16px] py-[8px] rounded-[10px] text-[13px] font-['Figtree'] font-semibold flex items-center gap-[6px] transition-colors ${bookedEventTitles.includes(event.title)
+                            ? 'bg-[#E8F0ED] text-[#2D5A4C] shadow-none'
+                            : 'bg-[#2D5A4C] text-white shadow-[0px_2px_6px_rgba(45,90,76,0.2)] hover:bg-[#244a3e]'
+                            }`}
+                        >
+                          {bookedEventTitles.includes(event.title) ? (
+                            <>
+                              Booked
+                              <Check size={13} weight="bold" />
+                            </>
+                          ) : isFree ? (
+                            <>
+                              RSVP
+                              <ArrowRight size={13} weight="bold" />
+                            </>
+                          ) : (
+                            <>
+                              <Ticket size={14} weight="bold" />
+                              Get Ticket
+                            </>
+                          )}
+                        </button>
                       </div>
                     </div>
-                  </motion.div>
+                  </div>
                 );
               })
             ) : (
               <div className="flex flex-col items-center justify-center py-20 px-8 text-center bg-white/50 rounded-2xl border border-dashed border-gray-200">
                 <p className="text-[14px] font-heading font-medium text-[#3f4544] opacity-70">
-                  You haven't joined any communities
+                  No events found matching "{searchQuery}"
+                </p>
+              </div>
+            )}
+          </div>
+        )}
+
+        {activeTab === 'Joined' && (
+          <div className="space-y-2">
+            {COMMUNITIES.filter(c => communityStatuses[c.id] === 'joined')
+              .filter(c =>
+                c.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                c.description.toLowerCase().includes(searchQuery.toLowerCase())
+              ).length > 0 ? (
+              COMMUNITIES.filter(c => communityStatuses[c.id] === 'joined')
+                .filter(c =>
+                  c.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                  c.description.toLowerCase().includes(searchQuery.toLowerCase())
+                ).map((community) => {
+                  const chat = chats.find(c => c.id === community.id);
+                  return (
+                    <motion.div
+                      key={community.id}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      whileTap={{ scale: 0.98 }}
+                      onClick={() => onSelectCommunity?.(community)}
+                      className="bg-white rounded-[12px] p-3 flex items-center gap-3 cursor-pointer hover:bg-white/80 transition-colors shadow-sm"
+                    >
+                      <div className="relative">
+                        <div className="w-[47px] h-[47px] rounded-full overflow-hidden shrink-0 bg-[#f3f3f3]">
+                          <ImageWithFallback
+                            src={community.logo}
+                            alt={community.name}
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                        <div className="absolute -bottom-1 -right-1 bg-white p-1 rounded-full shadow-sm border border-gray-50">
+                          <Users size={12} weight="bold" className="text-[#2d5a4c]" />
+                        </div>
+                      </div>
+
+                      <div className="flex-1 min-w-0">
+                        <div className="flex justify-between items-center mb-0.5">
+                          <div className="flex items-center gap-2 min-w-0">
+                            <h3 className="text-[14px] font-['Figtree'] font-medium text-[#272d2c] truncate">
+                              {community.name}
+                            </h3>
+                            <div className="bg-[#e8f0ed] px-1.5 py-0.5 rounded-full flex items-center gap-1 shrink-0">
+                              <Check size={8} weight="bold" className="text-[#2d5a4c]" />
+                              <span className="text-[8px] font-bold text-[#2d5a4c] uppercase tracking-wider">Member</span>
+                            </div>
+                          </div>
+                          <span className="text-[11px] font-['Figtree'] text-[#b7b9b9]">
+                            {chat?.time || 'Now'}
+                          </span>
+                        </div>
+                        <div className="flex items-center justify-between gap-2">
+                          <div className="flex items-center gap-1.5 min-w-0">
+                            {chat?.status === 'read' ? (
+                              <Checks size={16} className="text-[#2d5a4c] shrink-0" />
+                            ) : (
+                              <Check size={16} className="text-[#b7b9b9] shrink-0" />
+                            )}
+                            <p className="text-[14px] font-['Figtree'] text-[#3f4544] truncate opacity-70">
+                              {chat?.message || community.description}
+                            </p>
+                          </div>
+                          {chat && chat.unread > 0 && (
+                            <div className="min-w-[18px] h-[18px] bg-[#2d5a4c] rounded-full flex items-center justify-center px-1">
+                              <span className="text-[10px] font-['Figtree'] font-medium text-white">
+                                {chat.unread}
+                              </span>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </motion.div>
+                  );
+                })
+            ) : (
+              <div className="flex flex-col items-center justify-center py-20 px-8 text-center bg-white/50 rounded-2xl border border-dashed border-gray-200">
+                <p className="text-[14px] font-heading font-medium text-[#3f4544] opacity-70">
+                  {searchQuery.trim()
+                    ? `No communities found matching "${searchQuery}"`
+                    : "You haven't joined any communities"}
                 </p>
               </div>
             )}
           </div>
         )}
       </div>
-
 
       {/* Bottom Navigation */}
       <BottomNav activeView="teamup" onNavigate={onNavigate} hasUnreadChats={hasUnreadChats} />
